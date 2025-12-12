@@ -1,0 +1,77 @@
+#!/bin/bash
+# Fresh Install Script for Arch Hyprland Setup
+# This script installs all necessary packages for the configuration
+
+set -e  # Exit on error
+
+
+echo "=================================="
+echo "Arch Hyprland Config Installer"
+echo "=================================="
+echo ""
+
+# Check if running on Arch-based system
+if ! command -v pacman &> /dev/null; then
+    echo "Error: This script requires an Arch-based system with pacman."
+    exit 1
+fi
+
+# Check if yay is installed, install if not
+if ! command -v yay &> /dev/null; then
+    echo "Installing yay AUR helper..."
+    sudo pacman -S --needed git base-devel
+    git clone https://aur.archlinux.org/yay.git /tmp/yay
+    cd /tmp/yay
+    makepkg -si --noconfirm
+    cd -
+    rm -rf /tmp/yay
+fi
+
+echo ""
+echo "Installing core Wayland/Hyprland packages..."
+yay -S --needed --noconfirm \
+    hyprland \
+    hyprpaper \
+    waybar \
+    rofi \
+    mako \
+    polkit-gnome
+
+echo ""
+echo "Installing terminal and applications..."
+yay -S --needed --noconfirm \
+    kitty \
+    firefox \
+    nautilus
+
+echo ""
+echo "Installing system utilities..."
+yay -S --needed --noconfirm \
+    network-manager-applet \
+    blueman \
+    pavucontrol \
+    cliphist \
+    wl-clipboard \
+    grim \
+    slurp \
+    playerctl
+
+echo ""
+echo "Installing fonts..."
+yay -S --needed --noconfirm \
+    ttf-font-awesome \
+    ttf-jetbrains-mono-nerd \
+    noto-fonts \
+    noto-fonts-emoji
+
+echo ""
+echo "=================================="
+echo "Installation Complete!"
+echo "=================================="
+echo ""
+echo "Next steps:"
+echo "1. Log out and select Hyprland from your display manager"
+echo "2. Or run 'Hyprland' from a TTY"
+echo ""
+echo "Your config files are already in ~/.config/"
+echo ""

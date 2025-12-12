@@ -1,0 +1,281 @@
+2025-12-09 02:16:26.663 [info] Extension host with pid 11850 started
+2025-12-09 02:16:26.663 [info] Skipping acquiring lock for /home/alex/.config/Code/User/workspaceStorage/d532cb1e823bd47438a2e29068285bd9.
+2025-12-09 02:16:26.802 [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+2025-12-09 02:16:26.822 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
+2025-12-09 02:16:26.889 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: true, activationEvent: '*'
+2025-12-09 02:16:26.908 [info] ExtensionService#_doActivateExtension vscode.github, startup: true, activationEvent: '*'
+2025-12-09 02:16:26.965 [info] Eager extensions activated
+2025-12-09 02:16:26.971 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2025-12-09 02:16:26.974 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2025-12-09 02:16:31.699 [info] ExtensionService#_doActivateExtension vscode.git, startup: false, activationEvent: 'api', root cause: vscode.github
+2025-12-09 02:16:31.733 [info] ExtensionService#_doActivateExtension GitHub.copilot-chat, startup: false, activationEvent: 'onChatSession:copilotcli'
+2025-12-09 02:16:32.276 [info] ExtensionService#_doActivateExtension vscode.microsoft-authentication, startup: false, activationEvent: 'onAuthenticationRequest:microsoft'
+2025-12-09 02:16:32.327 [error] Error: chatParticipant must be declared in package.json: claude-code
+    at QKt.$registerAgent (vscode-file://vscode-app/opt/visual-studio-code/resources/app/out/vs/workbench/workbench.desktop.main.js:511:6057)
+2025-12-09 02:16:48.055 [info] ExtensionService#_doActivateExtension vscode.typescript-language-features, startup: false, activationEvent: 'onLanguage:javascript'
+2025-12-09 02:31:33.267 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 02:36:33.283 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 02:41:33.267 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 02:46:33.274 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 02:51:33.276 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 02:56:33.280 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:01:33.279 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:06:33.293 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:11:33.293 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:16:33.307 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:21:33.293 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:26:33.301 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:31:33.297 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:36:33.312 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:41:33.306 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:46:33.319 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:51:33.325 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 03:56:33.335 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 04:01:33.337 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 04:06:33.372 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 04:11:33.377 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 05:01:33.424 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 05:11:33.427 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 05:16:33.430 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 05:21:33.430 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 05:36:33.461 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 05:46:33.475 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 14:37:11.125 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 14:42:11.118 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 14:47:11.114 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 15:07:11.140 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 15:12:11.147 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:07:11.184 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:12:11.190 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:17:11.185 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:22:11.196 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:27:11.195 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:32:11.202 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:37:11.198 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:42:11.213 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:47:11.211 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:52:11.210 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 16:57:11.208 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:02:11.211 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:07:11.218 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:12:11.223 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:17:11.225 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:22:11.225 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:27:11.324 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:32:11.235 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:37:11.236 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:42:11.238 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:47:11.243 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:52:11.246 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 17:57:11.249 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:02:11.250 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:07:11.254 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:12:11.260 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:17:11.262 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:22:11.263 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:27:11.259 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:32:11.261 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:37:11.271 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:42:11.272 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:47:11.275 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-09 18:52:11.277 [error] Error: net::ERR_INTERNET_DISCONNECTED
+	at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/utility_init:2:10610)
+	at SimpleURLLoaderWrapper.emit (node:events:519:28)
+	at SimpleURLLoaderWrapper.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-12-11 22:42:08.881 [info] ExtensionService#_doActivateExtension vscode.terminal-suggest, startup: false, activationEvent: 'onTerminalShellIntegration:*'
+2025-12-11 22:42:10.269 [info] ExtensionService#_doActivateExtension vscode.npm, startup: false, activationEvent: 'onTerminalQuickFixRequest:ms-vscode.npm-command'

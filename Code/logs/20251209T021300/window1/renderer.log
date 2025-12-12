@@ -1,0 +1,11 @@
+2025-12-09 02:13:00.907 [info] ChatSessionStore: Migrating 0 chat sessions from storage service to file system
+2025-12-09 02:13:01.029 [info] Started local extension host with pid 10363.
+2025-12-09 02:13:01.066 [info] Started initializing default profile extensions in extensions installation folder. file:///home/alex/.vscode/extensions
+2025-12-09 02:13:01.266 [info] Completed initializing default profile extensions in extensions installation folder. file:///home/alex/.vscode/extensions
+2025-12-09 02:13:01.467 [info] MCP Registry configured: https://api.mcp.github.com
+2025-12-09 02:13:01.763 [info] Settings Sync: Account status changed from uninitialized to unavailable
+2025-12-09 02:13:03.707 [info] [perf] Render performance baseline is 15ms
+2025-12-09 02:14:34.758 [error] [Extension Host] (node:10363) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+2025-12-09 02:14:34.760 [error] [Extension Host] (node:10363) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+2025-12-09 02:14:35.985 [error] chatParticipant must be declared in package.json: claude-code

@@ -1,0 +1,143 @@
+2025-12-09 02:16:25.954 [info] ChatSessionStore: Migrating 0 chat sessions from storage service to file system
+2025-12-09 02:16:26.093 [info] Started local extension host with pid 11850.
+2025-12-09 02:16:26.277 [info] MCP Registry configured: https://api.mcp.github.com
+2025-12-09 02:16:26.687 [info] Settings Sync: Account status changed from uninitialized to unavailable
+2025-12-09 02:16:28.587 [info] [perf] Render performance baseline is 11ms
+2025-12-09 02:16:32.171 [error] [Extension Host] (node:11850) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+2025-12-09 02:16:32.171 [error] [Extension Host] (node:11850) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+2025-12-09 02:16:32.328 [error] chatParticipant must be declared in package.json: claude-code
+2025-12-09 02:16:32.754 [warning] No extension contribution found for chat session type: copilot-cloud-agent
+2025-12-09 02:16:32.755 [warning] No extension contribution found for chat session type: copilot-cloud-agent
+2025-12-09 02:31:33.270 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 02:36:33.285 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 02:41:33.270 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 02:46:33.277 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 02:51:33.278 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 02:56:33.283 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:01:33.281 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:06:33.296 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:11:33.296 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:16:28.669 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 03:16:33.309 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:21:28.678 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 03:21:33.296 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:26:28.685 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 03:26:33.303 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:31:28.690 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 03:31:33.300 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:36:28.698 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 03:36:33.314 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:41:28.707 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 03:41:33.308 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:46:28.711 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 03:46:33.321 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:51:28.719 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 03:51:33.328 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 03:56:28.727 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 03:56:33.337 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 04:01:28.739 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 04:01:33.340 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 04:06:28.749 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 04:06:33.374 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 04:11:28.755 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 04:11:33.379 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 05:01:33.427 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 05:11:33.429 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 05:16:28.934 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 05:16:33.432 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 05:21:28.938 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 05:21:33.433 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 05:36:33.463 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 05:46:33.478 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 06:58:44.894 [info] Extension host (LocalProcess pid: 11850) is unresponsive.
+2025-12-09 06:58:46.000 [info] Extension host (LocalProcess pid: 11850) is responsive.
+2025-12-09 06:58:46.273 [info] UNRESPONSIVE extension host: received responsive event and cancelling profiling session
+2025-12-09 06:58:53.240 [info] UNRESPONSIVE extension host: starting to profile NOW
+2025-12-09 07:02:09.323 [info] Extension host (LocalProcess pid: 11850) is unresponsive.
+2025-12-09 07:02:09.876 [info] Extension host (LocalProcess pid: 11850) is responsive.
+2025-12-09 07:02:09.919 [info] UNRESPONSIVE extension host: received responsive event and cancelling profiling session
+2025-12-09 07:02:12.852 [info] UNRESPONSIVE extension host: starting to profile NOW
+2025-12-09 14:37:11.128 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 14:42:11.122 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 14:47:11.117 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 15:07:11.142 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 15:12:11.149 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:07:11.187 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:12:11.193 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:17:11.187 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:22:11.201 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:27:00.577 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 16:27:11.198 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:32:00.592 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 16:32:11.204 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:37:00.611 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 16:37:11.200 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:42:00.622 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 16:42:11.215 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:47:00.634 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 16:47:11.214 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:52:00.643 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 16:52:11.213 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 16:57:00.652 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 16:57:11.211 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:02:00.664 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:02:11.214 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:07:00.674 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:07:11.221 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:12:00.689 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:12:11.225 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:17:00.698 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:17:11.227 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:22:00.706 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:22:11.227 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:27:00.718 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:27:11.326 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:32:00.735 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:32:11.238 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:37:00.744 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:37:11.238 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:42:00.754 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:42:11.241 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:47:00.762 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:47:11.246 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:52:00.773 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:52:11.248 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 17:57:00.782 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 17:57:11.250 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:02:00.792 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:02:11.253 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:07:00.807 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:07:11.259 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:12:00.816 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:12:11.264 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:17:00.831 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:17:11.265 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:22:00.839 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:22:11.266 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:27:00.844 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:27:11.262 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:32:00.852 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:32:11.263 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:37:00.863 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:37:11.273 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:42:00.872 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:42:11.274 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:47:00.881 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:47:11.277 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-09 18:52:00.890 [warning] Failed to fetch chat participant registry Offline
+2025-12-09 18:52:11.281 [error] An unknown error occurred. Please consult the log for more details.
+2025-12-11 22:40:13.560 [warning] Failed to fetch chat participant registry Failed to fetch
+2025-12-11 22:40:13.565 [error] Error while getting the latest version for the extension github.copilot from https://marketplace.visualstudio.com/_apis/public/gallery/vscode/{publisher}/{name}/latest. Trying the fallback https://www.vscode-unpkg.net/_gallery/{publisher}/{name}/latest Failed
+2025-12-11 22:40:13.576 [error] Error while getting the latest version for the extension github.copilot-chat from https://marketplace.visualstudio.com/_apis/public/gallery/vscode/{publisher}/{name}/latest. Trying the fallback https://www.vscode-unpkg.net/_gallery/{publisher}/{name}/latest Failed
+2025-12-11 22:40:13.666 [error] Error while getting the latest version for the extension github.copilot. TypeError: Failed to fetch
+2025-12-11 22:40:13.668 [error] Error while getting the latest version for the extension github.copilot-chat. TypeError: Failed to fetch
+2025-12-11 22:42:36.242 [error] [LanguageModelToolsService#invokeTool] Error from tool run_in_terminal with parameters {"command":"cd /home/alex/.config && git init","explanation":"Initialize a new git repository in .config directory","isBackground":false}:
+Canceled: Canceled: Canceled
+    at Cdt.invokeTool (vscode-file://vscode-app/opt/visual-studio-code/resources/app/out/vs/workbench/workbench.desktop.main.js:2239:4186)
+    at async ZKt.$invokeTool (vscode-file://vscode-app/opt/visual-studio-code/resources/app/out/vs/workbench/workbench.desktop.main.js:511:13328)
+2025-12-11 22:44:21.885 [warning] [File Watcher (node.js)] Watcher shutdown because watched path got deleted
+2025-12-11 22:44:49.729 [error] [LanguageModelToolsService#invokeTool] Error from tool run_in_terminal with parameters {"command":"cd /home/alex/.config && git add -A && git commit -m \"Local configuration updates\"","explanation":"Commit all your local changes first","isBackground":false}:
+Canceled: Canceled: Canceled
+    at Cdt.invokeTool (vscode-file://vscode-app/opt/visual-studio-code/resources/app/out/vs/workbench/workbench.desktop.main.js:2239:4186)
+    at async ZKt.$invokeTool (vscode-file://vscode-app/opt/visual-studio-code/resources/app/out/vs/workbench/workbench.desktop.main.js:511:13328)

@@ -1,0 +1,98 @@
+2025-12-09 02:16:25.630 [info] update#setState idle
+2025-12-09 02:16:55.627 [info] update#setState checking for updates
+2025-12-09 02:16:55.668 [info] update#setState idle
+2025-12-09 03:16:55.629 [info] update#setState checking for updates
+2025-12-09 03:16:55.637 [error] #3: https://update.code.visualstudio.com/api/update/linux-arm64/stable/bf9252a2fb45be6893dd8870c0bf37e2e1766d61?bg=true - error undefined net::ERR_INTERNET_DISCONNECTED
+2025-12-09 03:16:55.639 [error] Error: net::ERR_INTERNET_DISCONNECTED
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:2:123970)
+    at SimpleURLLoaderWrapper.emit (node:events:519:28)
+2025-12-09 03:16:55.640 [info] update#setState idle
+2025-12-09 04:16:55.633 [info] update#setState checking for updates
+2025-12-09 04:16:55.728 [info] update#setState idle
+2025-12-09 05:16:55.641 [info] update#setState checking for updates
+2025-12-09 05:16:55.652 [error] #5: https://update.code.visualstudio.com/api/update/linux-arm64/stable/bf9252a2fb45be6893dd8870c0bf37e2e1766d61?bg=true - error undefined net::ERR_INTERNET_DISCONNECTED
+2025-12-09 05:16:55.653 [error] Error: net::ERR_INTERNET_DISCONNECTED
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:2:123970)
+    at SimpleURLLoaderWrapper.emit (node:events:519:28)
+2025-12-09 05:16:55.653 [info] update#setState idle
+2025-12-09 06:16:55.648 [info] update#setState checking for updates
+2025-12-09 06:16:55.756 [info] update#setState idle
+2025-12-09 06:58:27.135 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 06:58:37.797 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 06:58:44.892 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 07:01:38.487 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 07:01:57.338 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 07:02:09.306 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 07:02:27.384 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 07:06:13.915 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 07:06:41.389 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 07:16:55.656 [info] update#setState checking for updates
+2025-12-09 07:16:55.740 [info] update#setState idle
+2025-12-09 08:16:55.665 [info] update#setState checking for updates
+2025-12-09 08:16:55.749 [info] update#setState idle
+2025-12-09 09:16:55.672 [info] update#setState checking for updates
+2025-12-09 09:16:55.760 [info] update#setState idle
+2025-12-09 10:16:55.679 [info] update#setState checking for updates
+2025-12-09 10:16:55.770 [info] update#setState idle
+2025-12-09 11:16:55.686 [info] update#setState checking for updates
+2025-12-09 11:16:55.798 [info] update#setState idle
+2025-12-09 12:16:55.689 [info] update#setState checking for updates
+2025-12-09 12:16:55.778 [info] update#setState idle
+2025-12-09 13:16:55.692 [info] update#setState checking for updates
+2025-12-09 13:16:55.783 [info] update#setState idle
+2025-12-09 14:16:55.694 [info] update#setState checking for updates
+2025-12-09 14:16:55.774 [info] update#setState idle
+2025-12-09 15:16:55.701 [info] update#setState checking for updates
+2025-12-09 15:16:55.893 [error] #15: https://update.code.visualstudio.com/api/update/linux-arm64/stable/bf9252a2fb45be6893dd8870c0bf37e2e1766d61?bg=true - error undefined net::ERR_CERT_DATE_INVALID
+2025-12-09 15:16:55.893 [error] Error: net::ERR_CERT_DATE_INVALID
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:2:123970)
+    at SimpleURLLoaderWrapper.emit (node:events:519:28)
+2025-12-09 15:16:55.894 [info] update#setState idle
+2025-12-09 16:16:55.708 [info] update#setState checking for updates
+2025-12-09 16:16:55.719 [error] #16: https://update.code.visualstudio.com/api/update/linux-arm64/stable/bf9252a2fb45be6893dd8870c0bf37e2e1766d61?bg=true - error undefined net::ERR_INTERNET_DISCONNECTED
+2025-12-09 16:16:55.720 [error] Error: net::ERR_INTERNET_DISCONNECTED
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:2:123970)
+    at SimpleURLLoaderWrapper.emit (node:events:519:28)
+2025-12-09 16:16:55.720 [info] update#setState idle
+2025-12-09 17:16:55.719 [info] update#setState checking for updates
+2025-12-09 17:16:55.731 [error] #17: https://update.code.visualstudio.com/api/update/linux-arm64/stable/bf9252a2fb45be6893dd8870c0bf37e2e1766d61?bg=true - error undefined net::ERR_INTERNET_DISCONNECTED
+2025-12-09 17:16:55.732 [error] Error: net::ERR_INTERNET_DISCONNECTED
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:2:123970)
+    at SimpleURLLoaderWrapper.emit (node:events:519:28)
+2025-12-09 17:16:55.732 [info] update#setState idle
+2025-12-09 18:16:55.732 [info] update#setState checking for updates
+2025-12-09 18:16:55.744 [error] #18: https://update.code.visualstudio.com/api/update/linux-arm64/stable/bf9252a2fb45be6893dd8870c0bf37e2e1766d61?bg=true - error undefined net::ERR_INTERNET_DISCONNECTED
+2025-12-09 18:16:55.745 [error] Error: net::ERR_INTERNET_DISCONNECTED
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:2:123970)
+    at SimpleURLLoaderWrapper.emit (node:events:519:28)
+2025-12-09 18:16:55.746 [info] update#setState idle
+2025-12-09 19:16:55.739 [info] update#setState checking for updates
+2025-12-09 19:16:55.823 [error] #19: https://update.code.visualstudio.com/api/update/linux-arm64/stable/bf9252a2fb45be6893dd8870c0bf37e2e1766d61?bg=true - error undefined net::ERR_CERT_DATE_INVALID
+2025-12-09 19:16:55.823 [error] Error: net::ERR_CERT_DATE_INVALID
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:2:123970)
+    at SimpleURLLoaderWrapper.emit (node:events:519:28)
+2025-12-09 19:16:55.824 [info] update#setState idle
+2025-12-09 19:47:56.583 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 19:48:09.521 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 19:49:19.131 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 19:54:59.342 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 19:55:05.534 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 19:57:37.043 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 19:58:19.091 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 19:58:46.952 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 19:58:59.370 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 20:00:01.585 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 20:00:13.327 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 20:00:25.271 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 20:00:37.516 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 20:02:35.274 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 20:02:41.515 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 20:02:54.127 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-09 20:11:38.730 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-11 22:40:13.499 [warning] No ptyHost heartbeat after 6 seconds
+2025-12-11 22:40:13.500 [info] update#setState checking for updates
+2025-12-11 22:40:13.549 [error] #20: https://update.code.visualstudio.com/api/update/linux-arm64/stable/bf9252a2fb45be6893dd8870c0bf37e2e1766d61?bg=true - error undefined net::ERR_NAME_NOT_RESOLVED
+2025-12-11 22:40:13.549 [error] Error: net::ERR_NAME_NOT_RESOLVED
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:2:123970)
+    at SimpleURLLoaderWrapper.emit (node:events:519:28)
+2025-12-11 22:40:13.549 [info] update#setState idle

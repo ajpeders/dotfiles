@@ -1,0 +1,38 @@
+2025-12-09 02:14:35.935 [info] [GitExtensionServiceImpl] Initializing Git extension service.
+2025-12-09 02:14:35.935 [info] [GitExtensionServiceImpl] Successfully activated the vscode.git extension.
+2025-12-09 02:14:35.935 [info] [GitExtensionServiceImpl] Enablement state of the vscode.git extension: true.
+2025-12-09 02:14:35.935 [info] [GitExtensionServiceImpl] Successfully registered Git commit message provider.
+2025-12-09 02:14:36.262 [info] Allowing anonymous access with devDeviceId
+2025-12-09 02:14:36.264 [info] Using the Electron fetcher.
+2025-12-09 02:14:36.483 [info] Got Copilot token for devDeviceId
+2025-12-09 02:14:36.483 [info] Copilot Chat: 0.33.5, VS Code: 1.106.3
+2025-12-09 02:14:36.488 [info] activationBlocker from 'languageModelAccess' took for 543ms
+2025-12-09 02:14:36.742 [info] Fetched model metadata in 789ms 5f7306c3-6a11-4d2b-82be-ce822f20ada1
+2025-12-09 02:14:36.779 [info] Latest entry: ccreq:latest.copilotmd
+2025-12-09 02:14:36.780 [info] ccreq:886d71a5.copilotmd | markdown
+2025-12-09 02:14:40.107 [info] copilot token chat_enabled: true, sku: no_auth_limited_copilot
+2025-12-09 02:14:40.107 [info] GitHub.vscode-pull-request-github extension is not yet activated.
+2025-12-09 02:14:40.117 [warning] Unable to fetch remote agents because user is not signed in.
+2025-12-09 02:14:40.118 [info] copilot token chat_enabled: true, sku: no_auth_limited_copilot
+2025-12-09 02:14:40.118 [info] activationBlocker from 'conversationFeature' took for 4175ms
+2025-12-09 02:14:40.180 [info] Fetched model metadata in 73ms f967789b-536c-4f43-95bf-1e15668e1b12
+2025-12-09 02:14:40.181 [info] ccreq:7a96a5a8.copilotmd | markdown
+2025-12-09 02:14:41.990 [info] Refetch model metadata: Succeeded in 199ms b9471856-c48c-4bb4-9628-17d5d63a7d3f (8569:658F0:127CCFB:160AA1B:6937E882) using node-fetch with status 403.
+2025-12-09 02:14:42.163 [info] Refetch model metadata: Succeeded in 173ms bedd6602-7e0e-426f-a7a9-23b4688bbc5f (933E:128CAA:12C2E7E:1651E0C:6937E882) using electron-fetch with status 403.
+2025-12-09 02:14:42.334 [info] Refetch model metadata: Succeeded in 171ms 4983279b-7e46-484b-ad9f-b0ad8f749652 (8938:258A0F:1236A70:15C6693:6937E882) using node-http with status 403.
+2025-12-09 02:14:48.038 [info] ccreq:7b0ff3df.copilotmd | success | gpt-5-mini -> gpt-5-mini-2025-08-07 | 7363ms | [panel/editAgent]
+2025-12-09 02:14:48.330 [info] message 0 returned. finish reason: [stop]
+2025-12-09 02:14:48.330 [info] request done: requestId: [ac4f3c2e-56f0-4fc7-9f45-f430631d2a69] model deployment ID: []
+2025-12-09 02:14:48.331 [info] ccreq:77402866.copilotmd | success | gpt-4o-mini -> gpt-4o-mini-2024-07-18 | 278ms | [title]
+2025-12-09 02:14:48.333 [info] message 0 returned. finish reason: [stop]
+2025-12-09 02:14:48.333 [info] request done: requestId: [35de0638-a10b-405b-87b0-d56d46037018] model deployment ID: []
+2025-12-09 02:14:48.334 [info] ccreq:a48fcc89.copilotmd | success | gpt-4o-mini -> gpt-4o-mini-2024-07-18 | 278ms | [title]
+2025-12-09 02:15:18.821 [info] Registering default platform agent...
+2025-12-09 02:15:18.838 [info] Logged in as ajpeders
+2025-12-09 02:15:19.153 [info] Got Copilot token for ajpeders
+2025-12-09 02:15:19.153 [info] Copilot Chat: 0.33.5, VS Code: 1.106.3
+2025-12-09 02:15:19.160 [info] copilot token chat_enabled: true, sku: monthly_subscriber_quota
+2025-12-09 02:15:19.160 [info] [code-referencing] Public code references are enabled.
+2025-12-09 02:15:19.217 [info] BYOK: Copilot Chat known models list fetched successfully.
+2025-12-09 02:15:19.425 [info] Fetched model metadata in 265ms 25959be1-b5d5-4d39-b0a5-c21e901b94a3
+2025-12-09 02:15:19.426 [info] ccreq:2fb907b1.copilotmd | markdown

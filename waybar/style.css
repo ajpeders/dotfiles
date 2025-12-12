@@ -1,0 +1,191 @@
+@import "../theme/colors.css";
+
+/* ===== Global Styles ===== */
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font", "Font Awesome 6 Free", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 24px;
+}
+
+window#waybar {
+    background: transparent;
+    color: @fg;
+    margin-bottom: 0px;
+}
+
+#workspaces,
+#window,
+#clock,
+#mpris,
+#status {
+    background: @bg_blur;
+    margin: 4px 8px 0px 8px;
+    padding: 0px 0px;
+    border-radius: 12px;
+    border: 2px solid alpha(@accent, 0.3);
+}
+
+#workspaces,
+#status {
+    padding: 2px 2px;
+}
+
+#workspaces button,
+#status > * {
+    padding: 0px 12px;
+    background: transparent;
+    color: @fg;
+    border: 1px solid alpha(@fg, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#workspaces button:first-child,
+#status > *:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+#workspaces button:last-child,
+#status > *:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* Buttons - Hover State */
+#workspaces button:hover {
+    background: alpha(@accent, 0.15);
+    color: @fg;
+    border: 1px solid alpha(@accent, 0.3);
+}
+
+/* Workspace Active State */
+#workspaces button.active {
+    background: linear-gradient(135deg, alpha(@accent, 0.3), alpha(@cyan, 0.2));
+    color: @accent;
+    font-weight: 700;
+    border: 1px solid alpha(@accent, 0.5);
+}
+
+/* ===== Left ===== */
+.modules-left {
+    margin-right: 0;
+}
+
+/* Window Title */
+#window {
+    font-weight: 500;
+    padding: 0px 12px;
+    margin-right: 0;
+}
+
+/* ===== Center ===== */
+.modules-center {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Clock */
+#clock {
+    font-weight: 700;
+    border: 2px solid alpha(@accent, 0.3);
+    padding: 0px 12px;
+}
+
+/* ===== Right ===== */
+.modules-left {
+    margin-left: 0;
+}
+
+/* Media & Audio */
+#mpris {
+    padding: 0px 16px;
+}
+
+/* Status Group */
+#status #idle_inhibitor {
+    padding: 0px 12px 0px 10px;
+}
+
+#status #pulseaudio {
+    padding: 0px 8px 0px 0px;
+}
+
+
+/* ===== System Modules ===== */
+#status #cpu,
+#status #memory,
+#status #disk {
+    padding: 0px 14px 0 0;
+}
+
+#status #temperature,
+#status #network {
+    padding: 0px 12px 0 2px;
+}
+
+#status #tray {
+    padding: 0px 8px 0 6px;
+}
+
+/*
+#network,
+#cpu,
+#memory,
+#temperature,
+#disk,
+#backlight,
+#idle_inhibitor,
+#tray {
+    padding: 0px 14px 0 0;
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid alpha(@accent, 0.3);
+} */
+/*
+#battery:hover,
+#network:hover,
+#cpu:hover,
+#memory:hover,
+#temperature:hover,
+#disk:hover,
+#backlight:hover,
+#idle_inhibitor:hover {
+    background: @bg_surface;
+    border: 2px solid alpha(@accent, 0.5);
+} */
+
+/* ===== Battery States ===== */
+/* #battery.charging {
+    color: @fg;
+    background: @bg_blur;
+    border: 2px solid alpha(@accent, 0.3);
+}
+
+#battery.warning:not(.charging) {
+    color: @yellow;
+    background: @bg_blur;
+    border: 2px solid alpha(@yellow, 0.5);
+}
+
+#battery.critical:not(.charging) {
+    color: @red;
+    background: @bg_blur;
+    border: 2px solid alpha(@red, 0.5);
+} */
+
+/* ===== Temperature States ===== */
+/* #temperature.critical {
+    color: @red;
+    background: @bg_blur;
+    border: 2px solid alpha(@red, 0.5);
+} */
+
+/* ===== Idle Inhibitor States ===== */
+/* #idle_inhibitor.activated {
+    color: @fg;
+    background: @bg_blur;
+    border: 2px solid alpha(@accent, 0.3);
+} */

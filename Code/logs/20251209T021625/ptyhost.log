@@ -1,0 +1,1 @@
+2025-12-09 02:21:18.993 [error] Failed to set sticky bit on /tmp/alex-code-zsh: Error: ENOENT: no such file or directory, chmod '/tmp/alex-code-zsh'
