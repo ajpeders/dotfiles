@@ -1,1 +1,0 @@
-/home/alex/.mydotfiles/com.ml4w.dotfiles.stable/.config/zshrc
