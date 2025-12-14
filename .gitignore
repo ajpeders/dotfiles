@@ -1,0 +1,33 @@
+# Ignore everything by default
+*
+*/
+
+# But include these specific config files
+!.gitignore
+!config_todo.md
+!pavucontrol.ini
+
+# Neofetch
+!neofetch/
+!neofetch/config.conf
+
+# Waypaper
+!waypaper/
+!waypaper/config.ini
+
+# Hyprland
+!hypr/
+!hypr/**
+
+# Kitty
+!kitty/
+!kitty/**
+
+# Themes
+!theme/
+!theme/**
+
+# Waybar
+!waybar/
+!waybar/**
+
