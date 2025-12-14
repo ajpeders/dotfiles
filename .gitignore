@@ -1,55 +1,18 @@
-# Ignore cache and temporary files
-Code/
-Code - OSS/
-CurseForge/
-discord/
-Electron/
-go/
-pulse/
-systemd/
-Thunar/
-xfce4/
-yay/
-dconf/
-
-# Ignore specific files
-*.log
-*.pid
-*.sock
-*SingletonCookie
-*SingletonLock
-*SingletonSocket
-Cookies*
-DIPS*
-machineid
-Preferences
-SharedStorage*
-TransportSecurity
-Trust\ Tokens*
-Network\ Persistent\ State
+# Ignore everything by default
+*
+*/
 
 # Keep configuration directories
+!.gitignore
 !waybar/
 !hypr/
 !theme/
-!rofi/
 !kitty/
-!nvim/
-!walker/
-!swaync/
-!wlogout/
 !waypaper/
-!fastfetch/
-!fish/
-!ohmyposh/
-!gtk-3.0/
-!gtk-4.0/
-!qt6ct/
-!cava/
 
-# Keep config files
-!*.conf
-!*.css
-!*.json
-!bashrc
-!zshrc
+# Keep config files in tracked directories
+!waybar/**
+!hypr/**
+!theme/**
+!kitty/**
+!waypaper/**
