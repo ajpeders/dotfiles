@@ -1,6 +1,14 @@
+/* ============================================
+   Waybar Configuration Stylesheet
+   ============================================ */
+
 @import "../theme/colors.css";
 
-/* ===== Global Styles ===== */
+/* ============================================
+   Global Styles
+   ============================================ */
+
+/* Reset default styling for all elements */
 * {
     border: none;
     border-radius: 0;
@@ -10,15 +18,22 @@
     min-height: 24px;
 }
 
-window#waybar {
+/* Main waybar window - transparent background */
+#waybar {
     background: transparent;
     color: @fg;
     margin-bottom: 0px;
 }
 
+/* ============================================
+   Module Containers
+   ============================================ */
+
+/* Common styling for main module containers */
+#tray,
 #workspaces,
 #window,
-#clock,
+#center,
 #mpris,
 #status {
     background: @bg_blur;
@@ -26,13 +41,25 @@ window#waybar {
     padding: 0px 0px;
     border-radius: 12px;
     border: 2px solid alpha(@accent, 0.3);
+    
 }
 
+/* Inner padding for grouped modules */
 #workspaces,
+#center,
 #status {
     padding: 2px 2px;
 }
 
+#tray {
+    padding: 0px 8px;
+}   
+
+/* ============================================
+   Buttons & Interactive Elements
+   ============================================ */
+
+/* Base styling for workspace buttons and status items */
 #workspaces button,
 #status > * {
     padding: 0px 12px;
@@ -42,26 +69,28 @@ window#waybar {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Rounded corners for first element in groups */
 #workspaces button:first-child,
 #status > *:first-child {
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
 }
 
+/* Rounded corners for last element in groups */
 #workspaces button:last-child,
 #status > *:last-child {
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
 }
 
-/* Buttons - Hover State */
+/* Hover effect for workspace buttons */
 #workspaces button:hover {
     background: alpha(@accent, 0.15);
     color: @fg;
     border: 1px solid alpha(@accent, 0.3);
 }
 
-/* Workspace Active State */
+/* Active workspace highlighting with gradient */
 #workspaces button.active {
     background: linear-gradient(135deg, alpha(@accent, 0.3), alpha(@cyan, 0.2));
     color: @accent;
@@ -69,123 +98,93 @@ window#waybar {
     border: 1px solid alpha(@accent, 0.5);
 }
 
-/* ===== Left ===== */
+/* ============================================
+   Left Modules
+   ============================================ */
+
 .modules-left {
     margin-right: 0;
 }
 
-/* Window Title */
+/* Window title styling */
 #window {
     font-weight: 500;
     padding: 0px 12px;
     margin-right: 0;
 }
 
-/* ===== Center ===== */
+/* ============================================
+   Center Modules
+   ============================================ */
+
 .modules-center {
     margin-left: 0;
     margin-right: 0;
 }
 
-/* Clock */
+/* Clock with emphasized styling */
 #clock {
-    font-weight: 700;
-    border: 2px solid alpha(@accent, 0.3);
     padding: 0px 12px;
 }
 
-/* ===== Right ===== */
-.modules-left {
+#custom-weather {
+    padding-right: 12px;
+    letter-spacing: -2px;
+}
+/* ============================================
+   Right Modules
+   ============================================ */
+
+.modules-right {
     margin-left: 0;
 }
 
-/* Media & Audio */
+/* Media player (MPRIS) controls */
 #mpris {
     padding: 0px 16px;
 }
 
-/* Status Group */
+/* ============================================
+   Status Group Modules
+   ============================================ */
+
+/* Idle inhibitor indicator */
 #status #idle_inhibitor {
     padding: 0px 12px 0px 10px;
 }
 
+/* Audio/volume control */
 #status #pulseaudio {
     padding: 0px 8px 0px 0px;
 }
 
+/* Custom notification modules */
+#status #custom-notifications {
+    padding: 0px 12px;
+}
 
-/* ===== System Modules ===== */
+/* System resource monitors */
 #status #cpu,
 #status #memory,
-#status #disk {
-    padding: 0px 14px 0 0;
+#status #disk,
+#status #custom-gpu,
+#status #pulseaudio,
+#status #battery {
+    padding: 0px 8px;
+    font-size: 13px;
 }
 
+#status #custom-gpu {
+    padding: 0px 8px;
+}
+
+/* Temperature and network status */
 #status #temperature,
 #status #network {
-    padding: 0px 12px 0 2px;
+    padding: 0px 12px 0px 8px;
 }
 
+/* System tray */
 #status #tray {
     padding: 0px 8px 0 6px;
 }
-
-/*
-#network,
-#cpu,
-#memory,
-#temperature,
-#disk,
-#backlight,
-#idle_inhibitor,
-#tray {
-    padding: 0px 14px 0 0;
-    border-radius: 10px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid alpha(@accent, 0.3);
-} */
-/*
-#battery:hover,
-#network:hover,
-#cpu:hover,
-#memory:hover,
-#temperature:hover,
-#disk:hover,
-#backlight:hover,
-#idle_inhibitor:hover {
-    background: @bg_surface;
-    border: 2px solid alpha(@accent, 0.5);
-} */
-
-/* ===== Battery States ===== */
-/* #battery.charging {
-    color: @fg;
-    background: @bg_blur;
-    border: 2px solid alpha(@accent, 0.3);
-}
-
-#battery.warning:not(.charging) {
-    color: @yellow;
-    background: @bg_blur;
-    border: 2px solid alpha(@yellow, 0.5);
-}
-
-#battery.critical:not(.charging) {
-    color: @red;
-    background: @bg_blur;
-    border: 2px solid alpha(@red, 0.5);
-} */
-
-/* ===== Temperature States ===== */
-/* #temperature.critical {
-    color: @red;
-    background: @bg_blur;
-    border: 2px solid alpha(@red, 0.5);
-} */
-
-/* ===== Idle Inhibitor States ===== */
-/* #idle_inhibitor.activated {
-    color: @fg;
-    background: @bg_blur;
-    border: 2px solid alpha(@accent, 0.3);
-} */
