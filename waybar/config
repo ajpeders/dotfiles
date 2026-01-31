@@ -1,15 +1,27 @@
 {
+    // ============================================
+    // General Settings
+    // ============================================
     "layer": "top",
-    "position": "tp",
-    "height": 18,
+    "position": "top",
+    "height": 32,
     "spacing": 0,
-    
     "expand-left": true,
     "fixed-center": true,
     
-    "modules-left": ["hyprland/workspaces", "hyprland/window"],
-    "modules-center": ["clock"],
+    // ============================================
+    // Module Layout
+    // ============================================
+    "modules-left": ["tray", "hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["group/center"],
     "modules-right": ["mpris", "group/status"],
+
+    // ============================================
+    // Left Modules
+    // ============================================
+    "tray": {
+        "spacing": 10
+    },
 
     "hyprland/workspaces": {
         "format": "{id}",
@@ -26,6 +38,14 @@
         "max-length": 500,
         "separate-outputs": true
     },
+
+    // ============================================
+    // Center Modules
+    // ============================================
+    "group/center": {
+        "orientation": "horizontal",
+        "modules": ["clock", "custom/weather"]
+    },
     
     "clock": {
         "interval": 1,
@@ -41,13 +61,24 @@
             }
         }
     },
+
+    "custom/weather": {
+        "format": "{}",
+        "exec": "~/.config/waybar/scripts/weather.sh",
+        "return-type": "json",
+        "interval": 1800
+    },
+
+    // ============================================
+    // Right Modules - Media
+    // ============================================
     "mpris": {
-        "format": "{player_icon} {title} - {artist}",
-        "format-paused": "{status_icon} {player_icon} {title} - {artist}",
+        "format": "{player_icon} {dynamic}",
+        "format-paused": "{status_icon} {player_icon} {dynamic}",
         "format-stopped": "",
-
+        "dynamic-order": ["title", "artist"],
+        "dynamic-separator": " - ",
         "player": "playerctld",
-
         "player-icons": {
             "default": "🎵",
             "firefox": "🦊"
@@ -57,9 +88,97 @@
             "paused": "⏸",
             "stopped": "⏹"
         },
-
         "max-length": 500,
+        "on-click": "playerctl play-pause",
+        "on-click-right": "playerctl stop",
+        "on-scroll-up": "playerctl next",
+        "on-scroll-down": "playerctl previous",
         "tooltip-format": "{player}: {title} - {artist}\n{album}"
+    },
+
+    // ============================================
+    // Right Modules - Status Group
+    // ============================================
+    "group/status": {
+        "orientation": "horizontal",
+        "modules": ["idle_inhibitor", "custom/notifications", "cpu", "memory", "custom/gpu", "disk", "backlight", "pulseaudio", "battery", "network"]
+    },
+
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "󰅶",
+            "deactivated": "󰾪"
+        },
+        "tooltip-format-activated": "Idle inhibitor active",
+        "tooltip-format-deactivated": "Idle inhibitor inactive"
+    },
+
+    "custom/notifications": {
+        "format": "{}",
+        "exec": "~/.config/waybar/scripts/notifications.sh",
+        "interval": 5,
+        "on-click": "~/.config/waybar/scripts/notification-menu.sh",
+        "on-click-right": "dunstctl close-all",
+        "tooltip": false
+    },
+
+    // ============================================
+    // System Monitoring
+    // ============================================
+    "cpu": {
+        "interval": 2,
+        "format": "易 {usage}%",
+        "tooltip": true,
+        "tooltip-format": "Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz\nUsage: {usage}%\nLoad: {load}"
+    },
+    
+    "memory": {
+        "interval": 5,
+        "format": "󰍛 {percentage}%",
+        "tooltip-format": "RAM: {used:0.1f}G / {total:0.1f}G\nSwap: {swapUsed:0.1f}G / {swapTotal:0.1f}G"
+    },
+    
+    "disk": {
+        "interval": 30,
+        "format": "󰋊 {percentage_used}%",
+        "path": "/",
+        "tooltip-format": "Used: {used} / {total}\nFree: {free} ({percentage_free}%)"
+    },
+
+    "custom/gpu": {
+        "format": "󰍹 {}",
+        "exec": "~/.config/waybar/scripts/gpu.sh",
+        "return-type": "json",
+        "interval": 5
+    },
+
+    "temperature": {
+        "critical-threshold": 80,
+        "format": "{icon} {temperatureC}°C",
+        "format-icons": ["", "", "", "", ""],
+        "tooltip-format": "Temperature: {temperatureC}°C"
+    },
+
+    // ============================================
+    // Hardware Controls
+    // ============================================
+    "backlight": {
+        "device": "intel_backlight",
+        "format": "{icon} {percent}%",
+        "format-icons": ["󰃞", "󰃟", "󰃠"],
+        "tooltip-format": "Brightness: {percent}%",
+        "on-scroll-up": "brightnessctl set 5%+",
+        "on-scroll-down": "brightnessctl set 5%-"
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰖁 Muted",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "on-click": "pavucontrol"
     },
 
     "battery": {
@@ -72,78 +191,15 @@
         "format-plugged": " {capacity}%",
         "format-icons": ["", "", "", "", ""]
     },
-    
+
+    // ============================================
+    // Network
+    // ============================================
     "network": {
-        "format-wifi": " {essid}",
-        "format-ethernet": " Wired",
-        "format-disconnected": "⚠ Disconnected",
+        "format-wifi": "󰖩 {essid}",
+        "format-ethernet": "󰈀 {ifname}",
+        "format-disconnected": "󰖪 Disconnected",
         "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
         "on-click": "nm-connection-editor"
-    },
-    
-    "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-muted": " Muted",
-        "format-icons": {
-            "default": ["", "", ""]
-        },
-        "on-click": "pavucontrol"
-    },
-    
-    "tray": {
-        "spacing": 10
-    },
-    
-    "idle_inhibitor": {
-        "format": "{icon}",
-        "format-icons": {
-            "activated": "󰅶",
-            "deactivated": "󰾪"
-        },
-        "tooltip-format-activated": "Idle inhibitor active",
-        "tooltip-format-deactivated": "Idle inhibitor inactive"
-    },
-    
-    "group/status": {
-        "orientation": "horizontal",
-        "modules": ["idle_inhibitor", "cpu", "memory", "temperature", "disk", "backlight", "pulseaudio", "network", "battery", "tray"]
-        //("modules-right": ["mpris", "idle_inhibitor", "cpu", "memory", "temperature", "disk", "backlight", "pulseaudio", "network", "battery", "tray"],
-    
-    },
-    
-    "cpu": {
-        "interval": 2,
-        "format": "  {usage}%",
-        "tooltip": true,
-        "tooltip-format": "CPU Usage: {usage}%\nLoad: {load}"
-    },
-    
-    "memory": {
-        "interval": 5,
-        "format": "  {percentage}%",
-        "tooltip-format": "RAM: {used:0.1f}G / {total:0.1f}G\nSwap: {swapUsed:0.1f}G / {swapTotal:0.1f}G"
-    },
-    
-    "temperature": {
-        "critical-threshold": 80,
-        "format": "{icon} {temperatureC}°C",
-        "format-icons": ["", "", "", "", ""],
-        "tooltip-format": "Temperature: {temperatureC}°C"
-    },
-    
-    "disk": {
-        "interval": 30,
-        "format": "  {percentage_used}%",
-        "path": "/",
-        "tooltip-format": "Used: {used} / {total}\nFree: {free} ({percentage_free}%)"
-    },
-    
-    "backlight": {
-        "device": "intel_backlight",
-        "format": "{icon} {percent}%",
-        "format-icons": ["󰃞", "󰃟", "󰃠"],
-        "tooltip-format": "Brightness: {percent}%",
-        "on-scroll-up": "brightnessctl set 5%+",
-        "on-scroll-down": "brightnessctl set 5%-"
-    },
+    }
 }
