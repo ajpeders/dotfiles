@@ -10,6 +10,8 @@
 !kitty/
 !waypaper/
 !rofi/
+!dunst/
+!rofimoji.rc
 
 # Keep config files in tracked directories
 !waybar/**
