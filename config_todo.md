@@ -1,1 +1,0 @@
-- waypaper not lauching penguins on startup
