@@ -1,0 +1,124 @@
+/*******************************************************************************
+ * ROFI FLOATING THEME - Centered with Big Icons
+ *******************************************************************************/
+
+* {
+    bg:              #0f0f17;
+    bg-blur:         #0f0f17f5;
+    bg-surface:      #1a1a26;
+    bg-highlight:    #24242f;
+    
+    fg:              #d8dee9;
+    fg-dim:          #a6adc8;
+    
+    accent:          #89b4fa;
+    accent-glow:     #89b4fa40;
+    
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+window {
+    background-color: @bg-blur;
+    border:           3px;
+    border-color:     @accent;
+    border-radius:    20px;
+    padding:          24px;
+    width:            650px;
+    location:         center;
+    y-offset:         -100;
+    
+    /* Shadow effect */
+    transparency:     "real";
+}
+
+mainbox {
+    background-color: transparent;
+    spacing:          16px;
+    children:         [ inputbar, listview, message ];
+}
+
+inputbar {
+    background-color: @bg-surface;
+    border:           2px solid;
+    border-color:     @accent;
+    border-radius:    14px;
+    padding:          14px 18px;
+    spacing:          12px;
+    children:         [ prompt, entry ];
+}
+
+prompt {
+    background-color: transparent;
+    text-color:       @accent;
+    font:             "JetBrainsMono Nerd Font Bold 13";
+}
+
+entry {
+    background-color: transparent;
+    text-color:       @fg;
+    placeholder:      "What are you looking for?";
+    placeholder-color: @fg-dim;
+    cursor:           text;
+}
+
+listview {
+    background-color: transparent;
+    columns:          1;
+    lines:            7;
+    spacing:          8px;
+    cycle:            true;
+    dynamic:          true;
+    scrollbar:        false;
+    fixed-height:     false;
+}
+
+element {
+    background-color: transparent;
+    text-color:       @fg;
+    orientation:      horizontal;
+    border-radius:    12px;
+    padding:          12px 16px;
+    spacing:          14px;
+}
+
+element normal.normal {
+    background-color: transparent;
+}
+
+element alternate.normal {
+    background-color: @bg-highlight;
+}
+
+element selected.normal {
+    background-color: @accent;
+    text-color:       @bg;
+}
+
+element-icon {
+    background-color: transparent;
+    size:             40px;
+    cursor:           inherit;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       inherit;
+    cursor:           inherit;
+    vertical-align:   0.5;
+    font:             "JetBrainsMono Nerd Font Medium 11";
+}
+
+message {
+    background-color: @bg-surface;
+    border:           2px;
+    border-color:     @accent-glow;
+    border-radius:    12px;
+    padding:          12px;
+}
+
+textbox {
+    background-color: transparent;
+    text-color:       @fg-dim;
+    font:             "JetBrainsMono Nerd Font 10";
+}
