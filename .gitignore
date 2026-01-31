@@ -9,6 +9,7 @@
 !theme/
 !kitty/
 !waypaper/
+!rofi/
 
 # Keep config files in tracked directories
 !waybar/**
@@ -16,3 +17,5 @@
 !theme/**
 !kitty/**
 !waypaper/**
+!rofi/**
+!config_todo.md

@@ -1,0 +1,211 @@
+/*******************************************************************************
+ * ROFI MODERN THEME - Beautiful with Icons
+ * Based on your color scheme
+ *******************************************************************************/
+
+* {
+    /* Colors from your theme */
+    bg:              #0f0f17;
+    bg-blur:         #0f0f17aa;
+    bg-surface:      #1a1a26;
+    bg-surface-high: #24242f;
+    
+    fg:              #d8dee9;
+    fg-dim:          #a6adc8;
+    
+    accent:          #89b4fa;
+    accent-2:        #74c7ec;
+    accent-3:        #89dceb;
+    accent-inactive: #45475a;
+    
+    red:             #bf616a;
+    yellow:          #ebcb8b;
+    green:           #a3be8c;
+    blue:            #81a1c1;
+    cyan:            #8fbcbb;
+    magenta:         #b48ead;
+    
+    /* Rofi specific */
+    background-color: transparent;
+    text-color:       @fg;
+    
+    spacing:          8;
+    border-color:     @accent;
+    separatorcolor:   @accent-inactive;
+}
+
+window {
+    background-color: @bg-blur;
+    border:           3px;
+    border-color:     @accent;
+    border-radius:    16px;
+    padding:          20px;
+    width:            700px;
+    location:         center;
+    anchor:           center;
+}
+
+mainbox {
+    background-color: transparent;
+    spacing:          15px;
+    children:         [ inputbar, message, listview ];
+}
+
+inputbar {
+    background-color: @bg-surface;
+    text-color:       @fg;
+    border:           2px;
+    border-color:     @accent-inactive;
+    border-radius:    12px;
+    padding:          12px 16px;
+    spacing:          10px;
+    children:         [ prompt, textbox-prompt-colon, entry ];
+}
+
+prompt {
+    background-color: transparent;
+    text-color:       @accent;
+    font:             "JetBrainsMono Nerd Font Bold 13";
+}
+
+textbox-prompt-colon {
+    expand:           false;
+    str:              "›";
+    text-color:       @accent-2;
+    background-color: transparent;
+    margin:           0px 4px 0px 0px;
+}
+
+entry {
+    background-color: transparent;
+    text-color:       @fg;
+    placeholder:      "Search...";
+    placeholder-color: @fg-dim;
+    cursor:           text;
+    blink:            true;
+}
+
+message {
+    background-color: @bg-surface;
+    border:           2px;
+    border-color:     @accent-inactive;
+    border-radius:    10px;
+    padding:          10px;
+}
+
+textbox {
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+listview {
+    background-color: transparent;
+    columns:          1;
+    lines:            8;
+    spacing:          6px;
+    cycle:            false;
+    dynamic:          true;
+    layout:           vertical;
+    scrollbar:        true;
+}
+
+scrollbar {
+    background-color: @bg-surface;
+    handle-color:     @accent;
+    border-radius:    8px;
+    handle-width:     6px;
+    padding:          0;
+    margin:           0px 0px 0px 4px;
+}
+
+element {
+    background-color: transparent;
+    text-color:       @fg;
+    orientation:      horizontal;
+    border-radius:    10px;
+    padding:          10px 12px;
+    spacing:          10px;
+}
+
+element normal.normal {
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+element normal.urgent {
+    background-color: @red;
+    text-color:       @bg;
+}
+
+element normal.active {
+    background-color: @bg-surface;
+    text-color:       @accent;
+}
+
+element selected.normal {
+    background-color: @accent;
+    text-color:       @bg;
+    border:           0px;
+    border-radius:    10px;
+}
+
+element selected.urgent {
+    background-color: @red;
+    text-color:       @bg;
+}
+
+element selected.active {
+    background-color: @accent;
+    text-color:       @bg;
+}
+
+element alternate.normal {
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+element alternate.urgent {
+    background-color: @red;
+    text-color:       @bg;
+}
+
+element alternate.active {
+    background-color: @bg-surface;
+    text-color:       @accent;
+}
+
+element-icon {
+    background-color: transparent;
+    size:             32px;
+    cursor:           inherit;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       inherit;
+    cursor:           inherit;
+    vertical-align:   0.5;
+    horizontal-align: 0.0;
+}
+
+/* Mode switcher */
+mode-switcher {
+    background-color: @bg-surface;
+    border:           2px;
+    border-color:     @accent-inactive;
+    border-radius:    10px;
+    padding:          4px;
+    spacing:          4px;
+}
+
+button {
+    background-color: transparent;
+    text-color:       @fg-dim;
+    border-radius:    8px;
+    padding:          8px 16px;
+}
+
+button selected {
+    background-color: @accent;
+    text-color:       @bg;
+}

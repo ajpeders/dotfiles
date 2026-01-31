@@ -1,0 +1,39 @@
+/*******************************************************************************
+ * ROFI CONFIG - Modern & Beautiful
+ *******************************************************************************/
+
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    icon-theme: "Papirus-Dark";
+    display-drun: " Apps";
+    display-run: " Run";
+    display-window: " Windows";
+    drun-display-format: "{icon} {name}";
+    font: "JetBrainsMono Nerd Font 12";
+    
+    /* Performance */
+    lazy-grab: false;
+    plugin-path: "/usr/lib/rofi";
+    
+    /* Behavior */
+    matching: "fuzzy";
+    tokenize: true;
+    hover-select: true;
+    me-select-entry: "";
+    me-accept-entry: "MousePrimary";
+    scroll-method: 0;
+    
+    /* Keybindings */
+    kb-row-up: "Up,Control+k";
+    kb-row-down: "Down,Control+j";
+    kb-accept-entry: "Return,KP_Enter";
+    kb-remove-to-eol: "";
+    kb-mode-next: "Shift+Right,Control+Tab";
+    kb-mode-previous: "Shift+Left,Control+ISO_Left_Tab";
+    kb-row-left: "Control+Page_Up";
+    kb-row-right: "Control+Page_Down";
+}
+
+/* Import theme */
+@theme "~/.config/rofi/themes/modern.rasi"
