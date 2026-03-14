@@ -1,0 +1,64 @@
+@import url("wallust-colors.css");
+
+* {
+    color: @theme_fg_color;
+    caret-color: @theme_fg_color;
+}
+
+window,
+dialog,
+popover,
+.background {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+headerbar,
+.titlebar {
+    background: alpha(@color0, 0.72);
+    border-bottom: 1px solid @borders;
+    color: @theme_fg_color;
+}
+
+entry,
+spinbutton,
+combobox,
+button,
+menu,
+menuitem {
+    background-color: alpha(@color0, 0.45);
+    border: 1px solid @borders;
+    color: @theme_fg_color;
+}
+
+button:hover,
+menuitem:hover {
+    background-color: alpha(@accent_color, 0.25);
+}
+
+scale trough,
+progressbar trough,
+levelbar trough {
+    background-color: alpha(@color0, 0.50);
+    border-radius: 999px;
+}
+
+scale highlight,
+progressbar progress,
+levelbar block.filled,
+trough highlight {
+    background-color: @accent_color;
+    border-radius: 999px;
+}
+
+switch:checked,
+check:checked,
+radio:checked {
+    background-color: alpha(@accent_color, 0.88);
+    color: @theme_selected_fg_color;
+}
+
+selection {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+}
