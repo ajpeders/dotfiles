@@ -2,20 +2,9 @@
  * ROFI COMPACT THEME - Grid Layout with Icons
  *******************************************************************************/
 
+@import "~/.config/rofi/themes/wallust-colors.rasi"
+
 * {
-    /* Colors */
-    bg:              #0f0f17;
-    bg-blur:         #0f0f17dd;
-    bg-surface:      #1a1a26;
-    bg-surface-high: #24242f;
-    
-    fg:              #d8dee9;
-    fg-dim:          #a6adc8;
-    
-    accent:          #89b4fa;
-    accent-2:        #74c7ec;
-    accent-inactive: #45475a;
-    
     background-color: transparent;
     text-color:       @fg;
     spacing:          8;
@@ -24,7 +13,7 @@
 window {
     background-color: @bg-blur;
     border:           3px;
-    border-color:     @accent;
+    border-color:     @border-main;
     border-radius:    16px;
     padding:          16px;
     width:            800px;

@@ -18,6 +18,9 @@ configuration {
     
     /* Behavior */
     matching: "fuzzy";
+    drun-match-fields: "name,generic,exec,categories,keywords,comment";
+    sort: true;
+    case-sensitive: false;
     tokenize: true;
     hover-select: true;
     me-select-entry: "";
