@@ -4,7 +4,7 @@
     // ============================================
     "layer": "top",
     "position": "top",
-    "height": 30,
+    "height": 32,
     "spacing": 0,
     "expand-left": true,
     "fixed-center": true,
@@ -12,32 +12,23 @@
     // ============================================
     // Module Layout
     // ============================================
-    "modules-left": ["hyprland/workspaces", "hyprland/window"],
-    "modules-center": ["clock"],
-    "modules-right": [
-        "group/media",
-        "temperature",
-        // "disk",
-        // "memory",
-        // "network",
-        "custom/weather",
-        "custom/swaync",
-        "tray"
-    ],
+    "modules-left": ["tray", "hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["group/center"],
+    "modules-right": ["mpris", "group/status"],
 
     // ============================================
     // Left Modules
     // ============================================
     "tray": {
-        "icon-size": 16,
-        "spacing": 8,
-        "show-passive-items": true
+        "spacing": 10
     },
 
     "hyprland/workspaces": {
         "format": "{id}",
         "on-click": "activate",
-        "active-only": false
+        "persistent-workspaces": {
+            "*": 5
+        }
     },
     
     "hyprland/window": {
@@ -51,6 +42,11 @@
     // ============================================
     // Center Modules
     // ============================================
+    "group/center": {
+        "orientation": "horizontal",
+        "modules": ["clock", "custom/weather"]
+    },
+    
     "clock": {
         "interval": 1,
         "format": "{:%a %b %d  %I:%M:%S %p}",
@@ -73,43 +69,26 @@
         "interval": 1800
     },
 
-    "custom/swaync": {
-        "tooltip-format": "Left: Notifications\nRight: Do not disturb",
-        "format": "{icon}",
-        "format-icons": {
-            "notification": "",
-            "none": "",
-            "dnd-notification": "",
-            "dnd-none": "",
-            "inhibited-notification": "",
-            "inhibited-none": "",
-            "dnd-inhibited-notification": "",
-            "dnd-inhibited-none": ""
-        },
-        "return-type": "json",
-        "exec-if": "which swaync-client",
-        "exec": "swaync-client -swb",
-        "on-click": "swaync-client -t -sw",
-        "on-click-right": "swaync-client -d -sw",
-        "escape": true
-    },
-
-    "group/media": {
-        "orientation": "horizontal",
-        "modules": ["mpris", "pulseaudio"]
-    },
-
     // ============================================
     // Right Modules - Media
     // ============================================
     "mpris": {
-        "format": "[Now] {dynamic}",
-        "format-paused": "[Pause] {dynamic}",
+        "format": "{player_icon} {dynamic}",
+        "format-paused": "{status_icon} {player_icon} {dynamic}",
         "format-stopped": "",
         "dynamic-order": ["title", "artist"],
         "dynamic-separator": " - ",
         "player": "playerctld",
-        "max-length": 72,
+        "player-icons": {
+            "default": "🎵",
+            "firefox": "🦊"
+        },
+        "status-icons": {
+            "playing": "▶",
+            "paused": "⏸",
+            "stopped": "⏹"
+        },
+        "max-length": 500,
         "on-click": "playerctl play-pause",
         "on-click-right": "playerctl stop",
         "on-scroll-up": "playerctl next",
@@ -122,7 +101,7 @@
     // ============================================
     "group/status": {
         "orientation": "horizontal",
-        "modules": ["custom/notifications", "network", "pulseaudio", "clock"]
+        "modules": ["idle_inhibitor", "custom/notifications", "cpu", "memory", "disk", "custom/gpu", "backlight", "pulseaudio", "battery"]
     },
 
     "idle_inhibitor": {
@@ -149,26 +128,26 @@
     // ============================================
     "cpu": {
         "interval": 2,
-        "format": "易 {usage}%",
+        "format": "CPU\n  {usage}%",
         "tooltip": true,
         "tooltip-format": "Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz\nUsage: {usage}%\nLoad: {load}"
     },
     
     "memory": {
         "interval": 5,
-        "format": "󰍛 {percentage}%",
+        "format": "MEM\n  {percentage}%",
         "tooltip-format": "RAM: {used:0.1f}G / {total:0.1f}G\nSwap: {swapUsed:0.1f}G / {swapTotal:0.1f}G"
     },
     
     "disk": {
         "interval": 30,
-        "format": "󰋊 {percentage_used}%",
+        "format": "DISK\n  {percentage_used}%",
         "path": "/",
         "tooltip-format": "Used: {used} / {total}\nFree: {free} ({percentage_free}%)"
     },
 
     "custom/gpu": {
-        "format": "󰍹 {}",
+        "format": "{}",
         "exec": "~/.config/waybar/scripts/gpu.sh",
         "return-type": "json",
         "interval": 5
@@ -194,10 +173,10 @@
     },
 
     "pulseaudio": {
-        "format": "Vol {volume}%",
-        "format-muted": "Vol Off",
+        "format": "VOL\n{icon} {volume}%",
+        "format-muted": "VOL\n Muted",
         "format-icons": {
-            "default": ["󰕿", "󰖀", "󰕾"]
+            "default": ["", "", ""]
         },
         "on-click": "pavucontrol"
     },
@@ -207,9 +186,9 @@
             "warning": 30,
             "critical": 15
         },
-        "format": "{icon} {capacity}%",
-        "format-charging": " {capacity}%",
-        "format-plugged": " {capacity}%",
+        "format": "BAT\n{icon} {capacity}%",
+        "format-charging": "BAT\n {capacity}%",
+        "format-plugged": "BAT\n {capacity}%",
         "format-icons": ["", "", "", "", ""]
     },
 
@@ -217,9 +196,9 @@
     // Network
     // ============================================
     "network": {
-        "format-wifi": "WiFi {signalStrength}%",
-        "format-ethernet": "Ethernet",
-        "format-disconnected": "Offline",
+        "format-wifi": " {essid}",
+        "format-ethernet": " Wired",
+        "format-disconnected": "⚠ Disconnected",
         "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
         "on-click": "nm-connection-editor"
     }
