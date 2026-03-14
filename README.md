@@ -1,1 +1,1 @@
-built for my one true love, logan caskey <3
+run install script
