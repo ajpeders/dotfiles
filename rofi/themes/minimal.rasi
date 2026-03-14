@@ -2,17 +2,9 @@
  * ROFI MINIMAL THEME - Clean & Simple
  *******************************************************************************/
 
+@import "~/.config/rofi/themes/wallust-colors.rasi"
+
 * {
-    bg:              #0f0f17;
-    bg-blur:         #0f0f17f0;
-    bg-surface:      #1a1a26;
-    
-    fg:              #d8dee9;
-    fg-dim:          #a6adc8;
-    
-    accent:          #89b4fa;
-    accent-2:        #74c7ec;
-    
     background-color: transparent;
     text-color:       @fg;
 }
@@ -20,7 +12,7 @@
 window {
     background-color: @bg-blur;
     border:           2px;
-    border-color:     @accent;
+    border-color:     @border-main;
     border-radius:    12px;
     padding:          0;
     width:            600px;

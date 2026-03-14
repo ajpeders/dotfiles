@@ -3,28 +3,9 @@
  * Based on your color scheme
  *******************************************************************************/
 
+@import "~/.config/rofi/themes/wallust-colors.rasi"
+
 * {
-    /* Colors from your theme */
-    bg:              #0f0f17;
-    bg-blur:         #0f0f17aa;
-    bg-surface:      #1a1a26;
-    bg-surface-high: #24242f;
-    
-    fg:              #d8dee9;
-    fg-dim:          #a6adc8;
-    
-    accent:          #89b4fa;
-    accent-2:        #74c7ec;
-    accent-3:        #89dceb;
-    accent-inactive: #45475a;
-    
-    red:             #bf616a;
-    yellow:          #ebcb8b;
-    green:           #a3be8c;
-    blue:            #81a1c1;
-    cyan:            #8fbcbb;
-    magenta:         #b48ead;
-    
     /* Rofi specific */
     background-color: transparent;
     text-color:       @fg;
@@ -37,7 +18,7 @@
 window {
     background-color: @bg-blur;
     border:           3px;
-    border-color:     @accent;
+    border-color:     @border-main;
     border-radius:    16px;
     padding:          20px;
     width:            700px;
