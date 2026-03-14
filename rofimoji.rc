@@ -1,7 +1,0 @@
-action = type
-selector = rofi
-clipboarder = wl-copy
-typer = wtype
-skin-tone = neutral
-max-recent = 20
-selector-args = -i -matching fuzzy -sort

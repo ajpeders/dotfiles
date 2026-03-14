@@ -10,8 +10,11 @@
 !kitty/
 !waypaper/
 !rofi/
-!dunst/
-!rofimoji.rc
+!swaync/
+!wallust/
+!gtk-3.0/
+!gtk-4.0/
+!zsh/
 
 # Keep config files in tracked directories
 !waybar/**
@@ -20,4 +23,12 @@
 !kitty/**
 !waypaper/**
 !rofi/**
-!dunst/**
+!swaync/**
+!wallust/**
+!gtk-3.0/**
+!gtk-4.0/**
+!zsh/**
+
+# Ignore generated zsh runtime files
+zsh/.zcompdump*
+zsh/.zsh_history
