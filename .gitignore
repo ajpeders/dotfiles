@@ -32,3 +32,6 @@
 # Ignore generated zsh runtime files
 zsh/.zcompdump*
 zsh/.zsh_history
+
+# Ignore Claude Code tooling artifacts
+rofi/.superpowers/
