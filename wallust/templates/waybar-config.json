@@ -8,7 +8,7 @@
     "spacing": 0,
     "expand-left": true,
     "fixed-center": true,
-    
+
     // ============================================
     // Module Layout
     // ============================================
@@ -37,16 +37,21 @@
     "hyprland/workspaces": {
         "format": "{icon}",
         "format-icons": {
-            "1": "1", "2": "2", "3": "3", "4": "4", "5": "5",
-            "6": "dev",
-            "7": "server",
-            "8": "work",
-            "9": "game"
+            "1": "A",
+            "2": "S",
+            "3": "D",
+            "4": "F",
+            "5": "G",
+            "6": "H",
+            "7": "J",
+            "8": "8",
+            "9": "9",
+            "10": "0"
         },
         "on-click": "activate",
         "active-only": false
     },
-    
+
     "hyprland/window": {
         "format": "{title}",
         "icon": true,
@@ -65,10 +70,10 @@
         "calendar": {
             "mode": "month",
             "format": {
-                "months": "<span color='#89b4fa'><b>{}</b></span>",
-                "days": "<span color='#cdd6f4'>{}</span>",
-                "weekdays": "<span color='#f9e2af'><b>{}</b></span>",
-                "today": "<span color='#a6e3a1'><b><u>{}</u></b></span>"
+                "months": "<span color='{{color4}}'><b>{}</b></span>",
+                "days": "<span color='{{foreground}}'>{}</span>",
+                "weekdays": "<span color='{{color3}}'><b>{}</b></span>",
+                "today": "<span color='{{color2}}'><b><u>{}</u></b></span>"
             }
         }
     },
@@ -84,14 +89,14 @@
         "tooltip-format": "Left: Notifications\nRight: Do not disturb",
         "format": "{icon}",
         "format-icons": {
-            "notification": "",
-            "none": "",
-            "dnd-notification": "",
-            "dnd-none": "",
-            "inhibited-notification": "",
-            "inhibited-none": "",
-            "dnd-inhibited-notification": "",
-            "dnd-inhibited-none": ""
+            "notification": "",
+            "none": "",
+            "dnd-notification": "",
+            "dnd-none": "",
+            "inhibited-notification": "",
+            "inhibited-none": "",
+            "dnd-inhibited-notification": "",
+            "dnd-inhibited-none": ""
         },
         "return-type": "json",
         "exec-if": "which swaync-client",
@@ -156,17 +161,17 @@
     // ============================================
     "cpu": {
         "interval": 2,
-        "format": "易 {usage}%",
+        "format": "易 {usage}%",
         "tooltip": true,
         "tooltip-format": "Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz\nUsage: {usage}%\nLoad: {load}"
     },
-    
+
     "memory": {
         "interval": 5,
         "format": "󰍛 {percentage}%",
         "tooltip-format": "RAM: {used:0.1f}G / {total:0.1f}G\nSwap: {swapUsed:0.1f}G / {swapTotal:0.1f}G"
     },
-    
+
     "disk": {
         "interval": 30,
         "format": "󰋊 {percentage_used}%",

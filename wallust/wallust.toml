@@ -64,4 +64,4 @@ yazi.target = "~/.config/yazi/theme.toml"
 # Run commands when wallust is invoked. Useful to avoid scripting.
 #wallpaper = """swww img "$(find ~/Media/Pictures/Wallpapers -iregex '.*.\\(jpg\\|jpeg\\|png\\|gif\\)' -type f | shuf -n 1)" """
 # Apply palette changes in already-running UI components.
-reload_ui = """hyprctl reload >/dev/null 2>&1 || true; swaync-client --reload-css -sw >/dev/null 2>&1 || true; swaync-client --reload-config -sw >/dev/null 2>&1 || true; killall -SIGUSR2 waybar >/dev/null 2>&1 || true; ~/.config/wallust/apply-vscode-theme.sh >/dev/null 2>&1 || true"""
+reload_ui = """hyprctl reload >/dev/null 2>&1 || true; swaync-client --reload-css -sw >/dev/null 2>&1 || true; swaync-client --reload-config -sw >/dev/null 2>&1 || true; killall -SIGUSR2 waybar >/dev/null 2>&1 || true; ~/.config/wallust/apply-vscode-theme.sh >/dev/null 2>&1 || true; (sleep 2 && ~/.config/wallust/apply-vscode-theme.sh >/dev/null 2>&1) &"""

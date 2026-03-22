@@ -118,3 +118,5 @@ source $(dirname $(gem which colorls))/tab_complete.sh
 export PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
 alias lc='colorls -lA --sd'
 alias ls='colorls'
+
+unset zle_bracketed_paste
