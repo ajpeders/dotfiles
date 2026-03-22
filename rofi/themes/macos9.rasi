@@ -1,0 +1,151 @@
+/*******************************************************************************
+ * ROFI THEME - Mac OS 9 Classic (wallust colors)
+ *******************************************************************************/
+
+@import "~/.config/rofi/themes/wallust-colors.rasi"
+
+* {
+    background-color:   @bg;
+    text-color:         @fg;
+    border-color:       @accent-inactive;
+}
+
+window {
+    background-color:   @bg;
+    border:             1px;
+    border-color:       @accent-inactive;
+    border-radius:      0px;
+    padding:            0px;
+    width:              560px;
+    location:           center;
+    anchor:             center;
+}
+
+mainbox {
+    border:             0px;
+    padding:            0px;
+    children:           [ inputbar, listview, mode-switcher ];
+}
+
+/**** SEARCH ****/
+inputbar {
+    border:             0px 0px 1px 0px;
+    border-color:       @accent-inactive;
+    padding:            8px 12px;
+    spacing:            8px;
+    background-color:   @bg;
+    children:           [ prompt, entry ];
+}
+
+prompt {
+    background-color:   transparent;
+    text-color:         @accent;
+    font:               "JetBrainsMono Nerd Font Bold 12";
+    vertical-align:     0.5;
+}
+
+entry {
+    background-color:   transparent;
+    text-color:         @fg;
+    placeholder:        "type to search...";
+    placeholder-color:  @accent-inactive;
+    cursor:             text;
+    vertical-align:     0.5;
+}
+
+/**** LIST ****/
+listview {
+    background-color:   transparent;
+    columns:            1;
+    lines:              8;
+    spacing:            0px;
+    cycle:              false;
+    dynamic:            true;
+    scrollbar:          false;
+    border:             0px 0px 1px 0px;
+    border-color:       @accent-inactive;
+}
+
+element {
+    background-color:   transparent;
+    orientation:        horizontal;
+    border-radius:      0px;
+    padding:            5px 12px;
+    spacing:            10px;
+    border:             0px 0px 1px 0px;
+    border-color:       @bg-surface-high;
+}
+
+element normal.normal {
+    background-color:   transparent;
+    text-color:         @fg;
+}
+
+element normal.urgent {
+    background-color:   transparent;
+    text-color:         @red;
+}
+
+element normal.active {
+    background-color:   transparent;
+    text-color:         @accent;
+}
+
+element selected.normal {
+    background-color:   @accent;
+    text-color:         @bg;
+}
+
+element selected.urgent {
+    background-color:   @red;
+    text-color:         @bg;
+}
+
+element selected.active {
+    background-color:   @accent;
+    text-color:         @bg;
+}
+
+element alternate.normal {
+    background-color:   transparent;
+    text-color:         @fg;
+}
+
+element-icon {
+    background-color:   transparent;
+    size:               16px;
+    cursor:             inherit;
+    vertical-align:     0.5;
+}
+
+element-text {
+    background-color:   transparent;
+    text-color:         inherit;
+    cursor:             inherit;
+    vertical-align:     0.5;
+    horizontal-align:   0.0;
+}
+
+/**** MODE SWITCHER (bottom bar — < Apps > style) ****/
+mode-switcher {
+    background-color:   @bg;
+    border:             0px 0px 1px 0px;
+    border-color:       @accent-inactive;
+    padding:            4px;
+    spacing:            0px;
+}
+
+button {
+    background-color:   transparent;
+    text-color:         @fg;
+    padding:            4px 16px;
+    border:             0px;
+    cursor:             pointer;
+    border-radius:      0px;
+}
+
+button selected {
+    background-color:   @accent;
+    text-color:         @bg;
+    font:               "JetBrainsMono Nerd Font Bold 12";
+}
