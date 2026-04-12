@@ -1,0 +1,74 @@
+# Core Hyprland packages
+hyprland
+awww
+xdg-desktop-portal-hyprland
+
+# Terminal
+kitty
+
+# Status bar
+waybar
+
+# App launcher
+rofi
+
+# File manager
+thunar
+
+# Browser
+firefox
+
+# Notifications
+swaync
+
+# Authentication
+polkit-gnome
+
+# Clipboard
+wl-clipboard
+cliphist
+
+# Audio control (usually pre-installed)
+pipewire
+pipewire-pulse
+wireplumber
+
+# System tray applets
+network-manager-applet
+blueman
+
+# Screenshots
+grim
+slurp
+
+# Media controls
+playerctl
+
+# Brightness control
+brightnessctl
+
+# Dynamic theming
+wallust
+
+# Display configuration
+nwg-displays
+
+# Fonts and icons
+ttf-jetbrains-mono-nerd
+noto-fonts
+noto-fonts-emoji
+papirus-icon-theme
+
+# Shell
+zsh
+ruby
+
+# Display manager
+ly
+
+# Utilities
+git
+curl
+pavucontrol
+btop
+yazi
