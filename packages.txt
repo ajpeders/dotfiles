@@ -19,7 +19,7 @@ thunar
 firefox
 
 # Notifications
-swaync
+mako
 
 # Authentication
 polkit-gnome

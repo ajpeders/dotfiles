@@ -121,7 +121,6 @@
     border-left: 1px solid alpha(@menu_shadow, 0.5);
 }
 
-#custom-notifications,
 #custom-swaync,
 #network,
 #pulseaudio,
@@ -140,6 +139,22 @@
 #network:hover,
 #media #pulseaudio:hover {
     background: alpha(@menu_selected, 0.12);
+}
+
+#custom-swaync {
+    background: alpha(@menu_selected, 0.22);
+    color: @menu_selected_text;
+    margin: 3px 6px 3px 0px;
+    padding: 0px 12px;
+    border-radius: 8px;
+    border-top: 1px solid alpha(@menu_gloss, 0.35);
+    border-left: 1px solid alpha(@menu_gloss, 0.24);
+    border-right: 1px solid alpha(@menu_shadow, 0.82);
+    border-bottom: 1px solid alpha(@menu_shadow_dark, 0.92);
+}
+
+#custom-swaync:hover {
+    background: alpha(@menu_selected, 0.34);
 }
 
 #clock,

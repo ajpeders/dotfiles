@@ -50,7 +50,6 @@ palette = "softdark"
 kitty = { src = "kitty.conf", dst = '~/.cache/wallust/kitty.conf' }
 waybar = { src = "colors-waybar.css", dst = '~/.config/waybar/colors-waybar.css' }
 hypr = { src = "hypr-colors.conf", dst = '~/.cache/wallust/hypr-colors.conf' }
-swaync = { src = "swaync-colors.css", dst = '~/.config/swaync/colors.css' }
 gtk3 = { src = "gtk-colors.css", dst = '~/.config/gtk-3.0/wallust-colors.css' }
 gtk4 = { src = "gtk-colors.css", dst = '~/.config/gtk-4.0/wallust-colors.css' }
 vscode = { src = "vscode-wallust.json", dst = '~/.cache/wallust/vscode-wallust.json' }
@@ -64,4 +63,4 @@ yazi.target = "~/.config/yazi/theme.toml"
 # Run commands when wallust is invoked. Useful to avoid scripting.
 #wallpaper = """swww img "$(find ~/Media/Pictures/Wallpapers -iregex '.*.\\(jpg\\|jpeg\\|png\\|gif\\)' -type f | shuf -n 1)" """
 # Apply palette changes in already-running UI components.
-reload_ui = """hyprctl reload >/dev/null 2>&1 || true; swaync-client --reload-css -sw >/dev/null 2>&1 || true; swaync-client --reload-config -sw >/dev/null 2>&1 || true; killall -SIGUSR2 waybar >/dev/null 2>&1 || true; ~/.config/wallust/apply-vscode-theme.sh >/dev/null 2>&1 || true; (sleep 2 && ~/.config/wallust/apply-vscode-theme.sh >/dev/null 2>&1) &"""
+reload_ui = """hyprctl reload >/dev/null 2>&1 || true; killall -SIGUSR2 waybar >/dev/null 2>&1 || true; ~/.config/wallust/apply-vscode-theme.sh >/dev/null 2>&1 || true; (sleep 2 && ~/.config/wallust/apply-vscode-theme.sh >/dev/null 2>&1) &"""

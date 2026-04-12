@@ -21,7 +21,6 @@
         // "memory",
         // "network",
         "custom/weather",
-        "custom/swaync",
         "tray"
     ],
 
@@ -85,27 +84,6 @@
         "interval": 1800
     },
 
-    "custom/swaync": {
-        "tooltip-format": "Left: Notifications\nRight: Do not disturb",
-        "format": "{icon}",
-        "format-icons": {
-            "notification": "",
-            "none": "",
-            "dnd-notification": "",
-            "dnd-none": "",
-            "inhibited-notification": "",
-            "inhibited-none": "",
-            "dnd-inhibited-notification": "",
-            "dnd-inhibited-none": ""
-        },
-        "return-type": "json",
-        "exec-if": "which swaync-client",
-        "exec": "swaync-client -swb",
-        "on-click": "swaync-client -t -sw",
-        "on-click-right": "swaync-client -d -sw",
-        "escape": true
-    },
-
     "group/media": {
         "orientation": "horizontal",
         "modules": ["mpris", "pulseaudio"]
@@ -134,7 +112,7 @@
     // ============================================
     "group/status": {
         "orientation": "horizontal",
-        "modules": ["custom/notifications", "network", "pulseaudio", "clock"]
+        "modules": ["network", "pulseaudio", "clock"]
     },
 
     "idle_inhibitor": {
@@ -147,13 +125,26 @@
         "tooltip-format-deactivated": "Idle inhibitor inactive"
     },
 
-    "custom/notifications": {
-        "format": "{}",
-        "exec": "~/.config/waybar/scripts/notifications.sh",
-        "interval": 5,
-        "on-click": "~/.config/waybar/scripts/notification-menu.sh",
-        "on-click-right": "swaync-client -C -sw",
-        "tooltip": false
+    // TODO: Re-enable this module after swaync notification-center issues are fixed.
+    "custom/swaync": {
+        "tooltip-format": "Left: Notifications\nRight: Do not disturb",
+        "format": "{icon}",
+        "format-icons": {
+            "notification": "󰂚",
+            "none": "󰂜",
+            "dnd-notification": "󰂛",
+            "dnd-none": "󰪑",
+            "inhibited-notification": "󰂛",
+            "inhibited-none": "󰪑",
+            "dnd-inhibited-notification": "󰂛",
+            "dnd-inhibited-none": "󰪑"
+        },
+        "return-type": "json",
+        "exec-if": "command -v swaync-client >/dev/null 2>&1",
+        "exec": "swaync-client -swb",
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw",
+        "escape": true
     },
 
     // ============================================
