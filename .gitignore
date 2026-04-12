@@ -4,6 +4,9 @@
 
 # Keep configuration directories
 !.gitignore
+!update.sh
+!install.sh
+!packages.txt
 !waybar/
 !hypr/
 !theme/
