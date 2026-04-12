@@ -47,6 +47,11 @@ phase_pull() {
 phase_packages() {
     print_phase "Phase 2: Package Sync"
 
+    if [ ! -f "$SCRIPT_DIR/packages.txt" ]; then
+        print_error "packages.txt not found"
+        return 1
+    fi
+
     local pkgs=()
     local line
     while IFS= read -r line; do
@@ -62,8 +67,12 @@ phase_packages() {
     fi
 
     print_info "Syncing ${#pkgs[@]} packages (new packages will be installed)..."
-    yay -S --needed --noconfirm "${pkgs[@]}"
-    print_status "Packages up to date"
+    if yay -S --needed --noconfirm "${pkgs[@]}"; then
+        print_status "Packages up to date"
+    else
+        print_error "Package sync failed"
+        return 1
+    fi
 }
 
 phase_pull
