@@ -21,7 +21,8 @@
         // "memory",
         // "network",
         "custom/weather",
-        "tray"
+        "tray",
+        "custom/swaync"
     ],
 
     // ============================================
@@ -125,7 +126,6 @@
         "tooltip-format-deactivated": "Idle inhibitor inactive"
     },
 
-    // TODO: Re-enable this module after swaync notification-center issues are fixed.
     "custom/swaync": {
         "tooltip-format": "Left: Notifications\nRight: Do not disturb",
         "format": "{icon}",
