@@ -4,6 +4,8 @@
 
 # Keep configuration directories
 !.gitignore
+!CLAUDE.md
+!README.md
 !update.sh
 !install.sh
 !packages.txt
@@ -11,7 +13,6 @@
 !hypr/
 !theme/
 !kitty/
-!waypaper/
 !rofi/
 !wallust/
 !gtk-3.0/
@@ -23,7 +24,6 @@
 !hypr/**
 !theme/**
 !kitty/**
-!waypaper/**
 !rofi/**
 !wallust/**
 !gtk-3.0/**

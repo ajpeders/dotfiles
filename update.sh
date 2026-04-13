@@ -163,10 +163,12 @@ phase_reload() {
             || print_error "Waybar reload failed (non-fatal)"
     fi
 
-    # Mako
-    if pgrep -x mako >/dev/null 2>&1; then
-        makoctl reload >/dev/null 2>&1 && print_status "Mako reloaded" \
-            || print_error "Mako reload failed (non-fatal)"
+    # SwayNC
+    if pgrep -x swaync >/dev/null 2>&1; then
+        swaync-client --reload-css -sw >/dev/null 2>&1 \
+            && swaync-client --reload-config -sw >/dev/null 2>&1 \
+            && print_status "SwayNC reloaded" \
+            || print_error "SwayNC reload failed (non-fatal)"
     fi
 
     print_status "Live reload complete"
