@@ -52,15 +52,13 @@ The script will:
 p10k configure
 
 # Set a wallpaper
-awww img ~/Pictures/Wallpapers/generated/wallpaper.png
+awww img ~/.config/wallpapers/wallpaper.jpg --resize crop
 
 # Generate color theme from wallpaper
-wallust run ~/Pictures/Wallpapers/generated/wallpaper.png
+wallust run ~/.config/wallpapers/wallpaper.jpg
 ```
 
 Then log out and select **Hyprland** from the ly login screen.
-
-> **Note:** If your username isn't `alex`, update the wallpaper path in `hypr/config/autostart.conf` line 8 before logging in.
 
 ## Keeping in Sync
 
@@ -102,6 +100,7 @@ This will pull the latest commits, install any new packages, re-apply symlinks, 
 ├── kitty/              # Terminal
 ├── rofi/               # App launcher
 ├── wallust/            # Dynamic theming (templates + hooks)
+├── wallpapers/         # Default wallpaper asset
 ├── zsh/                # Zsh config (ZDOTDIR)
 ├── gtk-3.0/            # GTK3 theme
 ├── gtk-4.0/            # GTK4 theme

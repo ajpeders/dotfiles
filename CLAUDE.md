@@ -53,7 +53,7 @@ wallust generates color schemes from the current wallpaper and distributes them 
 
 ```bash
 # Apply a new wallpaper + regenerate theme
-wallust run ~/Pictures/Wallpapers/generated/wallpaper.png
+wallust run ~/.config/wallpapers/wallpaper.jpg
 ```
 
 Templates in `wallust/templates/` generate output to:
@@ -70,7 +70,7 @@ The `reload_ui` hook auto-reloads hyprland and waybar after generation.
 Uses **awww** (not swww or hyprpaper). Daemon started via autostart:
 ```bash
 exec-once = awww-daemon
-exec-once = sh -lc 'sleep 1; awww img $HOME/Pictures/Wallpapers/generated/wallpaper.png --resize crop --transition-type none'
+exec-once = sh -lc 'sleep 1; awww img $HOME/.config/wallpapers/wallpaper.jpg --resize crop --transition-type none'
 ```
 
 ### Notifications

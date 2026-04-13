@@ -15,6 +15,7 @@
 !kitty/
 !rofi/
 !wallust/
+!wallpapers/
 !gtk-3.0/
 !gtk-4.0/
 !zsh/
@@ -26,6 +27,7 @@
 !kitty/**
 !rofi/**
 !wallust/**
+!wallpapers/**
 !gtk-3.0/**
 !gtk-4.0/**
 !zsh/**
