@@ -18,6 +18,7 @@ print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase() { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WALLUST_THEME="Kanagawa-Wave"
 
 phase_preflight() {
     print_phase "Phase 1: Preflight"
@@ -49,6 +50,7 @@ phase_preflight() {
     echo "  - Configure zsh, oh-my-zsh, plugins, powerlevel10k, and colorls"
     echo "  - Enable NetworkManager, bluetooth, pipewire, pipewire-pulse, and wireplumber"
     echo "  - Enable the ly display manager"
+    echo "  - Apply the $WALLUST_THEME wallust theme"
     echo ""
     read -rp "Continue? [y/N] " confirm
     [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
@@ -292,8 +294,19 @@ phase_display_manager() {
     fi
 }
 
+phase_wallust_theme() {
+    print_phase "Phase 9: Wallust Theme"
+
+    if command -v wallust >/dev/null 2>&1; then
+        wallust theme "$WALLUST_THEME"
+        print_status "Applied wallust theme: $WALLUST_THEME"
+    else
+        print_error "wallust not found; run after package install: wallust theme $WALLUST_THEME"
+    fi
+}
+
 phase_reminders() {
-    print_phase "Phase 9: Done"
+    print_phase "Phase 10: Done"
 
     echo ""
     echo -e "${GREEN}Installation complete.${NC} Reboot, then complete these manual steps:"
@@ -304,8 +317,8 @@ phase_reminders() {
     echo -e "${BOLD}2. Set a wallpaper${NC}"
     echo "   awww img ~/.config/wallpapers/wallpaper.jpg --resize crop"
     echo ""
-    echo -e "${BOLD}3. Generate your color theme${NC}"
-    echo "   wallust run ~/.config/wallpapers/wallpaper.jpg"
+    echo -e "${BOLD}3. Reapply the default color theme${NC}"
+    echo "   wallust theme $WALLUST_THEME"
     echo ""
     echo -e "${BOLD}4. Reboot and select Hyprland from ly${NC}"
     echo ""
@@ -319,4 +332,5 @@ phase_dotfiles
 phase_shell
 phase_services
 phase_display_manager
+phase_wallust_theme
 phase_reminders

@@ -9,7 +9,7 @@ Arch/CachyOS Linux dotfiles for a Hyprland desktop. Configs live directly in `~/
 bash install.sh
 ```
 
-Managed directories: `hypr kitty waybar theme rofi wallust gtk-3.0 gtk-4.0 zsh`
+Managed directories: `hypr kitty waybar theme rofi wallust wallpapers gtk-3.0 gtk-4.0 zsh`
 Managed files: `pavucontrol.ini QtProject.conf`
 
 Backs up any existing configs to `~/.config_backup_<timestamp>/` before symlinking.
@@ -49,11 +49,11 @@ Workspaces 6–9 have names and dedicated keybinds:
 
 ### Wallpaper & Theming (`wallust/`)
 
-wallust generates color schemes from the current wallpaper and distributes them to all apps:
+wallust applies the built-in Kanagawa-Wave theme and distributes it to all apps:
 
 ```bash
-# Apply a new wallpaper + regenerate theme
-wallust run ~/.config/wallpapers/wallpaper.jpg
+# Reapply the default color theme
+wallust theme Kanagawa-Wave
 ```
 
 Templates in `wallust/templates/` generate output to:

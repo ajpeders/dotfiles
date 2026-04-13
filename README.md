@@ -13,7 +13,7 @@ Hyprland dotfiles for Arch Linux. Includes an install script for fresh setups an
 | App launcher | Rofi |
 | Notifications | SwayNC |
 | Wallpaper | awww |
-| Dynamic theming | wallust |
+| Dynamic theming | wallust (Kanagawa-Wave) |
 | Display manager | ly |
 | File manager | Yazi (TUI) / Thunar (GUI) |
 
@@ -44,6 +44,7 @@ The script will:
 5. Set zsh as default shell and install Oh My Zsh, plugins, and Powerlevel10k
 6. Enable NetworkManager, bluetooth, pipewire, and wireplumber
 7. Install and enable `ly` display manager
+8. Apply the Kanagawa-Wave wallust theme
 
 ### After reboot
 
@@ -54,8 +55,8 @@ p10k configure
 # Set a wallpaper
 awww img ~/.config/wallpapers/wallpaper.jpg --resize crop
 
-# Generate color theme from wallpaper
-wallust run ~/.config/wallpapers/wallpaper.jpg
+# Reapply the default color theme
+wallust theme Kanagawa-Wave
 ```
 
 Then log out and select **Hyprland** from the ly login screen.

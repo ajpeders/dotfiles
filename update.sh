@@ -17,6 +17,7 @@ print_info()   { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase()  { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WALLUST_THEME="Kanagawa-Wave"
 
 phase_pull() {
     print_phase "Phase 1: Pull Latest Changes"
@@ -78,7 +79,7 @@ phase_packages() {
 phase_dotfiles() {
     print_phase "Phase 3: Dotfile Sync"
 
-    local config_dirs=(hypr kitty waybar theme rofi wallust gtk-3.0 gtk-4.0 zsh)
+    local config_dirs=(hypr kitty waybar theme rofi wallust wallpapers gtk-3.0 gtk-4.0 zsh)
     local config_files=(pavucontrol.ini QtProject.conf)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -143,7 +144,7 @@ phase_dotfiles() {
 }
 
 phase_reload() {
-    print_phase "Phase 4: Live Reload"
+    print_phase "Phase 5: Live Reload"
 
     if [ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
         print_info "Not inside a Hyprland session — skipping live reload"
@@ -174,9 +175,21 @@ phase_reload() {
     print_status "Live reload complete"
 }
 
+phase_wallust_theme() {
+    print_phase "Phase 4: Wallust Theme"
+
+    if command -v wallust >/dev/null 2>&1; then
+        wallust theme "$WALLUST_THEME"
+        print_status "Applied wallust theme: $WALLUST_THEME"
+    else
+        print_error "wallust not found; skipping theme apply"
+    fi
+}
+
 phase_pull
 phase_packages
 phase_dotfiles
+phase_wallust_theme
 phase_reload
 
 echo ""
