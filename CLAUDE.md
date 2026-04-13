@@ -1,6 +1,6 @@
 # Dotfiles — ~/.config
 
-Arch/CachyOS Linux dotfiles for a Hyprland desktop. Configs live directly in `~/.config/` as a git repo; `install.sh` symlinks each managed directory into place on a fresh machine.
+Arch Linux dotfiles for a Hyprland desktop. Configs live directly in `~/.config/` as a git repo; `install.sh` symlinks each managed directory into place on a fresh machine.
 
 ## Install
 
