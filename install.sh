@@ -121,7 +121,7 @@ phase_directories() {
 phase_dotfiles() {
     print_phase "Phase 5: Dotfiles"
 
-    local config_dirs=(hypr kitty waybar theme rofi wallust gtk-3.0 gtk-4.0 zsh)
+    local config_dirs=(hypr kitty waybar theme rofi wallust wallpapers gtk-3.0 gtk-4.0 zsh)
     local config_files=(pavucontrol.ini QtProject.conf)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -302,21 +302,12 @@ phase_reminders() {
     echo "   Open a new terminal and run: p10k configure"
     echo ""
     echo -e "${BOLD}2. Set a wallpaper${NC}"
-    echo "   Put an image at ~/Pictures/Wallpapers/generated/wallpaper.png"
-    echo "   awww img ~/Pictures/Wallpapers/generated/wallpaper.png"
+    echo "   awww img ~/.config/wallpapers/wallpaper.jpg --resize crop"
     echo ""
     echo -e "${BOLD}3. Generate your color theme${NC}"
-    echo "   wallust run ~/Pictures/Wallpapers/generated/wallpaper.png"
+    echo "   wallust run ~/.config/wallpapers/wallpaper.jpg"
     echo ""
-    echo -e "${BOLD}4. Username check${NC}"
-    echo "   hypr/config/autostart.conf currently hardcodes /home/alex/ for the wallpaper path."
-    if [ "$USER" != "alex" ]; then
-        echo -e "   ${RED}[!] Your username is '$USER'; update the path in autostart.conf.${NC}"
-    else
-        print_status "Username matches hardcoded path: alex"
-    fi
-    echo ""
-    echo -e "${BOLD}5. Reboot and select Hyprland from ly${NC}"
+    echo -e "${BOLD}4. Reboot and select Hyprland from ly${NC}"
     echo ""
 }
 
