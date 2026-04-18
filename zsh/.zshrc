@@ -112,7 +112,7 @@ source $ZSH/oh-my-zsh.sh
 
 # To customize prompt, run `p10k configure` or edit $ZDOTDIR/.p10k.zsh.
 [[ ! -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] || source ${ZDOTDIR:-$HOME}/.p10k.zsh
-alias ssh="TERM=xterm-256color ssh"
+alias ssh='kitten ssh'
 
 source $(dirname $(gem which colorls))/tab_complete.sh
 export PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
