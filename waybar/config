@@ -75,7 +75,7 @@
 
     "custom/weather": {
         "format": "{}",
-        "exec": "~/.config/waybar/scripts/weather.sh",
+        "exec": "$HOME/.config/waybar/scripts/weather.sh",
         "return-type": "json",
         "interval": 1800
     },
@@ -149,7 +149,7 @@
         "interval": 2,
         "format": "易 {usage}%",
         "tooltip": true,
-        "tooltip-format": "Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz\nUsage: {usage}%\nLoad: {load}"
+        "tooltip-format": "Usage: {usage}%\nLoad: {load}"
     },
     
     "memory": {
@@ -167,7 +167,7 @@
 
     "custom/gpu": {
         "format": "󰍹 {}",
-        "exec": "~/.config/waybar/scripts/gpu.sh",
+        "exec": "$HOME/.config/waybar/scripts/gpu.sh",
         "return-type": "json",
         "interval": 5
     },
