@@ -9,6 +9,7 @@
 !update.sh
 !install.sh
 !packages.txt
+!.hermes/
 !waybar/
 !hypr/
 !theme/
@@ -21,6 +22,7 @@
 !zsh/
 
 # Keep config files in tracked directories
+!.hermes/**
 !waybar/**
 !hypr/**
 !theme/**
