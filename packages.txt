@@ -16,7 +16,7 @@ rofi
 thunar
 
 # Browser
-firefox
+librewolf
 
 # Notifications
 swaync
@@ -61,7 +61,6 @@ papirus-icon-theme
 
 # Shell
 zsh
-ruby
 
 # Display manager
 ly
@@ -69,6 +68,8 @@ ly
 # Utilities
 git
 curl
+jq
+eza
 pavucontrol
 btop
 yazi

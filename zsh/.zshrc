@@ -114,9 +114,9 @@ source $ZSH/oh-my-zsh.sh
 [[ ! -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] || source ${ZDOTDIR:-$HOME}/.p10k.zsh
 alias ssh='kitten ssh'
 
-source $(dirname $(gem which colorls))/tab_complete.sh
-export PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
-alias lc='colorls -lA --sd'
-alias ls='colorls'
+alias ls='eza --icons'
+alias lc='eza -la --icons --group-directories-first'
 
 unset zle_bracketed_paste
+
+. "$HOME/.local/bin/env"
