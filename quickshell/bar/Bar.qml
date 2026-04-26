@@ -1,46 +1,27 @@
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Hyprland._Ipc
-import Quickshell.Services.Mpris
-import Quickshell.Services.SystemTray
-import Quickshell.Services.Notifications
 import QtQuick
+import QtQuick.Layouts
 
 Row {
     id: bar
-
-    // Set by shell via Loader.onLoaded: item.parentShell = barWindow
-    property var parentShell: null
-
     anchors.fill: parent
-    spacing: 0
+    spacing: 10
+    padding: 8
 
-    Workspaces { }
+    // Left — workspaces
+    WorkspacesModule { }
 
-    Item { width: 10; height: parent.height }
+    // Center — clock
+    ClockModule { }
 
-    Clock { }
+    // Right — placeholder for now
+    Item { Layout.fillWidth: true }
 
-    Item { width: 10; height: parent.height }
-
-    Item { width: 10; height: parent.height }
-    Item { Layout.fillWidth: true; height: parent.height }
-
-    MediaControls {
-        onOpenMedia: parentShell ? parentShell.shell.showMediaPopup() : null
-    }
-
-    VolumeSlider { }
-
-    Weather { }
-
-    SystemTrayItem { }
-
-    QuickSettingsButton {
-        onOpenQuickSettings: parentShell ? parentShell.shell.showQuickSettings() : null
-    }
-
-    NotificationBell {
-        onOpenNotifications: parentShell ? parentShell.shell.showNotificationCenter() : null
+    Text {
+        anchors.verticalCenter: parent.verticalCenter
+        text: "test"
+        color: "#cdd6f4"
+        font.family: "JetBrains Mono"
     }
 }

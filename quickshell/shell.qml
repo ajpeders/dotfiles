@@ -1,5 +1,6 @@
 import Quickshell
 import QtQuick
+import "bar/" as Bar
 
 PanelWindow {
     anchors {
@@ -7,10 +8,8 @@ PanelWindow {
         left: true
         right: true
     }
-    implicitHeight: 30
+    implicitHeight: 34
+    color: "#1a1a2e"
 
-    Text {
-        anchors.centerIn: parent
-        text: "hello world"
-    }
+    Bar.Bar { }
 }
