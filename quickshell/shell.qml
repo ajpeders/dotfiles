@@ -41,6 +41,12 @@ Item {
                 case 'brightness':
                     handleBrightnessCommand(arg)
                     break
+                case 'launcher':
+                    showLauncher()
+                    break
+                case 'clipboard':
+                    showClipboardPopup()
+                    break
             }
         }
     }
