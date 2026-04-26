@@ -30,7 +30,8 @@ Full Quickshell-based desktop shell for Hyprland, replacing Waybar, swaync, Rofi
 ├── quicksettings/
 │   └── QuickSettings.qml      # Wifi, BT, DND, toggles panel
 ├── launcher/
-│   └── Launcher.qml           # App launcher (replaces Rofi)
+│   ├── Launcher.qml           # App launcher (replaces Rofi)
+│   └── ClipboardPopup.qml     # Clipboard history (Super+V)
 └── notifications/
     └── NotificationCenter.qml # Full notification center (replaces swaync)
 ```
@@ -105,14 +106,27 @@ Flat, modern, minimal. Kanagawa-Wave palette. Semi-transparent blur backgrounds,
 - Fades in on volume change, 1.5s auto-dismiss timer resets on each change
 - Mute shows crossed-out icon and dimmed bar
 
-**Trigger mechanism:** Hyprland keybinds call Quickshell via IPC socket (`quickshell volume up/down/mute`). Quickshell performs the volume change using PipeWire/PulseAudio APIs and shows the OSD. This preserves the smart sink detection logic from the current `volume.sh` (running sink > sink-for-input > default sink).
+**Trigger mechanism:** Hyprland keybinds call Quickshell via Unix socket (`/tmp/quickshell-$USER.sock`). Quickshell listens with a `SplitParser` and handles newline-delimited commands: `volume up`, `volume down`, `volume mute`. Quickshell performs the volume change and shows the OSD. This preserves the smart sink detection logic from the current `volume.sh` (running sink > sink-for-input > default sink).
+
+**Hyprland keybinds (replace current `volume.sh` calls):**
+```
+bindel = ,XF86AudioRaiseVolume, exec, echo "volume up" | socat - UNIX-CONNECT:/tmp/quickshell-$USER.sock
+bindel = ,XF86AudioLowerVolume, exec, echo "volume down" | socat - UNIX-CONNECT:/tmp/quickshell-$USER.sock
+bindel = ,XF86AudioMute, exec, echo "volume mute" | socat - UNIX-CONNECT:/tmp/quickshell-$USER.sock
+```
 
 ### Brightness OSD
 
 - Same design as Volume OSD, sun icon instead
 - Same fade in/out behavior with 1.5s timer
 
-**Trigger mechanism:** Hyprland keybinds call Quickshell via IPC socket (`quickshell brightness up/down`). Quickshell calls `brightnessctl` to change brightness, reads back the new value, and shows the OSD. Alternatively, Quickshell watches `/sys/class/backlight/*/brightness` via inotify for changes from any source.
+**Trigger mechanism:** Hyprland keybinds call Quickshell via IPC socket. Quickshell calls `brightnessctl` to change brightness, reads back the new value, and shows the OSD.
+
+**Hyprland keybinds:**
+```
+bindel = ,XF86MonBrightnessUp, exec, echo "brightness up" | socat - UNIX-CONNECT:/tmp/quickshell-$USER.sock
+bindel = ,XF86MonBrightnessDown, exec, echo "brightness down" | socat - UNIX-CONNECT:/tmp/quickshell-$USER.sock
+```
 
 ### Media Popup
 
