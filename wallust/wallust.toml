@@ -59,6 +59,7 @@ neopywal.target = "~/.cache/wallust/colors_neopywal.vim"
 yazi.template = "yazi-theme.toml"
 yazi.target = "~/.config/yazi/theme.toml"
 swaync = { src = "swaync.css", dst = '~/.config/swaync/style.css' }
+quickshell = { src = "quickshell.json", dst = '~/.cache/wallust/quickshell-colors.json' }
 
 [hooks]
 # Run commands when wallust is invoked. Useful to avoid scripting.

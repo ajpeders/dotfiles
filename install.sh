@@ -123,7 +123,7 @@ phase_directories() {
 phase_dotfiles() {
     print_phase "Phase 5: Dotfiles"
 
-    local config_dirs=(hypr kitty waybar theme rofi wallust wallpapers gtk-3.0 gtk-4.0 zsh)
+    local config_dirs=(hypr kitty waybar theme rofi wallust wallpapers gtk-3.0 gtk-4.0 zsh quickshell)
     local config_files=(pavucontrol.ini QtProject.conf)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -278,6 +278,7 @@ phase_services() {
 phase_display_manager() {
     print_phase "Phase 8: Display Manager (ly)"
 
+    local ly_unit=""
     local dm
     for dm in gdm sddm lightdm; do
         if systemctl is-enabled --quiet "$dm" 2>/dev/null; then
@@ -286,11 +287,17 @@ phase_display_manager() {
         fi
     done
 
-    if systemctl is-enabled --quiet ly 2>/dev/null; then
-        print_status "ly already enabled"
+    if [[ -f /usr/lib/systemd/system/ly@.service ]]; then
+        ly_unit="ly@tty1.service"
     else
-        sudo systemctl enable ly
-        print_status "ly enabled"
+        ly_unit="ly.service"
+    fi
+
+    if systemctl is-enabled --quiet "$ly_unit" 2>/dev/null; then
+        print_status "$ly_unit already enabled"
+    else
+        sudo systemctl enable "$ly_unit"
+        print_status "Enabled: $ly_unit"
     fi
 }
 
