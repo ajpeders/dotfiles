@@ -1,6 +1,5 @@
 pragma Singleton
 import QtQuick
-import QtCore
 
 QtObject {
     id: theme
@@ -28,7 +27,6 @@ QtObject {
     // Derived colors
     property color accent: color5
     property color panelBg: background
-    property color panelBgAlpha: background
     property color borderColor: color0
     property color textSecondary: color7
     property color textMuted: color8
@@ -40,47 +38,54 @@ QtObject {
     property int padding: 8
     property int animDuration: 150
 
-    // File path to color cache
-    readonly property string colorFile: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0] + "/.cache/wallust/quickshell-colors.json"
+    // Path to color cache
+    readonly property string colorFile: Qt.platform.os === "linux"
+        ? StandardPaths.standardLocations(StandardPaths.HomeLocation)[0] + "/.cache/wallust/quickshell-colors.json"
+        : ""
 
-    // Load colors from JSON file
+    // Load colors from JSON via XMLHttpRequest
     function loadColors() {
-        const file = new File(colorFile)
-        if (!file.exists) return
+        if (colorFile === "") return
 
-        try {
-            const data = JSON.parse(file.read())
-            background = data.background || background
-            foreground = data.foreground || foreground
-            color0 = data.color0 || color0
-            color1 = data.color1 || color1
-            color2 = data.color2 || color2
-            color3 = data.color3 || color3
-            color4 = data.color4 || color4
-            color5 = data.color5 || color5
-            color6 = data.color6 || color6
-            color7 = data.color7 || color7
-            color8 = data.color8 || color8
-            color9 = data.color9 || color9
-            color10 = data.color10 || color10
-            color11 = data.color11 || color11
-            color12 = data.color12 || color12
-            color13 = data.color13 || color13
-            color14 = data.color14 || color14
-            color15 = data.color15 || color15
-            accent = data.accent || color5
-        } catch (e) {
-            console.warn("Theme: failed to parse colors:", e)
+        const xhr = new XMLHttpRequest()
+        xhr.open("GET", "file://" + colorFile)
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState !== XMLHttpRequest.DONE) return
+            if (xhr.status !== 200) return
+            try {
+                const data = JSON.parse(xhr.responseText)
+                background = data.background || background
+                foreground = data.foreground || foreground
+                color0 = data.color0 || color0
+                color1 = data.color1 || color1
+                color2 = data.color2 || color2
+                color3 = data.color3 || color3
+                color4 = data.color4 || color4
+                color5 = data.color5 || color5
+                color6 = data.color6 || color6
+                color7 = data.color7 || color7
+                color8 = data.color8 || color8
+                color9 = data.color9 || color9
+                color10 = data.color10 || color10
+                color11 = data.color11 || color11
+                color12 = data.color12 || color12
+                color13 = data.color13 || color13
+                color14 = data.color14 || color14
+                color15 = data.color15 || color15
+                accent = data.accent || color5
+            } catch (e) {
+                console.warn("Theme: failed to parse colors:", e)
+            }
         }
+        xhr.send()
     }
 
-    // Watch for wallust regeneration
-    FileWatcher {
-        id: watcher
-        path: theme.colorFile
-        onChanged: theme.loadColors()
+    // Poll for color file changes (every 5 seconds)
+    Timer {
+        interval: 5000
+        repeat: true
+        onTriggered: theme.loadColors()
     }
 
-    // Load on startup
-    Component.onCompleted: loadColors()
+    Component.onCompleted: theme.loadColors()
 }

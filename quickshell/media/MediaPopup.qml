@@ -1,17 +1,29 @@
-import QtQuick
-import Quickshell.Panels
+import Quickshell
+import Quickshell._Window
 import Quickshell.Services.Mpris
+import QtQuick
 
-PopupWindow {
+FloatingWindow {
     id: mediaPopup
     width: 320
     height: 120
-    anchor: PopupWindow.TopEdge
-    margin: 4
-    closePolicy: PopupWindow.ClickOutside | PopupWindow.Escape
+    // Position: center of primary screen
+    x: (Quickshell.screens[0].width - width) / 2
+    y: 50
+    visible: false
+    focusable: true
+    color: "transparent"
 
     MprisPlayer {
         id: mpris
+    }
+
+    OpacityAnimator {
+        id: fadeIn
+        target: mediaPopup
+        from: 0
+        to: 1
+        duration: Theme.animDuration
     }
 
     Rectangle {
@@ -46,13 +58,11 @@ PopupWindow {
                 }
             }
 
-            // Track info + controls
             Column {
                 width: parent.width - 80 - Theme.padding
                 height: 80
                 spacing: 4
 
-                // Title + artist
                 Column {
                     width: parent.width
                     spacing: 2
@@ -76,7 +86,6 @@ PopupWindow {
                     }
                 }
 
-                // Progress bar
                 Rectangle {
                     width: parent.width
                     height: 4
@@ -91,7 +100,6 @@ PopupWindow {
                     }
                 }
 
-                // Transport controls
                 Row {
                     height: 28
                     spacing: 8
@@ -110,8 +118,19 @@ PopupWindow {
                         height: 28
                         radius: 14
                         color: Theme.accent
-                        Text { anchors.centerIn: parent; text: mpris.playbackStatus === Mpris.Playing ? "⏸" : "▶"; font.pixelSize: 12; color: Theme.background }
-                        MouseArea { anchors.fill: parent; onClicked: { if (mpris.playbackStatus === Mpris.Playing) mpris.pause() else mpris.play() } }
+                        Text {
+                            anchors.centerIn: parent
+                            text: mpris.playbackStatus === Mpris.PlaybackState.Playing ? "⏸" : "▶"
+                            font.pixelSize: 12
+                            color: Theme.background
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (mpris.playbackStatus === Mpris.PlaybackState.Playing) mpris.pause()
+                                else mpris.play()
+                            }
+                        }
                     }
 
                     Rectangle {
@@ -133,5 +152,13 @@ PopupWindow {
                 }
             }
         }
+    }
+
+    onVisibleChanged: {
+        if (visible) fadeIn.start()
+    }
+
+    function toggle() {
+        visible = !visible
     }
 }

@@ -1,14 +1,24 @@
+import Quickshell
+import Quickshell._Window
 import QtQuick
-import Quickshell.Panels
 
-PopupWindow {
+FloatingWindow {
     id: clipboardPopup
     width: 400
     height: 400
-    anchor: PopupWindow.Center
-    margin: 10
-    closePolicy: PopupWindow.ClickOutside | PopupWindow.Escape
+    x: (Quickshell.screens[0].width - width) / 2
+    y: (Quickshell.screens[0].height - height) / 2
+    visible: false
     focusable: true
+    color: "transparent"
+
+    OpacityAnimator {
+        id: fadeIn
+        target: clipboardPopup
+        from: 0
+        to: 1
+        duration: Theme.animDuration
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -20,25 +30,29 @@ PopupWindow {
             padding: Theme.padding
             spacing: Theme.padding
 
-            // Header
             Row {
                 width: parent.width
+                height: 30
+
                 Text {
+                    anchors.verticalCenter: parent.verticalCenter
                     text: "Clipboard History"
                     color: Theme.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSize
                 }
-                Item { Layout.fillWidth: true }
+
+                Item { Layout.fillWidth: true; height: 1 }
+
                 Text {
+                    anchors.verticalCenter: parent.verticalCenter
                     text: "✕"
                     color: Theme.textMuted
                     font.pixelSize: 14
-                    MouseArea { anchors.fill: parent; onClicked: clipboardPopup.close() }
+                    MouseArea { anchors.fill: parent; onClicked: clipboardPopup.visible = false }
                 }
             }
 
-            // Clipboard list
             ListView {
                 id: clipboardList
                 width: parent.width
@@ -56,7 +70,7 @@ PopupWindow {
                     Text {
                         anchors.fill: parent
                         anchors.margins: 8
-                        text: model.text
+                        text: model.text || ""
                         color: Theme.foreground
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSize - 1
@@ -68,7 +82,7 @@ PopupWindow {
                         anchors.fill: parent
                         onClicked: {
                             Process.start("wl-copy", [model.text])
-                            clipboardPopup.close()
+                            clipboardPopup.visible = false
                         }
                     }
                 }
@@ -79,10 +93,36 @@ PopupWindow {
     property var clipboardItems: []
 
     function loadHistory() {
-        // Read from cliphist: cliphist list | head -20
-        // Parse output and populate clipboardItems
-        clipboardItems = []
+        const xhr = new XMLHttpRequest()
+        xhr.open("GET", "file:///tmp/cliphist.json")
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState !== XMLHttpRequest.DONE) return
+            if (xhr.status !== 200) {
+                // Fallback: try cliphist directly
+                loadHistoryFallback()
+                return
+            }
+            try {
+                clipboardItems = JSON.parse(xhr.responseText)
+            } catch (e) {
+                loadHistoryFallback()
+            }
+        }
+        xhr.send()
     }
 
-    Component.onCompleted: loadHistory()
+    function loadHistoryFallback() {
+        // cliphist list -> parse output
+        clipboardItems = []
+        const proc = Process
+        // Would need async process — simplified for now
+    }
+
+    function toggle() {
+        visible = !visible
+        if (visible) {
+            loadHistory()
+            fadeIn.start()
+        }
+    }
 }

@@ -1,20 +1,29 @@
-import QtQuick
-import Quickshell.Panels
+import Quickshell
+import Quickshell._Window
 import Quickshell.Services.Notifications
+import QtQuick
 
-PopupWindow {
+FloatingWindow {
     id: notifCenter
-    anchor: PopupWindow.RightEdge
     width: 380
-    height: parent ? parent.height : 800
-    margin: 0
-    closePolicy: PopupWindow.ClickOutside | PopupWindow.Escape
+    height: Quickshell.screens[0].height
+    // Right edge of primary screen
+    x: Quickshell.screens[0].width - width
+    y: 0
+    visible: false
     focusable: true
+    color: "transparent"
 
     NotificationServer {
         id: notifServer
-        persistenceSupported: true
-        keepOnReload: true
+    }
+
+    OpacityAnimator {
+        id: slideIn
+        target: notifCenter
+        from: 0
+        to: 1
+        duration: Theme.animDuration
     }
 
     Rectangle {
@@ -26,7 +35,6 @@ PopupWindow {
             padding: Theme.padding
             spacing: Theme.padding
 
-            // Header
             Row {
                 width: parent.width
                 height: 30
@@ -39,9 +47,8 @@ PopupWindow {
                     font.pixelSize: Theme.fontSize
                 }
 
-                Item { Layout.fillWidth: true }
+                Item { Layout.fillWidth: true; height: 1 }
 
-                // DND toggle
                 Rectangle {
                     width: 70
                     height: 24
@@ -62,7 +69,6 @@ PopupWindow {
                     }
                 }
 
-                // Clear all
                 Rectangle {
                     width: 70
                     height: 24
@@ -84,7 +90,6 @@ PopupWindow {
                 }
             }
 
-            // Notification list
             ListView {
                 id: notifList
                 width: parent.width
@@ -95,18 +100,15 @@ PopupWindow {
 
                 delegate: Rectangle {
                     width: notifList.width
-                    height: notifRowHeight
+                    height: 70
                     radius: Theme.radius
                     color: Theme.color0
-
-                    property int notifRowHeight: 70
 
                     Row {
                         anchors.fill: parent
                         anchors.margins: 8
                         spacing: 8
 
-                        // App icon
                         Image {
                             width: 24
                             height: 24
@@ -121,11 +123,20 @@ PopupWindow {
                             Row {
                                 width: parent.width
                                 Text { text: model.appName || ""; color: Theme.textSecondary; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize - 2 }
-                                Item { Layout.fillWidth: true }
+                                Item { Layout.fillWidth: true; height: 1 }
                                 Text { text: model.timestamp || ""; color: Theme.textMuted; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize - 3 }
                             }
 
-                            Text { text: model.title || ""; color: Theme.foreground; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize - 1; font.bold: true }
+                            Text {
+                                text: model.title || ""
+                                color: Theme.foreground
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontSize - 1
+                                font.bold: true
+                                elide: Text.ElideMiddle
+                                maximumLineCount: 1
+                            }
+
                             Text {
                                 text: model.body || ""
                                 color: Theme.textSecondary
@@ -136,11 +147,11 @@ PopupWindow {
                             }
                         }
 
-                        // Dismiss button
                         Text {
                             text: "✕"
                             color: Theme.textMuted
                             font.pixelSize: 12
+                            anchors.verticalCenter: parent.verticalCenter
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: notifServer.dismiss(model.id)
@@ -152,7 +163,8 @@ PopupWindow {
         }
     }
 
-    function open() {
-        notifCenter.visible = true
+    function toggle() {
+        visible = !visible
+        if (visible) slideIn.start()
     }
 }

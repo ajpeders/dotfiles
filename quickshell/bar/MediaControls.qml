@@ -5,23 +5,21 @@ Item {
     id: media
     property int barHeight: 34
     width: 120
+    signal openMedia()
 
-    // Mpris player
     MprisPlayer {
         id: mpris
-        // Uses the most recent player if multiple exist
     }
 
     MouseArea {
         anchors.fill: parent
-        onClicked: app.showMediaPopup()
+        onClicked: openMedia()
     }
 
     Row {
         height: barHeight
         spacing: 4
 
-        // Play/pause icon
         Rectangle {
             width: 24
             height: barHeight - 6
@@ -31,7 +29,7 @@ Item {
 
             Text {
                 anchors.centerIn: parent
-                text: mpris.playbackStatus === Mpris.Playing ? "⏸" : "▶"
+                text: mpris.playbackStatus === Mpris.PlaybackState.Playing ? "⏸" : "▶"
                 color: Theme.background
                 font.pixelSize: 10
             }
@@ -39,13 +37,12 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    if (mpris.playbackStatus === Mpris.Playing) mpris.pause()
+                    if (mpris.playbackStatus === Mpris.PlaybackState.Playing) mpris.pause()
                     else mpris.play()
                 }
             }
         }
 
-        // Track info
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: mpris.trackTitle || "Nothing playing"

@@ -4,6 +4,7 @@ Item {
     id: qsButton
     property int barHeight: 34
     width: 30
+    signal openQuickSettings()
 
     Rectangle {
         id: btn
@@ -24,6 +25,6 @@ Item {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: app.showQuickSettings()
+        onClicked: openQuickSettings()
     }
 }

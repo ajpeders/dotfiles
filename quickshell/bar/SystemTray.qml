@@ -23,14 +23,14 @@ Item {
 
             Image {
                 anchors.centerIn: parent
-                source: model.icon
+                source: model.icon || ""
                 width: 16
                 height: 16
             }
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: model.activate()
+                onClicked: systemTray.activate(model.id)
             }
         }
     }
