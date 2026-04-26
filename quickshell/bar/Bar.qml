@@ -8,6 +8,10 @@ import QtQuick
 
 Row {
     id: bar
+
+    // Set by shell via Loader.onLoaded: item.parentShell = barWindow
+    property var parentShell: null
+
     anchors.fill: parent
     spacing: 0
 
@@ -23,8 +27,7 @@ Row {
     Item { Layout.fillWidth: true; height: parent.height }
 
     MediaControls {
-        // bar (Row) → contentItem → PanelWindow → shell
-        onOpenMedia: bar.parent.parent.shell.showMediaPopup()
+        onOpenMedia: parentShell ? parentShell.shell.showMediaPopup() : null
     }
 
     VolumeSlider { }
@@ -34,10 +37,10 @@ Row {
     SystemTrayItem { }
 
     QuickSettingsButton {
-        onOpenQuickSettings: bar.parent.parent.shell.showQuickSettings()
+        onOpenQuickSettings: parentShell ? parentShell.shell.showQuickSettings() : null
     }
 
     NotificationBell {
-        onOpenNotifications: bar.parent.parent.shell.showNotificationCenter()
+        onOpenNotifications: parentShell ? parentShell.shell.showNotificationCenter() : null
     }
 }

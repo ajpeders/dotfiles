@@ -70,7 +70,13 @@ Item {
             // Expose shell API to bar children
             property var shell: root
 
-            Bar { }
+            // Bar must be loaded from file
+            property var barComponent: barLoader.item
+            Loader {
+                id: barLoader
+                source: "bar/Bar.qml"
+                onLoaded: item.parentShell = barWindow
+            }
         }
     }
 
