@@ -18,8 +18,12 @@ thunar
 # Browser
 librewolf
 
-# Notifications
-swaync
+# Quickshell desktop shell
+quickshell
+qt6-svg
+qt6-imageformats
+qt6-multimedia
+qt6-5compat
 
 # Authentication
 polkit-gnome
