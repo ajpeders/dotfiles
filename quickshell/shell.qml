@@ -9,9 +9,9 @@ import Quickshell.Services.Mpris
 import Quickshell.Services.SystemTray
 import Quickshell.Services.Pipewire
 import QtQuick
+import "." as Config
 
-Item {
-    id: root
+Config { id: themeSingleton }
 
     // Expose shell API to bar components via QtObject with closures
     property QtObject shellApi: QtObject {
