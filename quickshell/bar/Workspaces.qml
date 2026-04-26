@@ -1,9 +1,15 @@
 import QtQuick
-import Quickshell.Hyprland
+import Quickshell.Hyprland._Ipc
 
 Item {
     id: workspaces
     property int barHeight: 34
+
+    // Named workspaces: 1-5 + dev(6) + server(7) + work(8) + game(9) + config(10)
+    property var workspaceNames: {
+        1: "1", 2: "2", 3: "3", 4: "4", 5: "5",
+        6: "dev", 7: "server", 8: "work", 9: "game", 10: "config"
+    }
 
     Row {
         height: barHeight
@@ -14,19 +20,21 @@ Item {
 
             Rectangle {
                 id: wsBtn
-                width: 36
+                width: wsLabel.width + 12
                 height: barHeight - 6
                 y: 3
                 radius: Theme.radius
-                color: model.active ? Theme.accent : Theme.color0
-                opacity: model.active ? 1.0 : (mouseArea.containsMouse ? 0.7 : 0.3)
+                color: modelData.active ? Theme.accent : Theme.color0
+                opacity: modelData.active ? 1.0 : (mouseArea.containsMouse ? 0.7 : 0.3)
 
-                property bool isNamed: model.name !== String(model.id)
+                property string wsName: modelData.name || String(modelData.id)
+                property string displayName: workspaceNames[modelData.id] || wsName
 
                 Text {
+                    id: wsLabel
                     anchors.centerIn: parent
-                    text: isNamed ? model.name : model.id
-                    color: model.active ? Theme.background : Theme.foreground
+                    text: displayName
+                    color: modelData.active ? Theme.background : Theme.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSize - 2
                 }
@@ -35,25 +43,24 @@ Item {
                     id: mouseArea
                     anchors.fill: parent
                     hoverEnabled: true
-                    onClicked: Hyprland.switchToWorkspace(model.id)
+                    onClicked: Hyprland.dispatch(`workspace ${modelData.id}`)
                 }
 
-                // Scroll to cycle workspaces
                 WheelEventListener {
                     anchors.fill: parent
                     onWheel: (event) => {
                         const delta = event.angleDelta.y > 0 ? -1 : 1
-                        const next = model.id + delta
-                        if (next >= 1) Hyprland.switchToWorkspace(next)
+                        const next = modelData.id + delta
+                        if (next >= 1) Hyprland.dispatch(`workspace ${next}`)
                     }
                 }
             }
         }
 
-        // Active window title (truncated)
+        // Active window title
         Text {
             anchors.verticalCenter: parent.verticalCenter
-            text: Hyprland.activeWindow.title
+            text: Hyprland.activeToplevel ? Hyprland.activeToplevel.title : ""
             color: Theme.textSecondary
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSize - 1

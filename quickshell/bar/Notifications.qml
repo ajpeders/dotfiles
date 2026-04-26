@@ -5,6 +5,7 @@ Item {
     id: notifications
     property int barHeight: 34
     width: 30
+    signal openNotifications()
 
     NotificationServer {
         id: notifServer
@@ -23,7 +24,6 @@ Item {
             font.pixelSize: 14
         }
 
-        // Unread count badge
         Rectangle {
             visible: notifServer.trackedNotifications.length > 0
             x: parent.width - 10
@@ -47,6 +47,6 @@ Item {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: app.showNotificationCenter()
+        onClicked: openNotifications()
     }
 }

@@ -1,17 +1,57 @@
-import QtQuick
 import Quickshell
-import Quickshell.Panels
+import Quickshell._Window
+import QtQuick
 
-PanelWindow {
+FloatingWindow {
     id: brightnessOsd
-    anchor: PanelWindow.Center
     width: 300
     height: 50
-    margin: 0
+    x: (Quickshell.screens[0].width - width) / 2
+    y: (Quickshell.screens[0].height - height) / 2
     visible: false
-    layer: PanelWindow.Above
-    blockGestures: true
     focusable: false
+    color: "transparent"
+
+    property int brightness: 100
+    property int maxBrightness: 100
+
+    function show() {
+        visible = true
+        readBrightness()
+        hideTimer.restart()
+    }
+
+    Timer {
+        id: hideTimer
+        interval: 1500
+        onTriggered: brightnessOsd.visible = false
+    }
+
+    Process {
+        id: brightnessReader
+        onFinished: (code) => {
+            if (code !== 0) return
+            const val = parseInt(brightnessReader.read().trim())
+            if (!isNaN(val)) {
+                brightness = val
+                // Get max from brightnessctl
+                brightnessReader2.start("brightnessctl", ["max"])
+            }
+        }
+    }
+
+    Process {
+        id: brightnessReader2
+        onFinished: (code) => {
+            if (code !== 0) return
+            const val = parseInt(brightnessReader2.read().trim())
+            if (!isNaN(val) && val > 0) maxBrightness = val
+        }
+    }
+
+    function readBrightness() {
+        brightnessReader.start("brightnessctl", ["get"])
+    }
 
     OpacityAnimator {
         id: fadeAnim
@@ -21,31 +61,10 @@ PanelWindow {
         duration: Theme.animDuration
     }
 
-    // Brightness via brightnessctl
-    property int brightness: 100
-    property int maxBrightness: 100
-
-    Process {
-        id: brightnessReader
-        onFinished: (exitCode) => {
-            if (exitCode !== 0) return
-            const val = parseInt(brightnessReader.read().trim())
-            if (!isNaN(val)) {
-                brightness = val
-                maxBrightness = brightnessReader.read().trim() || 100
-            }
-        }
-    }
-
-    function readBrightness() {
-        brightnessReader.start("brightnessctl", ["get"])
-    }
-
     Rectangle {
         anchors.fill: parent
         radius: 25
         color: Theme.panelBg
-        opacity: 0.9
 
         Row {
             anchors.fill: parent
@@ -66,7 +85,7 @@ PanelWindow {
                 color: Theme.color0
 
                 Rectangle {
-                    width: (brightness / maxBrightness) * 200
+                    width: (brightness / Math.max(maxBrightness, 1)) * 200
                     height: 6
                     radius: 3
                     color: Theme.accent
@@ -75,7 +94,7 @@ PanelWindow {
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                text: Math.round((brightness / maxBrightness) * 100) + "%"
+                text: Math.round((brightness / Math.max(maxBrightness, 1)) * 100) + "%"
                 color: Theme.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSize
@@ -84,9 +103,6 @@ PanelWindow {
     }
 
     onVisibleChanged: {
-        if (visible) {
-            readBrightness()
-            fadeAnim.start()
-        }
+        if (visible) fadeAnim.start()
     }
 }

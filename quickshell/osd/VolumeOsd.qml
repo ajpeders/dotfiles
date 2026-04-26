@@ -1,20 +1,48 @@
-import QtQuick
 import Quickshell
-import Quickshell.Panels
-import Quickshell.Services.Audio
+import Quickshell._Window
+import QtQuick
 
-PanelWindow {
+FloatingWindow {
     id: volumeOsd
-    anchor: PanelWindow.Center
     width: 300
     height: 50
-    margin: 0
+    // Center on primary screen
+    x: (Quickshell.screens[0].width - width) / 2
+    y: (Quickshell.screens[0].height - height) / 2
     visible: false
-    layer: PanelWindow.Above
-    blockGestures: true
     focusable: false
+    color: "transparent"
 
-    // Fades in/out with animation
+    property int volumeLevel: 100
+    property bool isMuted: false
+
+    function show() {
+        visible = true
+        refreshVolume()
+        hideTimer.restart()
+    }
+
+    Timer {
+        id: hideTimer
+        interval: 1500
+        onTriggered: volumeOsd.visible = false
+    }
+
+    Process {
+        id: volReader
+        onFinished: (code) => {
+            if (code !== 0) return
+            const out = volReader.read()
+            const match = out.match(/Volume:\s*([\d.]+)/)
+            if (match) volumeLevel = Math.round(parseFloat(match[1]) * 100)
+            isMuted = out.includes("Muted")
+        }
+    }
+
+    function refreshVolume() {
+        volReader.start("wpctl", ["get-volume", "@DEFAULT_AUDIO_SINK@"])
+    }
+
     OpacityAnimator {
         id: fadeAnim
         target: volumeOsd
@@ -23,29 +51,22 @@ PanelWindow {
         duration: Theme.animDuration
     }
 
-    AudioDevice {
-        id: defaultSink
-    }
-
     Rectangle {
         anchors.fill: parent
         radius: 25
         color: Theme.panelBg
-        opacity: 0.9
 
         Row {
             anchors.fill: parent
             padding: 12
             spacing: 12
 
-            // Speaker icon
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                text: defaultSink.muted ? "🔇" : (defaultSink.volume < 33 ? "🔈" : (defaultSink.volume < 66 ? "🔉" : "🔊"))
+                text: isMuted ? "🔇" : (volumeLevel < 33 ? "🔈" : (volumeLevel < 66 ? "🔉" : "🔊"))
                 font.pixelSize: 20
             }
 
-            // Volume bar
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 width: 200
@@ -54,17 +75,16 @@ PanelWindow {
                 color: Theme.color0
 
                 Rectangle {
-                    width: defaultSink.muted ? 0 : (defaultSink.volume / 100 * 200)
+                    width: isMuted ? 0 : (volumeLevel / 100 * 200)
                     height: 6
                     radius: 3
                     color: Theme.accent
                 }
             }
 
-            // Percentage
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                text: defaultSink.volume + "%"
+                text: volumeLevel + "%"
                 color: Theme.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSize
@@ -72,7 +92,6 @@ PanelWindow {
         }
     }
 
-    // Watch app volumeOsdVisible
     onVisibleChanged: {
         if (visible) fadeAnim.start()
     }

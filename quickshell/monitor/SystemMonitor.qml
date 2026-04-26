@@ -1,17 +1,56 @@
-import QtQuick
 import Quickshell
-import Quickshell.Panels
+import Quickshell._Window
+import QtQuick
 
-PanelWindow {
+FloatingWindow {
     id: sysMonitor
     width: 200
     height: 120
-    margin: 10
-    layer: PanelWindow.Above
-    movable: true
+    visible: false
     focusable: true
+    color: "transparent"
+    movable: true
 
-    // Position persisted via Quickshell state
+    // Position: top-right of primary screen by default
+    x: Quickshell.screens[0].width - width - 10
+    y: 50
+
+    property int cpuUsage: 0
+    property int ramUsage: 0
+    property int gpuUsage: 0
+    property bool gpuAvailable: true
+
+    Process { id: cpuProc }
+    Process { id: ramProc }
+    Process { id: gpuProc }
+
+    Timer {
+        interval: 2000
+        repeat: true
+        onTriggered: {
+            readCpu()
+            readRam()
+            if (gpuAvailable) readGpu()
+        }
+    }
+
+    function readCpu() {
+        cpuProc.start("bash", ["-c", "top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | cut -d'%' -f1"])
+    }
+
+    function readRam() {
+        ramProc.start("bash", ["-c", "free | grep Mem | awk '{print int($3/$2 * 100)}'"])
+    }
+
+    function readGpu() {
+        gpuProc.start("bash", ["-c", "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits || echo 0"])
+    }
+
+    Component.onCompleted: {
+        readCpu()
+        readRam()
+        readGpu()
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -23,115 +62,55 @@ PanelWindow {
             padding: Theme.padding
             spacing: 8
 
-            // CPU
-            MonitorRow {
-                label: "CPU"
-                value: cpuUsage
-                onValueChanged: cpuUsage = readCpu()
-            }
-
-            // RAM
-            MonitorRow {
-                label: "RAM"
-                value: ramUsage
-                onValueChanged: ramUsage = readRam()
-            }
-
-            // GPU (if available)
-            MonitorRow {
-                label: "GPU"
-                value: gpuUsage
-                visible: gpuAvailable
-                onValueChanged: gpuUsage = readGpu()
-            }
+            MonitorRow { label: "CPU"; value: cpuUsage }
+            MonitorRow { label: "RAM"; value: ramUsage }
+            MonitorRow { label: "GPU"; value: gpuUsage; visible: gpuAvailable }
         }
     }
-
-    property int cpuUsage: 0
-    property int ramUsage: 0
-    property int gpuUsage: 0
-    property bool gpuAvailable: false
-
-    Timer {
-        interval: 2000
-        repeat: true
-        onTriggered: {
-            cpuUsage = readCpu()
-            ramUsage = readRam()
-            if (gpuAvailable) gpuUsage = readGpu()
-        }
-    }
-
-    function readCpu() {
-        // Read /proc/stat for cpu usage — simplified
-        return 0 // implement with Process reading /proc/stat
-    }
-
-    function readRam() {
-        // Read /proc/meminfo — simplified
-        return 0
-    }
-
-    function readGpu() {
-        // Check nvidia-smi first, then amd sysfs — simplified
-        return 0
-    }
-
-    function detectGpu() {
-        // Check /sys/class/drm for AMD, nvidia-smi for NVIDIA
-        gpuAvailable = true // implement detection
-    }
-
-    Component.onCompleted: detectGpu()
 }
 
-Component {
-    id: MonitorRow
+component MonitorRow := Rectangle {
+    property string label: ""
+    property int value: 0
+    width: parent ? parent.width : 200
+    height: 24
+    radius: 4
+    color: "transparent"
 
-    Rectangle {
-        width: parent ? parent.width : 200
-        height: 24
-        radius: 4
-        color: "transparent"
+    Row {
+        anchors.fill: parent
+        spacing: 8
 
-        property string label: ""
-        property int value: 0
+        Text {
+            width: 36
+            anchors.verticalCenter: parent.verticalCenter
+            text: label
+            color: Theme.textSecondary
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSize - 2
+        }
 
-        Row {
-            anchors.fill: parent
-            spacing: 8
-
-            Text {
-                width: 36
-                anchors.verticalCenter: parent.verticalCenter
-                text: label
-                color: Theme.textSecondary
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSize - 2
-            }
+        Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
+            width: 100
+            height: 6
+            radius: 3
+            color: Theme.color0
 
             Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 100
+                width: (value / 100) * 100
                 height: 6
                 radius: 3
-                color: Theme.color0
-
-                Rectangle {
-                    width: (value / 100) * 100
-                    height: 6
-                    radius: 3
-                    color: Theme.accent
-                }
+                color: Theme.accent
             }
+        }
 
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: value + "%"
-                color: Theme.foreground
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSize - 2
-            }
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            text: value + "%"
+            color: Theme.foreground
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSize - 2
         }
     }
 }

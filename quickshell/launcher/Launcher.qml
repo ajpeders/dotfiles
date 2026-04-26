@@ -1,26 +1,28 @@
-import QtQuick
 import Quickshell
-import Quickshell.Panels
+import Quickshell._Window
+import QtQuick
 
-PanelWindow {
+FloatingWindow {
     id: launcher
-    anchor: PanelWindow.Fullscreen
+    width: 600
+    height: 500
+    // Center on primary screen
+    x: (Quickshell.screens[0].width - width) / 2
+    y: (Quickshell.screens[0].height - height) / 2
     visible: false
-    layer: PanelWindow.Above
     focusable: true
+    color: "transparent"
 
-    // Dimmed backdrop
-    Rectangle {
-        anchors.fill: parent
-        color: Theme.background
-        opacity: 0.7
+    OpacityAnimator {
+        id: fadeIn
+        target: launcher
+        from: 0
+        to: 1
+        duration: Theme.animDuration
     }
 
-    // Search overlay
     Rectangle {
-        anchors.centerIn: parent
-        width: 600
-        height: 500
+        anchors.fill: parent
         radius: Theme.radius
         color: Theme.panelBg
 
@@ -29,7 +31,6 @@ PanelWindow {
             padding: Theme.padding
             spacing: Theme.padding
 
-            // Search box
             Rectangle {
                 id: searchBox
                 width: parent.width
@@ -58,7 +59,6 @@ PanelWindow {
                 }
             }
 
-            // App grid
             ListView {
                 id: appList
                 width: parent.width
@@ -72,7 +72,6 @@ PanelWindow {
                     height: 48
                     radius: Theme.radius
                     color: Theme.color0
-                    opacity: 0.5
 
                     Row {
                         anchors.fill: parent
@@ -89,8 +88,8 @@ PanelWindow {
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 2
-                            Text { text: model.name; color: Theme.foreground; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize }
-                            Text { text: model.comment || ""; color: Theme.textMuted; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize - 2 }
+                            Text { text: model.name || ""; color: Theme.foreground; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize }
+                            Text { text: model.genericName || ""; color: Theme.textMuted; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize - 2 }
                         }
                     }
 
@@ -107,21 +106,25 @@ PanelWindow {
     property var filteredApps: []
 
     function loadApps() {
-        // Parse .desktop files from XDG paths
-        // For now, populate with placeholder structure
+        // DesktopEntries.applications is pre-populated by Quickshell
+        const apps = DesktopEntries.applications
         allApps = []
-        filteredApps = allApps
+        for (let i = 0; i < apps.count; i++) {
+            const app = apps.get(i)
+            allApps.push({ id: app.id, name: app.name, genericName: app.genericName, icon: app.icon || "", exec: app.exec || "" })
+        }
+        filteredApps = allApps.slice(0, 20)
     }
 
     function filterApps() {
         const query = searchInput.text.toLowerCase()
         if (query === "") {
-            filteredApps = allApps.slice(0, 20) // top 20 by recency
+            filteredApps = allApps.slice(0, 20)
             return
         }
         filteredApps = allApps.filter(app =>
-            app.name.toLowerCase().includes(query) ||
-            (app.comment && app.comment.toLowerCase().includes(query))
+            (app.name && app.name.toLowerCase().includes(query)) ||
+            (app.genericName && app.genericName.toLowerCase().includes(query))
         )
     }
 
@@ -130,12 +133,13 @@ PanelWindow {
         launcher.visible = false
     }
 
-    Component.onCompleted: {
-        loadApps()
-        launcher.visible = true
+    onVisibleChanged: {
+        if (visible) {
+            loadApps()
+            fadeIn.start()
+        }
     }
 
-    // Keyboard navigation
     Keys.onPressed: (event) => {
         if (event.key === Qt.Key_Escape) launcher.visible = false
         if (event.key === Qt.Key_Return && filteredApps.length > 0) launchApp(filteredApps[0])

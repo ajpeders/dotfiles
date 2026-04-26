@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell.Panels
 
 Item {
     id: clock
@@ -28,16 +27,13 @@ Item {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: calendarDropdown.toggle()
+        onClicked: calendarDropdown.toggle(clock)
     }
 
     CalendarDropdown {
         id: calendarDropdown
-        anchors.top: parent.bottom
-        x: parent.width / 2 - width / 2
     }
 
-    // Update time every minute
     Timer {
         interval: 1000
         repeat: true
