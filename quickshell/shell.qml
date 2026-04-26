@@ -24,9 +24,9 @@ Item {
     }
 
     // Socket server for IPC from Hyprland keybinds
-    Io.SocketServer {
+    SocketServer {
         id: ipcServer
-        path: `/tmp/quickshell-${Quickshell.username}.sock`
+        path: "/tmp/quickshell-alex.sock"
         splitParser: true
 
         onLineReceived: (line) => {
