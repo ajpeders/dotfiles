@@ -74,9 +74,9 @@ Item {
         }
     }
 
-    // OSD layers
-    VolumeOsd { id: volumeOsd }
-    BrightnessOsd { id: brightnessOsd }
+    // OSD layers — lazily instantiated
+    property var _volumeOsd: null
+    property var _brightnessOsd: null
 
     // Lazy-loaded panels
     property var _mediaPopup: null
@@ -172,7 +172,7 @@ Item {
         } else if (action === "mute") {
             Process.start("wpctl", ["set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
         }
-        volumeOsd.show()
+        getVolumeOsd().show()
     }
 
     function handleBrightnessCommand(action) {
@@ -181,6 +181,26 @@ Item {
         } else if (action === "down") {
             Process.start("brightnessctl", ["set", "5%-"])
         }
-        brightnessOsd.show()
+        getBrightnessOsd().show()
+    }
+
+    function getVolumeOsd() {
+        if (!_volumeOsd) {
+            const comp = Qt.createComponent("osd/VolumeOsd.qml")
+            if (comp.status === Component.Ready) {
+                _volumeOsd = comp.createObject(root)
+            }
+        }
+        return _volumeOsd
+    }
+
+    function getBrightnessOsd() {
+        if (!_brightnessOsd) {
+            const comp = Qt.createComponent("osd/BrightnessOsd.qml")
+            if (comp.status === Component.Ready) {
+                _brightnessOsd = comp.createObject(root)
+            }
+        }
+        return _brightnessOsd
     }
 }
