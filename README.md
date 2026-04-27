@@ -7,11 +7,9 @@ Hyprland dotfiles for Arch Linux. Includes an install script for fresh setups an
 | Role | Tool |
 |------|------|
 | Window manager | Hyprland |
+| Desktop shell | Noctalia (bar, launcher, notifications, OSD, control center) |
 | Terminal | Kitty |
 | Shell | Zsh + Oh My Zsh + Powerlevel10k |
-| Status bar | Waybar |
-| App launcher | Rofi |
-| Notifications | SwayNC |
 | Wallpaper | awww |
 | Dynamic theming | wallust (Kanagawa-Wave) |
 | Display manager | ly |
@@ -69,23 +67,28 @@ After pulling changes from this repo on an existing install:
 bash update.sh
 ```
 
-This will pull the latest commits, install any new packages, re-apply symlinks, and hot-reload Hyprland/Waybar/SwayNC if you're in a session.
+This will pull the latest commits, install any new packages, re-apply symlinks, and hot-reload Hyprland if you're in a session.
 
 ## Key Bindings
 
 | Keys | Action |
 |------|--------|
 | `Super + Return` | Terminal (Kitty) |
-| `Super + Space` | App launcher (Rofi) |
+| `Super + Space` | App launcher (Noctalia) |
 | `Super + Q` | Close window |
-| `Super + E` | File manager (Yazi) |
-| `Super + B` | Browser (Firefox) |
+| `Super + E` | Browser (Librewolf) |
+| `Super + B` | btop |
 | `Super + F` | Fullscreen |
 | `Super + Shift + F` | Float window |
 | `Super + V` | Clipboard history |
+| `Super + N` | Notification history |
+| `Super + A` | Control center |
+| `Super + ,` | Settings |
+| `Super + L` | Lock screen |
+| `Super + O` | Session menu |
 | `Super + P` | Screenshot |
 | `Super + Shift + P` | Screenshot region |
-| `Super + Ctrl + P` | Screenshot region → clipboard |
+| `Super + Ctrl + P` | Screenshot region to clipboard |
 | `Super + Tab` | Cycle monitor focus |
 | `Super + 1-5` | Switch workspace |
 | `Super + D/S/W/G` | dev / server / work / game workspace |
@@ -97,15 +100,14 @@ This will pull the latest commits, install any new packages, re-apply symlinks, 
 ```
 ~/.config/
 ├── hypr/               # Hyprland config (split into hypr/config/*.conf)
-├── waybar/             # Status bar
 ├── kitty/              # Terminal
-├── rofi/               # App launcher
+├── noctalia/           # Noctalia shell user config
 ├── wallust/            # Dynamic theming (templates + hooks)
 ├── wallpapers/         # Default wallpaper asset
 ├── zsh/                # Zsh config (ZDOTDIR)
 ├── gtk-3.0/            # GTK3 theme
 ├── gtk-4.0/            # GTK4 theme
-├── theme/              # Wallust apply scripts
+├── theme/              # Wallust color output
 ├── install.sh          # Fresh install bootstrap
 ├── update.sh           # Sync existing install
 └── packages.txt        # Package list (pacman + AUR)

@@ -79,7 +79,7 @@ phase_packages() {
 phase_dotfiles() {
     print_phase "Phase 3: Dotfile Sync"
 
-    local config_dirs=(hypr kitty waybar theme rofi wallust wallpapers gtk-3.0 gtk-4.0 zsh)
+    local config_dirs=(hypr kitty theme wallust wallpapers gtk-3.0 gtk-4.0 zsh noctalia)
     local config_files=(pavucontrol.ini QtProject.conf)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -156,20 +156,6 @@ phase_reload() {
     if command -v hyprctl >/dev/null 2>&1; then
         hyprctl reload >/dev/null 2>&1 && print_status "Hyprland reloaded" \
             || print_error "hyprctl reload failed (non-fatal)"
-    fi
-
-    # Waybar
-    if pgrep -x waybar >/dev/null 2>&1; then
-        killall -SIGUSR2 waybar >/dev/null 2>&1 && print_status "Waybar reloaded" \
-            || print_error "Waybar reload failed (non-fatal)"
-    fi
-
-    # SwayNC
-    if pgrep -x swaync >/dev/null 2>&1; then
-        swaync-client --reload-css -sw >/dev/null 2>&1 \
-            && swaync-client --reload-config -sw >/dev/null 2>&1 \
-            && print_status "SwayNC reloaded" \
-            || print_error "SwayNC reload failed (non-fatal)"
     fi
 
     print_status "Live reload complete"

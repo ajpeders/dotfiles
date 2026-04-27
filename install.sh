@@ -123,7 +123,7 @@ phase_directories() {
 phase_dotfiles() {
     print_phase "Phase 5: Dotfiles"
 
-    local config_dirs=(hypr kitty waybar theme rofi wallust wallpapers gtk-3.0 gtk-4.0 zsh quickshell)
+    local config_dirs=(hypr kitty theme wallust wallpapers gtk-3.0 gtk-4.0 zsh noctalia)
     local config_files=(pavucontrol.ini QtProject.conf)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
