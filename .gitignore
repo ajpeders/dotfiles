@@ -22,6 +22,7 @@
 !gtk-4.0/
 !zsh/
 !noctalia/
+!noctalia/**
 
 # Keep config files in tracked directories
 !.hermes/**
