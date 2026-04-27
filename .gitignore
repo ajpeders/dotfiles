@@ -6,37 +6,35 @@
 !.gitignore
 !CLAUDE.md
 !README.md
+!ARCHITECTURE.md
+!ROADMAP.md
+!HOWTO.md
 !update.sh
 !install.sh
 !packages.txt
 !.hermes/
-!waybar/
 !hypr/
 !theme/
 !kitty/
-!rofi/
 !wallust/
 !wallpapers/
 !gtk-3.0/
 !gtk-4.0/
 !zsh/
+!noctalia/
 
 # Keep config files in tracked directories
 !.hermes/**
-!waybar/**
 !hypr/**
 !theme/**
 !kitty/**
-!rofi/**
 !wallust/**
 !wallpapers/**
 !gtk-3.0/**
 !gtk-4.0/**
 !zsh/**
+!noctalia/**
 
 # Ignore generated zsh runtime files
 zsh/.zcompdump*
 zsh/.zsh_history
-
-# Ignore Claude Code tooling artifacts
-rofi/.superpowers/

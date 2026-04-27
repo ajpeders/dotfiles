@@ -6,24 +6,14 @@ xdg-desktop-portal-hyprland
 # Terminal
 kitty
 
-# Status bar
-waybar
-
-# App launcher
-rofi
+# Desktop shell (Noctalia)
+noctalia-shell
 
 # File manager
 thunar
 
 # Browser
 librewolf
-
-# Quickshell desktop shell
-quickshell
-qt6-svg
-qt6-imageformats
-qt6-multimedia
-qt6-5compat
 
 # Authentication
 polkit-gnome
@@ -32,7 +22,7 @@ polkit-gnome
 wl-clipboard
 cliphist
 
-# Audio control (usually pre-installed)
+# Audio control
 pipewire
 pipewire-pulse
 wireplumber
@@ -57,6 +47,15 @@ wallust
 # Display configuration
 nwg-displays
 
+# Night light
+wlsunset
+
+# Monitor brightness (desktop)
+ddcutil
+
+# Calendar sync
+evolution-data-server
+
 # Fonts and icons
 ttf-jetbrains-mono-nerd
 noto-fonts
@@ -74,6 +73,5 @@ git
 curl
 jq
 eza
-pavucontrol
 btop
 yazi
