@@ -10,7 +10,7 @@ Hyprland dotfiles for Arch Linux. Includes an install script for fresh setups an
 | Desktop shell | Noctalia (bar, launcher, notifications, OSD, control center) |
 | Terminal | Kitty |
 | Shell | Zsh + Oh My Zsh + Powerlevel10k |
-| Wallpaper | awww |
+| Wallpaper | Noctalia (built-in) |
 | Dynamic theming | wallust (Kanagawa-Wave) |
 | Display manager | ly |
 | File manager | Yazi (TUI) / Thunar (GUI) |
@@ -49,9 +49,6 @@ The script will:
 ```bash
 # Configure your prompt (run in a new zsh session)
 p10k configure
-
-# Set a wallpaper
-awww img ~/.config/wallpapers/wallpaper.jpg --resize crop
 
 # Reapply the default color theme
 wallust theme Kanagawa-Wave
@@ -103,6 +100,7 @@ This will pull the latest commits, install any new packages, re-apply symlinks, 
 ├── kitty/              # Terminal
 ├── noctalia/           # Noctalia shell user config
 ├── wallust/            # Dynamic theming (templates + hooks)
+├── yazi/               # Yazi file manager config
 ├── wallpapers/         # Default wallpaper asset
 ├── zsh/                # Zsh config (ZDOTDIR)
 ├── gtk-3.0/            # GTK3 theme

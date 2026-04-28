@@ -1,6 +1,5 @@
 # Core Hyprland packages
 hyprland
-awww
 xdg-desktop-portal-hyprland
 
 # Terminal
@@ -75,3 +74,5 @@ jq
 eza
 btop
 yazi
+localsend-go
+realesrgan-ncnn-vulkan

@@ -123,7 +123,7 @@ phase_directories() {
 phase_dotfiles() {
     print_phase "Phase 5: Dotfiles"
 
-    local config_dirs=(hypr kitty theme wallust wallpapers gtk-3.0 gtk-4.0 zsh noctalia)
+    local config_dirs=(hypr kitty theme wallust wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi)
     local config_files=(pavucontrol.ini QtProject.conf)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -270,6 +270,7 @@ phase_services() {
 
     enable_system_service NetworkManager
     enable_system_service bluetooth
+    enable_system_service avahi-daemon
     enable_user_service pipewire
     enable_user_service pipewire-pulse
     enable_user_service wireplumber
@@ -321,13 +322,10 @@ phase_reminders() {
     echo -e "${BOLD}1. Configure your prompt${NC}"
     echo "   Open a new terminal and run: p10k configure"
     echo ""
-    echo -e "${BOLD}2. Set a wallpaper${NC}"
-    echo "   awww img ~/.config/wallpapers/wallpaper.jpg --resize crop"
-    echo ""
-    echo -e "${BOLD}3. Reapply the default color theme${NC}"
+    echo -e "${BOLD}2. Reapply the default color theme${NC}"
     echo "   wallust theme $WALLUST_THEME"
     echo ""
-    echo -e "${BOLD}4. Reboot and select Hyprland from ly${NC}"
+    echo -e "${BOLD}3. Reboot and select Hyprland from ly${NC}"
     echo ""
 }
 

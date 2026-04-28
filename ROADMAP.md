@@ -16,13 +16,10 @@ Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, 
 
 ## Next
 
-- [ ] Configure Noctalia theme (Kanagawa color scheme, transparency, blur)
-- [ ] Set up Noctalia wallpaper integration with awww
-- [ ] Review and clean up packages.txt (remove anything no longer needed)
 - [ ] Test install.sh on a fresh system
+- [ ] Review wlsunset — Noctalia has built-in night light, may be redundant
 
 ## Ideas
 
 - Desktop widgets via Noctalia
-- Night light (wlsunset) auto-schedule
 - Gaming mode toggle (disable shell animations, notifications)

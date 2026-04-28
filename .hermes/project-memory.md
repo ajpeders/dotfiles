@@ -5,7 +5,7 @@ Scope
 - Default working mode: audit first, then propose small one-at-a-time changes.
 
 Stable setup facts
-- Managed directories: hypr, kitty, waybar, theme, rofi, wallust, wallpapers, gtk-3.0, gtk-4.0, zsh.
+- Managed directories: hypr, kitty, theme, wallust, wallpapers, gtk-3.0, gtk-4.0, zsh, noctalia, yazi.
 - Managed files: pavucontrol.ini, QtProject.conf.
 - Fresh-machine bootstrap uses install.sh; existing-machine sync uses update.sh.
 
@@ -16,7 +16,7 @@ Hyprland conventions
 - hypr/workspaces.conf currently exists as an empty placeholder and is not sourced.
 
 Theme / wallpaper conventions
-- Wallpaper tool is awww.
+- Wallpaper is managed by Noctalia (built-in).
 - Dynamic theming is wallust with the Kanagawa-Wave theme.
 - Generated theme outputs such as waybar/colors-waybar.css, gtk wallust-colors.css, rofi wallust-colors.rasi, and ~/.cache/wallust outputs should not be hand-edited.
 
