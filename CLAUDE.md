@@ -8,7 +8,7 @@ Arch Linux + Hyprland desktop dotfiles. Git repo in `~/.config/`, `install.sh` s
 - **Shell:** Noctalia — desktop shell (bar, launcher, notifications, OSD, control center, lock screen)
 - **Terminal:** Kitty
 - **Shell:** Zsh (Oh My Zsh + Powerlevel10k) at `zsh/` via `ZDOTDIR`
-- **Wallpaper:** awww (not swww/hyprpaper)
+- **Wallpaper:** Noctalia (built-in wallpaper manager)
 - **Theming:** wallust (Kanagawa-Wave) — generates colors for hypr, gtk, kitty, yazi, vscode
 - **IPC:** `qs -c noctalia-shell ipc call <target> <function>` for keybinds
 

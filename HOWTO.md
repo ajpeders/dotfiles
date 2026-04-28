@@ -2,8 +2,12 @@
 
 ## Change wallpaper
 
+Noctalia manages wallpapers. Use IPC or the settings panel:
+
 ```bash
-awww img ~/path/to/image.jpg --resize crop
+qs -c noctalia-shell ipc call wallpaper set ~/Pictures/Wallpapers/image.jpg ""
+qs -c noctalia-shell ipc call wallpaper random ""
+qs -c noctalia-shell ipc call settings openTab wallpaper
 ```
 
 ## Reapply color theme

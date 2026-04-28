@@ -23,6 +23,7 @@
 !zsh/
 !noctalia/
 !noctalia/**
+!yazi/
 
 # Keep config files in tracked directories
 !.hermes/**
@@ -35,6 +36,7 @@
 !gtk-4.0/**
 !zsh/**
 !noctalia/**
+!yazi/**
 
 # Ignore generated zsh runtime files
 zsh/.zcompdump*

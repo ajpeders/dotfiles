@@ -10,8 +10,8 @@ Dotfiles managed as a git repo at `~/.config/`. The `install.sh` script symlinks
 ┌─────────────────────────────────────────┐
 │            Hyprland (compositor)         │
 ├──────────┬──────────┬───────────────────┤
-│ Noctalia │  awww    │  wallust          │
-│ (shell)  │ (wallpaper) │ (theming)      │
+│ Noctalia            │  wallust          │
+│ (shell + wallpaper) │  (theming)        │
 ├──────────┴──────────┴───────────────────┤
 │         Kitty + Zsh (terminal)          │
 ├─────────────────────────────────────────┤
@@ -45,6 +45,6 @@ Noctalia has its own theming (Kanagawa built-in). wallust handles everything els
 ## Key Decisions
 
 - **Noctalia over custom Quickshell** — Noctalia provides bar, launcher, notifications, clipboard, OSD, control center, and lock screen out of the box. Custom Quickshell was abandoned due to PipeWire binding issues and complexity.
-- **awww over swww/hyprpaper** — simpler wallpaper daemon
+- **Noctalia wallpaper** — built-in wallpaper manager with Material You color generation, replaces awww
 - **wallust over pywal** — better template system, v3 supports more color spaces
 - **ly over SDDM/GDM** — minimal TUI display manager

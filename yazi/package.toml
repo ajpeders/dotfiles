@@ -1,0 +1,9 @@
+[[plugin.deps]]
+use = "boydaihungst/restore"
+rev = "4eda0bf"
+hash = "778941e7f1ebbacd60f4e254bb3c51de"
+
+[[flavor.deps]]
+use = "yazi-rs/flavors:catppuccin-mocha"
+rev = "9511cb0"
+hash = "7dfe41c9c3d9be76da8a844263d0bbed"
