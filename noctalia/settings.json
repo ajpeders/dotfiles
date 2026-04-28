@@ -88,8 +88,8 @@
             "center": [
                 {
                     "clockColor": "none",
-                    "customFont": "",
-                    "formatHorizontal": "HH:mm ddd, MMM dd",
+                    "customFont": "Sans Serif",
+                    "formatHorizontal": "h:mm:ss AP ddd, MMM dd",
                     "formatVertical": "HH mm - dd MM",
                     "id": "Clock",
                     "tooltipFormat": "HH:mm ddd, MMM dd",
@@ -133,12 +133,12 @@
             "right": [
                 {
                     "colorName": "primary",
-                    "hideWhenIdle": false,
+                    "hideWhenIdle": true,
                     "id": "AudioVisualizer",
                     "width": 200
                 },
                 {
-                    "compactMode": false,
+                    "compactMode": true,
                     "hideMode": "hidden",
                     "hideWhenIdle": false,
                     "id": "MediaMini",
@@ -259,7 +259,7 @@
         "manualSunrise": "06:30",
         "manualSunset": "18:30",
         "monitorForColors": "",
-        "predefinedScheme": "Kanagawa",
+        "predefinedScheme": "Mine",
         "schedulingMode": "off",
         "syncGsettings": true,
         "useWallpaperColors": false
@@ -297,6 +297,9 @@
             "left": [
                 {
                     "id": "Network"
+                },
+                {
+                    "id": "plugin:dns-switcher"
                 },
                 {
                     "id": "Bluetooth"
@@ -373,7 +376,7 @@
         "autoStartAuth": false,
         "avatarImage": "/home/alex/.face",
         "boxRadiusRatio": 1,
-        "clockFormat": "hh\\nmm",
+        "clockFormat": "HH:mm:ss ",
         "clockStyle": "custom",
         "compactLockScreen": false,
         "dimmerOpacity": 0,
@@ -486,7 +489,7 @@
         "autoSchedule": true,
         "dayTemp": "6500",
         "enabled": true,
-        "forced": true,
+        "forced": false,
         "manualSunrise": "06:30",
         "manualSunset": "18:30",
         "nightTemp": "4000"
@@ -623,7 +626,7 @@
         "diskAvailWarningThreshold": 20,
         "diskCriticalThreshold": 90,
         "diskWarningThreshold": 80,
-        "enableDgpuMonitoring": false,
+        "enableDgpuMonitoring": true,
         "externalMonitor": "resources || missioncenter || jdsystemmonitor || corestats || system-monitoring-center || gnome-system-monitor || plasma-systemmonitor || mate-system-monitor || ukui-system-monitor || deepin-system-monitor || pantheon-system-monitor",
         "gpuCriticalThreshold": 90,
         "gpuWarningThreshold": 80,
@@ -661,6 +664,34 @@
         "enableMultiMonitorDirectories": false,
         "enabled": true,
         "favorites": [
+            {
+                "appearance": "dark",
+                "colorScheme": "Kanagawa",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#76946a",
+                    "#c0a36e",
+                    "#7e9cd8",
+                    "#c34043"
+                ],
+                "path": "/home/alex/Pictures/Wallpapers/maoguin.jpg",
+                "useWallpaperColors": false
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Mine",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#e1e2d5",
+                    "#2d2a2e",
+                    "#2d2a2e",
+                    "#d94a59"
+                ],
+                "path": "/home/alex/Pictures/Wallpapers/upscaled_maoguin.png",
+                "useWallpaperColors": false
+            }
         ],
         "fillColor": "#000000",
         "fillMode": "crop",
@@ -691,7 +722,7 @@
         "useOriginalImages": false,
         "useSolidColor": false,
         "useWallhaven": false,
-        "viewMode": "single",
+        "viewMode": "recursive",
         "wallhavenApiKey": "",
         "wallhavenCategories": "111",
         "wallhavenOrder": "desc",
