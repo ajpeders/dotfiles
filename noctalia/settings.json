@@ -132,12 +132,6 @@
             ],
             "right": [
                 {
-                    "colorName": "primary",
-                    "hideWhenIdle": true,
-                    "id": "AudioVisualizer",
-                    "width": 200
-                },
-                {
                     "compactMode": true,
                     "hideMode": "hidden",
                     "hideWhenIdle": false,
@@ -148,7 +142,7 @@
                     "showAlbumArt": true,
                     "showArtistFirst": true,
                     "showProgressRing": true,
-                    "showVisualizer": false,
+                    "showVisualizer": true,
                     "textColor": "none",
                     "useFixedWidth": false,
                     "visualizerType": "linear"
@@ -488,7 +482,7 @@
     "nightLight": {
         "autoSchedule": true,
         "dayTemp": "6500",
-        "enabled": true,
+        "enabled": false,
         "forced": false,
         "manualSunrise": "06:30",
         "manualSunset": "18:30",
