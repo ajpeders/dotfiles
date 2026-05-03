@@ -253,7 +253,7 @@
         "manualSunrise": "06:30",
         "manualSunset": "18:30",
         "monitorForColors": "",
-        "predefinedScheme": "Mine",
+        "predefinedScheme": "Occult Umbral",
         "schedulingMode": "off",
         "syncGsettings": true,
         "useWallpaperColors": false
@@ -674,14 +674,14 @@
             },
             {
                 "appearance": "dark",
-                "colorScheme": "Mine",
+                "colorScheme": "Occult Umbral",
                 "darkMode": true,
                 "generationMethod": "tonal-spot",
                 "paletteColors": [
-                    "#e1e2d5",
-                    "#2d2a2e",
-                    "#2d2a2e",
-                    "#d94a59"
+                    "#8b2e2e",
+                    "#8baa82",
+                    "#9a7398",
+                    "#c25b5b"
                 ],
                 "path": "/home/alex/Pictures/Wallpapers/upscaled_maoguin.png",
                 "useWallpaperColors": false

@@ -12,7 +12,7 @@ noctalia-shell
 thunar
 
 # Browser
-librewolf
+librewolf-bin
 
 # Authentication
 polkit-gnome
@@ -67,12 +67,18 @@ zsh
 # Display manager
 ly
 
+# Editor
+neovim
+
 # Utilities
 git
 curl
+wget
+unzip
 jq
 eza
 btop
+fastfetch
 yazi
 localsend-go
 realesrgan-ncnn-vulkan
