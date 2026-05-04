@@ -287,6 +287,10 @@ phase_services() {
 
     enable_user_service() {
         local svc="$1"
+        if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -z "${XDG_RUNTIME_DIR:-}" ]; then
+            print_info "No user session bus; skipping user service: $svc (will auto-start after reboot)"
+            return
+        fi
         if systemctl --user is-enabled --quiet "$svc" 2>/dev/null; then
             print_status "Already enabled for user: $svc"
         else
