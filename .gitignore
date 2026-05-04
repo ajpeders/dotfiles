@@ -11,6 +11,7 @@
 !HOWTO.md
 !update.sh
 !install.sh
+!sync-private.sh
 !packages.txt
 !.hermes/
 !hypr/
