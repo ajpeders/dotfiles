@@ -1,6 +1,6 @@
 #!/bin/bash
 # Arch Linux dotfiles bootstrap script.
-# Usage: bash install.sh [--sync-private=user@host]
+# Usage: bash install.sh
 # Run from within the cloned dotfiles repo as a non-root user.
 # Safe to re-run: each phase checks whether its work is already done.
 
@@ -18,15 +18,6 @@ print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase() { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SYNC_HOST=""
-
-# Parse flags
-for arg in "$@"; do
-    case "$arg" in
-        --sync-private=*) SYNC_HOST="${arg#*=}" ;;
-        --sync-private)   print_error "--sync-private requires a value: --sync-private=user@host"; exit 1 ;;
-    esac
-done
 
 phase_preflight() {
     print_phase "Phase 1: Preflight"
@@ -58,9 +49,6 @@ phase_preflight() {
     echo "  - Configure zsh, oh-my-zsh, plugins, powerlevel10k, and colorls"
     echo "  - Enable NetworkManager, bluetooth, pipewire, pipewire-pulse, and wireplumber"
     echo "  - Enable the ly display manager"
-    if [ -n "$SYNC_HOST" ]; then
-        echo "  - Sync private files from $SYNC_HOST via rsync"
-    fi
     echo ""
     read -rp "Continue? [y/N] " confirm
     [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
@@ -334,51 +322,6 @@ phase_display_manager() {
 }
 
 
-phase_sync_private() {
-    if [ -z "$SYNC_HOST" ]; then
-        return
-    fi
-
-    print_phase "Phase 10: Sync Private Files"
-
-    if ! command -v rsync >/dev/null 2>&1; then
-        print_error "rsync not found; install it first"
-        return
-    fi
-
-    # Test SSH connectivity
-    print_info "Testing SSH connection to $SYNC_HOST..."
-    if ! ssh -o ConnectTimeout=5 -o BatchMode=yes "$SYNC_HOST" true 2>/dev/null; then
-        print_error "Cannot connect to $SYNC_HOST — check SSH key/config and retry"
-        return
-    fi
-    print_status "SSH connection OK"
-
-    # Paths to sync: local_dest <- remote_src
-    # Add more entries here as needed (e.g. ssh config, fonts)
-    local -A sync_paths=(
-        ["$HOME/Pictures/Wallpapers"]="Pictures/Wallpapers/"
-        ["$HOME/.ssh/config.d"]="ssh-hosts/"
-    )
-
-    for local_dest in "${!sync_paths[@]}"; do
-        local remote_src="${sync_paths[$local_dest]}"
-        local name
-        name="$(basename "$local_dest")"
-
-        # Check if remote path exists
-        if ! ssh "$SYNC_HOST" "[ -d '$remote_src' ]" 2>/dev/null; then
-            print_info "Remote path not found, skipping: $remote_src"
-            continue
-        fi
-
-        mkdir -p "$local_dest"
-        print_info "Syncing $name from $SYNC_HOST:$remote_src..."
-        rsync -avz --progress -e ssh "$SYNC_HOST:$remote_src" "$local_dest/"
-        print_status "Synced: $name"
-    done
-}
-
 phase_reminders() {
     print_phase "Done"
 
@@ -400,5 +343,4 @@ phase_dotfiles
 phase_shell
 phase_services
 phase_display_manager
-phase_sync_private
 phase_reminders
