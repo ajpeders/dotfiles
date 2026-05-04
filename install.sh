@@ -110,12 +110,10 @@ phase_packages() {
     local failed=()
     print_info "Installing ${#pkgs[@]} packages via yay; already-installed packages are skipped..."
     for pkg in "${pkgs[@]}"; do
-        if yay -S --needed --noconfirm "$pkg" 2>&1; then
-            true
-        else
+        yay -S --needed --noconfirm "$pkg" || {
             print_error "Failed to install: $pkg (skipping)"
             failed+=("$pkg")
-        fi
+        }
     done
 
     if [ "${#failed[@]}" -gt 0 ]; then
