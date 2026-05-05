@@ -38,27 +38,39 @@ if ! ssh -o ConnectTimeout=5 -o BatchMode=yes "$SYNC_HOST" true 2>/dev/null; the
 fi
 print_status "SSH connection OK"
 
-# Paths to sync: local_dest <- remote_src
-# Add more entries here as needed (e.g. fonts, GPG keys)
-declare -A sync_paths=(
-    ["$HOME/Pictures/Wallpapers"]="Pictures/Wallpapers/"
-    ["$HOME/.ssh/config.d"]="ssh-hosts/"
-)
-
-for local_dest in "${!sync_paths[@]}"; do
-    remote_src="${sync_paths[$local_dest]}"
+# Sync helper: sync_dir remote_src local_dest [extra rsync args...]
+sync_dir() {
+    local remote_src="$1"
+    local local_dest="$2"
+    shift 2
+    local name
     name="$(basename "$local_dest")"
 
-    # Check if remote path exists
     if ! ssh "$SYNC_HOST" "[ -d '$remote_src' ]" 2>/dev/null; then
         print_info "Remote path not found, skipping: $remote_src"
-        continue
+        return
     fi
 
     mkdir -p "$local_dest"
     print_info "Syncing $name from $SYNC_HOST:$remote_src..."
-    rsync -avz --progress -e ssh "$SYNC_HOST:$remote_src" "$local_dest/"
+    rsync -avz --progress -e ssh "$@" "$SYNC_HOST:$remote_src" "$local_dest/"
     print_status "Synced: $name"
-done
+}
+
+# Wallpapers
+sync_dir "Pictures/Wallpapers/" "$HOME/Pictures/Wallpapers"
+
+# SSH hosts
+sync_dir "ssh-hosts/" "$HOME/.ssh/config.d"
+
+# Librewolf profile (extensions, bookmarks, settings — excluding caches)
+sync_dir ".config/librewolf/" "$HOME/.config/librewolf" \
+    --exclude="*/cache2/" \
+    --exclude="*/Cache/" \
+    --exclude="*/storage/default/" \
+    --exclude="*/crashes/" \
+    --exclude="*/datareporting/" \
+    --exclude="*/saved-telemetry-pings/" \
+    --exclude="*/thumbnails/"
 
 print_status "Done"
