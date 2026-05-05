@@ -253,7 +253,7 @@
         "manualSunrise": "06:30",
         "manualSunset": "18:30",
         "monitorForColors": "",
-        "predefinedScheme": "Occult Umbral",
+        "predefinedScheme": "Ayu",
         "schedulingMode": "off",
         "syncGsettings": true,
         "useWallpaperColors": false
@@ -415,7 +415,7 @@
         "passwordChars": false,
         "radiusRatio": 1,
         "reverseScroll": false,
-        "scaleRatio": 1.05,
+        "scaleRatio": 0.9,
         "screenRadiusRatio": 1,
         "shadowDirection": "bottom_right",
         "shadowOffsetX": 2,
@@ -674,14 +674,14 @@
             },
             {
                 "appearance": "dark",
-                "colorScheme": "Occult Umbral",
+                "colorScheme": "Ayu",
                 "darkMode": true,
                 "generationMethod": "tonal-spot",
                 "paletteColors": [
-                    "#8b2e2e",
-                    "#8baa82",
-                    "#9a7398",
-                    "#c25b5b"
+                    "#e6b450",
+                    "#aad94c",
+                    "#39bae6",
+                    "#d95757"
                 ],
                 "path": "/home/alex/Pictures/Wallpapers/upscaled_maoguin.png",
                 "useWallpaperColors": false
@@ -702,7 +702,7 @@
         "showHiddenFiles": false,
         "skipStartupTransition": false,
         "solidColor": "#1a1a2e",
-        "sortOrder": "name",
+        "sortOrder": "date_desc",
         "transitionDuration": 1500,
         "transitionEdgeSmoothness": 0.05,
         "transitionType": [

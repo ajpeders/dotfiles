@@ -8,7 +8,6 @@ Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, 
 
 - [x] Hyprland base config (workspaces, keybinds, window rules)
 - [x] Kitty terminal + Zsh/P10k shell
-- [x] wallust dynamic theming (Kanagawa-Wave)
 - [x] Noctalia shell (replaced waybar + rofi + swaync)
 - [x] Keybinds updated for Noctalia IPC
 - [x] Install/update scripts updated

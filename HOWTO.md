@@ -10,12 +10,6 @@ qs -c noctalia-shell ipc call wallpaper random ""
 qs -c noctalia-shell ipc call settings openTab wallpaper
 ```
 
-## Reapply color theme
-
-```bash
-wallust theme Kanagawa-Wave
-```
-
 ## Noctalia IPC
 
 All Noctalia commands follow: `qs -c noctalia-shell ipc call <target> <function>`

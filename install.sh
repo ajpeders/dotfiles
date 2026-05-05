@@ -138,7 +138,7 @@ phase_directories() {
 phase_dotfiles() {
     print_phase "Phase 5: Dotfiles"
 
-    local config_dirs=(hypr kitty theme wallust wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi)
+    local config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi)
     local config_files=(pavucontrol.ini QtProject.conf)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -331,7 +331,10 @@ phase_reminders() {
     echo -e "${BOLD}1. Configure your prompt${NC}"
     echo "   Open a new terminal and run: p10k configure"
     echo ""
-    echo -e "${BOLD}2. Reboot and select Hyprland from ly${NC}"
+    echo -e "${BOLD}2. Sync private files (wallpapers, ssh hosts)${NC}"
+    echo "   bash $SCRIPT_DIR/sync-private.sh user@your-main-host"
+    echo ""
+    echo -e "${BOLD}3. Reboot and select Hyprland from ly${NC}"
     echo ""
 }
 

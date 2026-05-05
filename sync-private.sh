@@ -30,9 +30,13 @@ if ! command -v rsync >/dev/null 2>&1; then
     exit 1
 fi
 
+# Use absolute paths to bypass any ssh wrapper (e.g. kitty's ssh kitten)
+SSH_BIN="$(command -v /usr/bin/ssh || command -v ssh)"
+RSYNC_BIN="$(command -v rsync)"
+
 # Test SSH connectivity
 print_info "Testing SSH connection to $SYNC_HOST..."
-if ! ssh -o ConnectTimeout=5 -o BatchMode=yes "$SYNC_HOST" true 2>/dev/null; then
+if ! "$SSH_BIN" -o ConnectTimeout=10 "$SYNC_HOST" true; then
     print_error "Cannot connect to $SYNC_HOST — check SSH key/config and retry"
     exit 1
 fi
@@ -46,14 +50,14 @@ sync_dir() {
     local name
     name="$(basename "$local_dest")"
 
-    if ! ssh "$SYNC_HOST" "[ -d '$remote_src' ]" 2>/dev/null; then
+    if ! "$SSH_BIN" "$SYNC_HOST" "[ -d '$remote_src' ]" 2>/dev/null; then
         print_info "Remote path not found, skipping: $remote_src"
         return
     fi
 
     mkdir -p "$local_dest"
     print_info "Syncing $name from $SYNC_HOST:$remote_src..."
-    rsync -avz --progress -e ssh "$@" "$SYNC_HOST:$remote_src" "$local_dest/"
+    "$RSYNC_BIN" -avz --progress -e "$SSH_BIN" "$@" "$SYNC_HOST:$remote_src" "$local_dest/"
     print_status "Synced: $name"
 }
 
@@ -61,7 +65,7 @@ sync_dir() {
 sync_dir "Pictures/Wallpapers/" "$HOME/Pictures/Wallpapers"
 
 # SSH hosts
-sync_dir "ssh-hosts/" "$HOME/.ssh/config.d"
+sync_dir ".ssh/config.d/" "$HOME/.ssh/config.d"
 
 # Librewolf profile (extensions, bookmarks, settings — excluding caches)
 sync_dir ".config/librewolf/" "$HOME/.config/librewolf" \
