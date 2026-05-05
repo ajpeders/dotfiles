@@ -11,7 +11,6 @@ Hyprland dotfiles for Arch Linux. Includes an install script for fresh setups an
 | Terminal | Kitty |
 | Shell | Zsh + Oh My Zsh + Powerlevel10k |
 | Wallpaper | Noctalia (built-in) |
-| Dynamic theming | wallust (Kanagawa-Wave) |
 | Display manager | ly |
 | File manager | Yazi (TUI) / Thunar (GUI) |
 
@@ -42,16 +41,12 @@ The script will:
 5. Set zsh as default shell and install Oh My Zsh, plugins, and Powerlevel10k
 6. Enable NetworkManager, bluetooth, pipewire, and wireplumber
 7. Install and enable `ly` display manager
-8. Apply the Kanagawa-Wave wallust theme
 
 ### After reboot
 
 ```bash
 # Configure your prompt (run in a new zsh session)
 p10k configure
-
-# Reapply the default color theme
-wallust theme Kanagawa-Wave
 ```
 
 Then log out and select **Hyprland** from the ly login screen.
@@ -99,13 +94,12 @@ This will pull the latest commits, install any new packages, re-apply symlinks, 
 ├── hypr/               # Hyprland config (split into hypr/config/*.conf)
 ├── kitty/              # Terminal
 ├── noctalia/           # Noctalia shell user config
-├── wallust/            # Dynamic theming (templates + hooks)
 ├── yazi/               # Yazi file manager config
 ├── wallpapers/         # Default wallpaper asset
 ├── zsh/                # Zsh config (ZDOTDIR)
 ├── gtk-3.0/            # GTK3 theme
 ├── gtk-4.0/            # GTK4 theme
-├── theme/              # Wallust color output
+├── theme/              # Static color theme
 ├── install.sh          # Fresh install bootstrap
 ├── update.sh           # Sync existing install
 └── packages.txt        # Package list (pacman + AUR)

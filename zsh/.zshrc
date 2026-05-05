@@ -112,11 +112,16 @@ source $ZSH/oh-my-zsh.sh
 
 # To customize prompt, run `p10k configure` or edit $ZDOTDIR/.p10k.zsh.
 [[ ! -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] || source ${ZDOTDIR:-$HOME}/.p10k.zsh
-alias ssh='kitten ssh'
+# Route ssh through the kitty kitten only when we're actually inside a kitty
+# window. Outside kitty (TTY, other terminals, scripts) the kitten errors out
+# with "The SSH kitten is meant to run inside a kitty window".
+if [[ -n "${KITTY_WINDOW_ID:-}" ]]; then
+    alias ssh='kitten ssh'
+fi
 
 alias ls='eza --icons'
 alias lc='eza -la --icons --group-directories-first'
 
 unset zle_bracketed_paste
 
-. "$HOME/.local/bin/env"
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
