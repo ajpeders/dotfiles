@@ -122,7 +122,7 @@
                     "colorizeIcons": false,
                     "hideMode": "hidden",
                     "id": "ActiveWindow",
-                    "maxWidth": 145,
+                    "maxWidth": 500,
                     "scrollingMode": "hover",
                     "showIcon": true,
                     "showText": true,
@@ -136,9 +136,9 @@
                     "hideMode": "hidden",
                     "hideWhenIdle": false,
                     "id": "MediaMini",
-                    "maxWidth": 10000,
+                    "maxWidth": 500,
                     "panelShowAlbumArt": true,
-                    "scrollingMode": "always",
+                    "scrollingMode": "hover",
                     "showAlbumArt": true,
                     "showArtistFirst": true,
                     "showProgressRing": true,
@@ -179,19 +179,19 @@
                     "diskPath": "/",
                     "iconColor": "none",
                     "id": "SystemMonitor",
-                    "showCpuCores": false,
-                    "showCpuFreq": false,
+                    "showCpuCores": true,
+                    "showCpuFreq": true,
                     "showCpuTemp": true,
                     "showCpuUsage": true,
-                    "showDiskAvailable": false,
-                    "showDiskUsage": false,
-                    "showDiskUsageAsPercent": false,
-                    "showGpuTemp": false,
-                    "showLoadAverage": false,
-                    "showMemoryAsPercent": false,
+                    "showDiskAvailable": true,
+                    "showDiskUsage": true,
+                    "showDiskUsageAsPercent": true,
+                    "showGpuTemp": true,
+                    "showLoadAverage": true,
+                    "showMemoryAsPercent": true,
                     "showMemoryUsage": true,
-                    "showNetworkStats": false,
-                    "showSwapUsage": false,
+                    "showNetworkStats": true,
+                    "showSwapUsage": true,
                     "textColor": "none",
                     "useMonospaceFont": true,
                     "usePadding": false
@@ -635,8 +635,36 @@
     },
     "templates": {
         "activeTemplates": [
+            {
+                "enabled": true,
+                "id": "hyprland"
+            },
+            {
+                "enabled": true,
+                "id": "code"
+            },
+            {
+                "enabled": true,
+                "id": "steam"
+            },
+            {
+                "enabled": true,
+                "id": "kitty"
+            },
+            {
+                "enabled": true,
+                "id": "btop"
+            },
+            {
+                "enabled": true,
+                "id": "discord"
+            },
+            {
+                "enabled": true,
+                "id": "qt"
+            }
         ],
-        "enableUserTheming": false
+        "enableUserTheming": true
     },
     "ui": {
         "boxBorderEnabled": false,
