@@ -77,12 +77,21 @@ phase_packages() {
         print_status "kitty installed"
     fi
 
-    if brew list wireguard-tools >/dev/null 2>&1; then
-        print_status "wireguard-tools already installed"
+    if command -v mas >/dev/null 2>&1; then
+        print_status "mas already installed"
     else
-        print_info "Installing wireguard-tools..."
-        brew install wireguard-tools
-        print_status "wireguard-tools installed"
+        print_info "Installing mas (Mac App Store CLI)..."
+        brew install mas
+        print_status "mas installed"
+    fi
+
+    # WireGuard — official Mac App Store app (id 1451685025)
+    if mas list 2>/dev/null | grep -q '^1451685025'; then
+        print_status "WireGuard already installed"
+    else
+        print_info "Installing WireGuard from Mac App Store..."
+        print_info "(Requires being signed in to the App Store.)"
+        mas install 1451685025 || print_error "WireGuard install failed — sign in to App Store and run: mas install 1451685025"
     fi
 }
 
@@ -152,10 +161,8 @@ phase_reminders() {
     echo "   open -a AeroSpace"
     echo ""
     echo -e "${BOLD}6. Connect WireGuard${NC}"
-    echo "   Config lives at ~/.config/wireguard/alex.conf (sync via sync-private.sh)"
-    echo "   Bring up: sudo wg-quick up ~/.config/wireguard/alex.conf"
-    echo "   Bring down: sudo wg-quick down ~/.config/wireguard/alex.conf"
-    echo "   For a menu-bar UI, install 'WireGuard' from the Mac App Store and import the .conf."
+    echo "   Open the WireGuard app and import ~/.config/wireguard/alex.conf"
+    echo "   (or drag-and-drop the .conf onto the app)."
     echo ""
 }
 
