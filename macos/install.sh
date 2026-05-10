@@ -126,8 +126,31 @@ phase_dotfiles() {
     link "$SCRIPT_DIR/com.alex.mount.share.plist" "$HOME/Library/LaunchAgents/com.alex.mount.share.plist"
 }
 
+phase_keychain() {
+    print_phase "Phase 5: Keychain (SMB password)"
+
+    if /usr/bin/security find-internet-password -a ween -s share.thelunadog.com >/dev/null 2>&1; then
+        print_status "SMB keychain entry already exists for ween@share.thelunadog.com"
+        return
+    fi
+
+    print_info "No keychain entry found for ween@share.thelunadog.com."
+    read -rp "Seed it now? You'll be prompted for the SMB password. [y/N] " confirm
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        print_info "Skipped. Seed later with:"
+        echo "    /usr/bin/security add-internet-password -a ween -s share.thelunadog.com -r 'smb ' -w"
+        return
+    fi
+
+    if /usr/bin/security add-internet-password -a ween -s share.thelunadog.com -r 'smb ' -w; then
+        print_status "Keychain entry added"
+    else
+        print_error "security command failed; run it manually after install"
+    fi
+}
+
 phase_launchagents() {
-    print_phase "Phase 5: LaunchAgents"
+    print_phase "Phase 6: LaunchAgents"
 
     local plist="$HOME/Library/LaunchAgents/com.alex.mount.share.plist"
     if launchctl list | grep -q com.alex.mount.share; then
@@ -144,25 +167,25 @@ phase_reminders() {
     echo ""
     echo -e "${GREEN}Installation complete.${NC} Manual follow-ups:"
     echo ""
-    echo -e "${BOLD}1. Seed Keychain with the SMB password${NC}"
-    echo "   /usr/bin/security add-internet-password -a ween -s share.thelunadog.com -r 'smb ' -w"
-    echo ""
-    echo -e "${BOLD}2. Grant kitty Full Disk Access${NC}"
+    echo -e "${BOLD}1. Grant kitty Full Disk Access${NC}"
     echo "   System Settings → Privacy & Security → Full Disk Access → add kitty.app"
     echo "   (Required to read /Volumes/share from the terminal.)"
     echo ""
-    echo -e "${BOLD}3. Trigger SMB mount${NC}"
+    echo -e "${BOLD}2. Trigger SMB mount${NC}"
     echo "   launchctl start com.alex.mount.share"
     echo ""
-    echo -e "${BOLD}4. (Optional) symlink the share to home${NC}"
+    echo -e "${BOLD}3. (Optional) symlink the share to home${NC}"
     echo "   ln -s /Volumes/share ~/share"
     echo ""
-    echo -e "${BOLD}5. Start AeroSpace${NC}"
+    echo -e "${BOLD}4. Start AeroSpace${NC}"
     echo "   open -a AeroSpace"
     echo ""
-    echo -e "${BOLD}6. Connect WireGuard${NC}"
+    echo -e "${BOLD}5. Connect WireGuard${NC}"
     echo "   Open the WireGuard app and import ~/.config/wireguard/alex.conf"
     echo "   (or drag-and-drop the .conf onto the app)."
+    echo ""
+    echo -e "${BOLD}Note:${NC} If you skipped the Keychain phase, seed it later with:"
+    echo "   /usr/bin/security add-internet-password -a ween -s share.thelunadog.com -r 'smb ' -w"
     echo ""
 }
 
@@ -170,5 +193,6 @@ phase_preflight
 phase_brew
 phase_packages
 phase_dotfiles
+phase_keychain
 phase_launchagents
 phase_reminders
