@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/propertylist-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.alex.mount.share</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/osascript</string>
+        <string>-e</string>
+        <string>mount volume "smb://ween@share.thelunadog.com/share"</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StandardErrorPath</key>
+    <string>/tmp/com.alex.mount.share.err</string>
+    <key>StandardOutPath</key>
+    <string>/tmp/com.alex.mount.share.out</string>
+</dict>
+</plist>
