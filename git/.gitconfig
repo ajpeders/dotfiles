@@ -1,0 +1,11 @@
+[user]
+	name = Alex
+	email = alexjpeders@gmail.com
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true
+[push]
+	autoSetupRemote = true
+[core]
+	editor = nvim

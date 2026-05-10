@@ -1,106 +1,98 @@
-# ArchConfig
+# dotfiles
 
-Hyprland dotfiles for Arch Linux. Includes an install script for fresh setups and an update script for keeping an existing install in sync.
+Cross-platform dotfiles. Hyprland desktop on Arch Linux, AeroSpace tiling on macOS, shared configs for shell and TUI tools.
 
 ## Stack
 
-| Role | Tool |
-|------|------|
-| Window manager | Hyprland |
-| Desktop shell | Noctalia (bar, launcher, notifications, OSD, control center) |
-| Terminal | Kitty |
-| Shell | Zsh + Oh My Zsh + Powerlevel10k |
-| Wallpaper | Noctalia (built-in) |
-| Display manager | ly |
-| File manager | Yazi (TUI) / Thunar (GUI) |
+| Role | Arch Linux | macOS |
+|------|-----------|-------|
+| Window manager | Hyprland | AeroSpace |
+| Desktop shell | Noctalia (bar, launcher, notifications, OSD, control center) | macOS Finder |
+| Terminal | Kitty | Kitty |
+| Shell | Zsh + Oh My Zsh + Powerlevel10k | Zsh + Oh My Zsh + Powerlevel10k |
+| File manager | Yazi (TUI) / Thunar (GUI) | Yazi (TUI) / Finder |
+| Display manager | ly | macOS login |
+| VPN | WireGuard (CLI) | WireGuard (App Store) |
+| SMB share | autofs / systemd | LaunchAgent (`com.alex.mount.share`) |
 
 ## Fresh Install
 
-### Prerequisites
-
-- Arch Linux installed (base system, user account created)
-- Internet connection
-- Git: `sudo pacman -S git`
-
-### Steps
+### Arch Linux
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/ajpeders/ArchConfig.git ~/.config
-
-# 2. Run the install script
+git clone git@git.thelunadog.com:alex/dotfiles.git ~/.config
 cd ~/.config
 bash install.sh
 ```
 
-The script will:
-1. Install `yay` (AUR helper) if not present
-2. Install all packages from `packages.txt`
-3. Create `~/Pictures/Screenshots` and `~/Pictures/Wallpapers/generated`
-4. Symlink config directories into `~/.config`
-5. Set zsh as default shell and install Oh My Zsh, plugins, and Powerlevel10k
-6. Enable NetworkManager, bluetooth, pipewire, and wireplumber
-7. Install and enable `ly` display manager
+The Arch script installs `yay`, packages from `packages.txt`, symlinks configs into `~/.config`, sets up zsh, enables `NetworkManager`/`bluetooth`/`pipewire`/`wireplumber`, and installs the `ly` display manager.
 
-### After reboot
-
+After reboot:
 ```bash
-# Configure your prompt (run in a new zsh session)
 p10k configure
 ```
+Then log out and pick **Hyprland** from ly.
 
-Then log out and select **Hyprland** from the ly login screen.
-
-## Keeping in Sync
-
-After pulling changes from this repo on an existing install:
+### macOS
 
 ```bash
+git clone git@git.thelunadog.com:alex/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+bash macos/install.sh
+```
+
+The macOS script installs Homebrew, AeroSpace, kitty, `mas` + WireGuard (App Store), symlinks configs into `~/.config` and `~/Library/LaunchAgents`, and interactively seeds the SMB Keychain entry. See `HOWTO.md` for the manual follow-ups (Full Disk Access for kitty, etc.).
+
+## Keep in Sync
+
+```bash
+# Arch only — pull + reinstall packages + relink + hyprctl reload
 bash update.sh
 ```
 
-This will pull the latest commits, install any new packages, re-apply symlinks, and hot-reload Hyprland if you're in a session.
+```bash
+# Both — sync private files (wallpapers, SSH hosts, librewolf profile) from a remote host
+bash sync-private.sh user@host
+```
 
 ## Key Bindings
 
-| Keys | Action |
-|------|--------|
-| `Super + Return` | Terminal (Kitty) |
-| `Super + Space` | App launcher (Noctalia) |
-| `Super + Q` | Close window |
-| `Super + E` | Browser (Librewolf) |
-| `Super + B` | btop |
-| `Super + F` | Fullscreen |
-| `Super + Shift + F` | Float window |
-| `Super + V` | Clipboard history |
-| `Super + N` | Notification history |
-| `Super + A` | Control center |
-| `Super + ,` | Settings |
-| `Super + L` | Lock screen |
-| `Super + O` | Session menu |
-| `Super + P` | Screenshot |
-| `Super + Shift + P` | Screenshot region |
-| `Super + Ctrl + P` | Screenshot region to clipboard |
-| `Super + Tab` | Cycle monitor focus |
-| `Super + 1-5` | Switch workspace |
-| `Super + D/S/W/G` | dev / server / work / game workspace |
-| `Super + K` | Toggle scratchpad |
-| `Super + Shift + Q` | Exit Hyprland |
+Keybinds match between Hyprland and AeroSpace, with mac substituting `alt` for `super`.
+
+| Hyprland | AeroSpace | Action |
+|----------|-----------|--------|
+| `Super + Return` | `Alt + Enter` | Terminal (Kitty) |
+| `Super + Q` | `Alt + Q` | Close window |
+| `Super + E` | `Alt + E` | Browser (Librewolf) |
+| `Super + B` | `Alt + B` | btop |
+| `Super + F` | `Alt + F` | Fullscreen |
+| `Super + Shift + F` | `Alt + Shift + F` | Float toggle |
+| `Super + J` | `Alt + J` | Toggle split direction |
+| `Super + 1-9` | `Alt + 1-9` | Switch workspace |
+| `Super + Shift + 1-9` | `Alt + Shift + 1-9` | Move window to workspace |
+| `Super + Tab` | `Alt + Tab` | Cycle monitor focus |
+| `Super + arrows` | `Alt + arrows` | Focus direction |
+| `Super + Shift + arrows` | `Alt + Shift + arrows` | Move window |
+| `Super + Ctrl + arrows` | `Alt + Ctrl + arrows` | Resize window |
+
+Hyprland-only (no mac equivalent): Noctalia bindings (`N`, `,`, `A`, `L`, `O`), screenshots (`P`), magic/special workspace (`K`), media keys.
 
 ## Structure
 
 ```
-~/.config/
-├── hypr/               # Hyprland config (split into hypr/config/*.conf)
-├── kitty/              # Terminal
-├── noctalia/           # Noctalia shell user config
-├── yazi/               # Yazi file manager config
-├── wallpapers/         # Default wallpaper asset
-├── zsh/                # Zsh config (ZDOTDIR)
-├── gtk-3.0/            # GTK3 theme
-├── gtk-4.0/            # GTK4 theme
-├── theme/              # Static color theme
-├── install.sh          # Fresh install bootstrap
-├── update.sh           # Sync existing install
-└── packages.txt        # Package list (pacman + AUR)
+dotfiles/
+├── hypr/                  # Hyprland config (Linux)
+├── kitty/                 # Terminal (shared)
+├── noctalia/              # Noctalia shell (Linux)
+├── yazi/                  # File manager (shared)
+├── zsh/                   # Zsh / p10k config (shared via ZDOTDIR)
+├── wallpapers/            # Default wallpaper
+├── gtk-3.0/, gtk-4.0/     # GTK theme (Linux)
+├── theme/                 # Static colors
+├── macos/                 # macOS-only: aerospace, LaunchAgents, install.sh
+├── install.sh             # Arch bootstrap
+├── update.sh              # Arch resync
+├── sync-private.sh        # Cross-platform private file sync
+├── packages.txt           # Pacman + AUR package list
+└── HOWTO.md, ARCHITECTURE.md, ROADMAP.md
 ```
