@@ -72,7 +72,7 @@ The share lives on the home server (`192.168.0.176` / `share.thelunadog.com`) an
 security add-internet-password -a ween -s share.thelunadog.com -r 'smb ' -w
 
 # 2. Symlink the LaunchAgent and load it.
-ln -sfn ~/ArchDotfiles/macos/com.alex.mount.share.plist ~/Library/LaunchAgents/com.alex.mount.share.plist
+ln -sfn ~/dotfiles/macos/com.alex.mount.share.plist ~/Library/LaunchAgents/com.alex.mount.share.plist
 launchctl load ~/Library/LaunchAgents/com.alex.mount.share.plist
 
 # 3. Convenience symlink.

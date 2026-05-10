@@ -59,36 +59,24 @@ phase_brew() {
 }
 
 phase_packages() {
-    print_phase "Phase 3: Packages"
+    print_phase "Phase 3: Packages (brew bundle)"
 
-    if brew list --cask aerospace >/dev/null 2>&1; then
-        print_status "AeroSpace already installed"
-    else
-        print_info "Installing AeroSpace..."
-        brew install --cask nikitabobko/tap/aerospace
-        print_status "AeroSpace installed"
+    if [ ! -f "$SCRIPT_DIR/Brewfile" ]; then
+        print_error "Brewfile not found at $SCRIPT_DIR/Brewfile"
+        exit 1
     fi
 
-    if brew list --cask kitty >/dev/null 2>&1; then
-        print_status "kitty already installed"
+    print_info "Installing packages from Brewfile..."
+    if brew bundle --file="$SCRIPT_DIR/Brewfile"; then
+        print_status "Brewfile applied"
     else
-        print_info "Installing kitty..."
-        brew install --cask kitty
-        print_status "kitty installed"
+        print_error "Some packages failed; review brew bundle output above"
     fi
 
-    if command -v mas >/dev/null 2>&1; then
-        print_status "mas already installed"
-    else
-        print_info "Installing mas (Mac App Store CLI)..."
-        brew install mas
-        print_status "mas installed"
-    fi
-
-    # WireGuard — official Mac App Store app (id 1451685025)
-    if mas list 2>/dev/null | grep -q '^1451685025'; then
+    # WireGuard — Mac App Store (id 1451685025). 'mas' is included in the Brewfile.
+    if command -v mas >/dev/null 2>&1 && mas list 2>/dev/null | grep -q '^1451685025'; then
         print_status "WireGuard already installed"
-    else
+    elif command -v mas >/dev/null 2>&1; then
         print_info "Installing WireGuard from Mac App Store..."
         print_info "(Requires being signed in to the App Store.)"
         mas install 1451685025 || print_error "WireGuard install failed — sign in to App Store and run: mas install 1451685025"
@@ -121,9 +109,27 @@ phase_dotfiles() {
         print_status "Linked: $name"
     }
 
+    # macOS-only
     link "$SCRIPT_DIR/aerospace" "$HOME/.config/aerospace"
-    link "$REPO_DIR/kitty" "$HOME/.config/kitty"
     link "$SCRIPT_DIR/com.alex.mount.share.plist" "$HOME/Library/LaunchAgents/com.alex.mount.share.plist"
+
+    # Cross-platform configs from the repo root
+    link "$REPO_DIR/kitty" "$HOME/.config/kitty"
+    link "$REPO_DIR/yazi" "$HOME/.config/yazi"
+    link "$REPO_DIR/zsh" "$HOME/.config/zsh"
+    link "$REPO_DIR/tmux" "$HOME/.config/tmux"
+    link "$REPO_DIR/git/.gitconfig" "$HOME/.gitconfig"
+
+    # ZDOTDIR so zsh reads ~/.config/zsh/.zshrc
+    if [ ! -f "$HOME/.zshenv" ]; then
+        printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
+        print_status "Created ~/.zshenv with ZDOTDIR"
+    elif grep -q 'ZDOTDIR=.*\.config/zsh' "$HOME/.zshenv"; then
+        print_status "~/.zshenv already configures ZDOTDIR"
+    else
+        printf '\nexport ZDOTDIR="$HOME/.config/zsh"\n' >> "$HOME/.zshenv"
+        print_status "Added ZDOTDIR to ~/.zshenv"
+    fi
 }
 
 phase_keychain() {

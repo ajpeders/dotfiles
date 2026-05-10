@@ -25,6 +25,8 @@
 !noctalia/**
 !yazi/
 !macos/
+!git/
+!tmux/
 
 # Keep config files in tracked directories
 !.hermes/**
@@ -38,6 +40,8 @@
 !noctalia/**
 !yazi/**
 !macos/**
+!git/**
+!tmux/**
 
 # Ignore generated zsh runtime files
 zsh/.zcompdump*
