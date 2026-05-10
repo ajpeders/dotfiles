@@ -80,3 +80,7 @@ fastfetch
 yazi
 localsend-go
 realesrgan-ncnn-vulkan
+imagemagick
+
+# Remote shell
+mosh

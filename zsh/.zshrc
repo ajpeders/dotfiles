@@ -124,4 +124,17 @@ alias lc='eza -la --icons --group-directories-first'
 
 unset zle_bracketed_paste
 
+# Only fetch autosuggestions after 2+ characters to avoid freeze on single keys
+_zsh_autosuggest_fetch_min() {
+  if (( ${#BUFFER} < 2 )); then
+    _zsh_autosuggest_clear
+    return
+  fi
+  _zsh_autosuggest_fetch_orig "$@"
+}
+if (( ${+functions[_zsh_autosuggest_fetch]} )); then
+  functions[_zsh_autosuggest_fetch_orig]="${functions[_zsh_autosuggest_fetch]}"
+  functions[_zsh_autosuggest_fetch]="${functions[_zsh_autosuggest_fetch_min]}"
+fi
+
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
