@@ -68,7 +68,13 @@ sync_dir "Pictures/Wallpapers/" "$HOME/Pictures/Wallpapers"
 sync_dir ".ssh/config.d/" "$HOME/.ssh/config.d"
 
 # Librewolf profile (extensions, bookmarks, settings — excluding caches)
-sync_dir ".config/librewolf/" "$HOME/.config/librewolf" \
+# Local path differs per OS; remote source stays Linux-style.
+if [[ "$(uname)" == "Darwin" ]]; then
+    LIBREWOLF_LOCAL="$HOME/Library/Application Support/librewolf"
+else
+    LIBREWOLF_LOCAL="$HOME/.config/librewolf"
+fi
+sync_dir ".config/librewolf/" "$LIBREWOLF_LOCAL" \
     --exclude="*/cache2/" \
     --exclude="*/Cache/" \
     --exclude="*/storage/default/" \
