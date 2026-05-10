@@ -40,3 +40,6 @@
 # Ignore generated zsh runtime files
 zsh/.zcompdump*
 zsh/.zsh_history
+
+# Ignore editor/backup files anywhere in the tree
+**/*.bak
