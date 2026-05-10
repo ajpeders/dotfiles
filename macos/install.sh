@@ -76,6 +76,14 @@ phase_packages() {
         brew install --cask kitty
         print_status "kitty installed"
     fi
+
+    if brew list wireguard-tools >/dev/null 2>&1; then
+        print_status "wireguard-tools already installed"
+    else
+        print_info "Installing wireguard-tools..."
+        brew install wireguard-tools
+        print_status "wireguard-tools installed"
+    fi
 }
 
 phase_dotfiles() {
@@ -142,6 +150,12 @@ phase_reminders() {
     echo ""
     echo -e "${BOLD}5. Start AeroSpace${NC}"
     echo "   open -a AeroSpace"
+    echo ""
+    echo -e "${BOLD}6. Connect WireGuard${NC}"
+    echo "   Config lives at ~/.config/wireguard/alex.conf (sync via sync-private.sh)"
+    echo "   Bring up: sudo wg-quick up ~/.config/wireguard/alex.conf"
+    echo "   Bring down: sudo wg-quick down ~/.config/wireguard/alex.conf"
+    echo "   For a menu-bar UI, install 'WireGuard' from the Mac App Store and import the .conf."
     echo ""
 }
 
