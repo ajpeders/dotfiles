@@ -46,7 +46,7 @@ phase_preflight() {
     echo "  - Install packages from packages.txt"
     echo "  - Create picture and local application directories"
     echo "  - Link repo-managed dotfiles into ~/.config when needed"
-    echo "  - Configure zsh, oh-my-zsh, plugins, powerlevel10k, and colorls"
+    echo "  - Configure zsh, oh-my-zsh, plugins, and powerlevel10k"
     echo "  - Enable NetworkManager, bluetooth, pipewire, pipewire-pulse, and wireplumber"
     echo "  - Enable the ly display manager"
     echo ""
@@ -138,7 +138,7 @@ phase_directories() {
 phase_dotfiles() {
     print_phase "Phase 5: Dotfiles"
 
-    local config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi)
+    local config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux)
     local config_files=(pavucontrol.ini QtProject.conf)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -248,16 +248,6 @@ phase_shell() {
         print_status "powerlevel10k installed"
     fi
 
-    if command -v colorls >/dev/null 2>&1; then
-        print_status "colorls already installed"
-    else
-        print_info "Installing colorls gem..."
-        if gem install colorls --user-install; then
-            print_status "colorls installed"
-        else
-            print_error "colorls install failed; continue and fix manually after reboot"
-        fi
-    fi
 }
 
 phase_services() {
