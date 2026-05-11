@@ -81,6 +81,10 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
+# Override OMZ's matcher-list to drop anchor patterns (r:|=*, l:|=* r:|=*);
+# Claude Code's completion can't parse anchor-based matching.
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
