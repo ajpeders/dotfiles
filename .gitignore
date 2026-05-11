@@ -27,6 +27,7 @@
 !macos/
 !git/
 !tmux/
+!nvim/
 
 # Keep config files in tracked directories
 !.hermes/**
@@ -42,6 +43,7 @@
 !macos/**
 !git/**
 !tmux/**
+!nvim/**
 
 # Ignore generated zsh runtime files
 zsh/.zcompdump*

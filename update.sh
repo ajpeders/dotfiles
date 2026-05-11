@@ -78,7 +78,7 @@ phase_packages() {
 phase_dotfiles() {
     print_phase "Phase 3: Dotfile Sync"
 
-    local config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux)
+    local config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux nvim)
     local config_files=(pavucontrol.ini QtProject.conf)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -143,7 +143,7 @@ phase_dotfiles() {
 }
 
 phase_reload() {
-    print_phase "Phase 5: Live Reload"
+    print_phase "Phase 4: Live Reload"
 
     if [ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
         print_info "Not inside a Hyprland session — skipping live reload"
