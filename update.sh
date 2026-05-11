@@ -78,7 +78,7 @@ phase_packages() {
 phase_dotfiles() {
     print_phase "Phase 3: Dotfile Sync"
 
-    local config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia)
+    local config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux)
     local config_files=(pavucontrol.ini QtProject.conf)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
