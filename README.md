@@ -33,6 +33,16 @@ p10k configure
 ```
 Then log out and pick **Hyprland** from ly.
 
+### Arch Linux — headless
+
+For servers / boxes you only SSH into:
+
+```bash
+bash install.sh --headless
+```
+
+Installs only the CLI base from `packages.txt` (zsh, neovim, git, mosh, openssh, tmux, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), enables `sshd`, and switches the system to `multi-user.target` (no display manager). `update.sh` reads the mode from `~/.local/state/dotfiles-mode` and stays in headless mode on resync; pass `--full` to override.
+
 ### macOS
 
 ```bash
