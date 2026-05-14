@@ -1,7 +1,10 @@
 #!/bin/bash
 # Arch Linux dotfiles update script.
-# Usage: bash update.sh
+# Usage: bash update.sh [--headless | --full]
 # Run from within the dotfiles repo. Pulls latest changes and syncs everything.
+#
+# If no flag is given, mode is read from ~/.local/state/dotfiles-mode
+# (written by install.sh); falls back to full-desktop mode if absent.
 
 set -euo pipefail
 
@@ -17,6 +20,38 @@ print_info()   { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase()  { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
+STATE_FILE="$HOME/.local/state/dotfiles-mode"
+
+HEADLESS=""
+for arg in "$@"; do
+    case "$arg" in
+        --headless) HEADLESS=1 ;;
+        --full)     HEADLESS=0 ;;
+        --help|-h)
+            sed -n '2,8p' "$0" | sed 's/^# \?//'
+            exit 0
+            ;;
+        *)
+            print_error "Unknown argument: $arg (try --help)"
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z "$HEADLESS" ]; then
+    if [ -r "$STATE_FILE" ] && [ "$(cat "$STATE_FILE")" = "headless" ]; then
+        HEADLESS=1
+    else
+        HEADLESS=0
+    fi
+fi
+
+if [ "$HEADLESS" -eq 1 ]; then
+    print_info "Mode: HEADLESS (GUI packages and desktop dotfiles will be skipped)"
+else
+    print_info "Mode: FULL DESKTOP"
+fi
 
 phase_pull() {
     print_phase "Phase 1: Pull Latest Changes"
@@ -54,7 +89,15 @@ phase_packages() {
 
     local pkgs=()
     local line
+    local in_gui=0
     while IFS= read -r line; do
+        if [[ "$line" =~ $GUI_MARKER_REGEX ]]; then
+            in_gui=1
+            continue
+        fi
+        if [ "$in_gui" -eq 1 ] && [ "$HEADLESS" -eq 1 ]; then
+            continue
+        fi
         line="${line%%#*}"
         line="${line//[[:space:]]/}"
         [ -n "$line" ] || continue
@@ -78,8 +121,15 @@ phase_packages() {
 phase_dotfiles() {
     print_phase "Phase 3: Dotfile Sync"
 
-    local config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux nvim)
-    local config_files=(pavucontrol.ini QtProject.conf)
+    local config_dirs
+    local config_files
+    if [ "$HEADLESS" -eq 1 ]; then
+        config_dirs=(zsh yazi git tmux nvim)
+        config_files=()
+    else
+        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux nvim)
+        config_files=(pavucontrol.ini QtProject.conf)
+    fi
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
 
@@ -144,6 +194,11 @@ phase_dotfiles() {
 
 phase_reload() {
     print_phase "Phase 4: Live Reload"
+
+    if [ "$HEADLESS" -eq 1 ]; then
+        print_info "Headless mode — no graphical components to reload"
+        return
+    fi
 
     if [ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
         print_info "Not inside a Hyprland session — skipping live reload"

@@ -1,8 +1,13 @@
 #!/bin/bash
 # Arch Linux dotfiles bootstrap script.
-# Usage: bash install.sh
+# Usage: bash install.sh [--headless]
 # Run from within the cloned dotfiles repo as a non-root user.
 # Safe to re-run: each phase checks whether its work is already done.
+#
+# Modes:
+#   (default)    Full Hyprland desktop install.
+#   --headless   Skip GUI packages, desktop dotfiles, and the display manager.
+#                Sets the system to multi-user.target and enables sshd.
 
 set -euo pipefail
 
@@ -18,9 +23,30 @@ print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase() { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
+STATE_FILE="$HOME/.local/state/dotfiles-mode"
+
+HEADLESS=0
+for arg in "$@"; do
+    case "$arg" in
+        --headless) HEADLESS=1 ;;
+        --help|-h)
+            sed -n '2,11p' "$0" | sed 's/^# \?//'
+            exit 0
+            ;;
+        *)
+            print_error "Unknown argument: $arg (try --help)"
+            exit 1
+            ;;
+    esac
+done
+
+mode_label() {
+    if [ "$HEADLESS" -eq 1 ]; then echo "HEADLESS"; else echo "FULL DESKTOP"; fi
+}
 
 phase_preflight() {
-    print_phase "Phase 1: Preflight"
+    print_phase "Phase 1: Preflight ($(mode_label))"
 
     if [ ! -f /etc/arch-release ]; then
         print_error "This script requires Arch Linux (/etc/arch-release not found)"
@@ -43,12 +69,20 @@ phase_preflight() {
     echo ""
     print_info "This script will:"
     echo "  - Install yay if needed"
-    echo "  - Install packages from packages.txt"
-    echo "  - Create picture and local application directories"
-    echo "  - Link repo-managed dotfiles into ~/.config when needed"
-    echo "  - Configure zsh, oh-my-zsh, plugins, and powerlevel10k"
-    echo "  - Enable NetworkManager, bluetooth, pipewire, pipewire-pulse, and wireplumber"
-    echo "  - Enable the ly display manager"
+    if [ "$HEADLESS" -eq 1 ]; then
+        echo "  - Install headless packages from packages.txt (GUI packages skipped)"
+        echo "  - Link CLI dotfiles into ~/.config (shell, editor, tmux, yazi, git)"
+        echo "  - Configure zsh, oh-my-zsh, plugins, and powerlevel10k"
+        echo "  - Enable NetworkManager, avahi-daemon, and sshd"
+        echo "  - Set the system default target to multi-user.target (no graphical login)"
+    else
+        echo "  - Install packages from packages.txt"
+        echo "  - Create picture and local application directories"
+        echo "  - Link repo-managed dotfiles into ~/.config when needed"
+        echo "  - Configure zsh, oh-my-zsh, plugins, and powerlevel10k"
+        echo "  - Enable NetworkManager, bluetooth, pipewire, pipewire-pulse, and wireplumber"
+        echo "  - Enable the ly display manager"
+    fi
     echo ""
     read -rp "Continue? [y/N] " confirm
     [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
@@ -76,17 +110,32 @@ phase_yay() {
     print_status "yay installed"
 }
 
-phase_packages() {
-    print_phase "Phase 3: Packages"
-
-    local pkgs=()
+read_packages() {
+    # Reads packages.txt into the global $pkgs array.
+    # In headless mode, stops at the GUI marker line.
+    pkgs=()
     local line
+    local in_gui=0
     while IFS= read -r line; do
+        if [[ "$line" =~ $GUI_MARKER_REGEX ]]; then
+            in_gui=1
+            continue
+        fi
+        if [ "$in_gui" -eq 1 ] && [ "$HEADLESS" -eq 1 ]; then
+            continue
+        fi
         line="${line%%#*}"
         line="${line//[[:space:]]/}"
         [ -n "$line" ] || continue
         pkgs+=("$line")
     done < "$SCRIPT_DIR/packages.txt"
+}
+
+phase_packages() {
+    print_phase "Phase 3: Packages"
+
+    local pkgs
+    read_packages
 
     if [ "${#pkgs[@]}" -eq 0 ]; then
         print_info "No packages listed in packages.txt"
@@ -118,13 +167,19 @@ phase_packages() {
 phase_directories() {
     print_phase "Phase 4: Directories"
 
-    local dirs=(
-        "$HOME/Pictures/Screenshots"
-        "$HOME/Pictures/Wallpapers/generated"
-        "$HOME/.local/share/applications"
-    )
-    local dir
+    local dirs
+    if [ "$HEADLESS" -eq 1 ]; then
+        dirs=("$HOME/.local/state")
+    else
+        dirs=(
+            "$HOME/Pictures/Screenshots"
+            "$HOME/Pictures/Wallpapers/generated"
+            "$HOME/.local/share/applications"
+            "$HOME/.local/state"
+        )
+    fi
 
+    local dir
     for dir in "${dirs[@]}"; do
         if [ -d "$dir" ]; then
             print_status "Already exists: $dir"
@@ -138,8 +193,15 @@ phase_directories() {
 phase_dotfiles() {
     print_phase "Phase 5: Dotfiles"
 
-    local config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux nvim)
-    local config_files=(pavucontrol.ini QtProject.conf)
+    local config_dirs
+    local config_files
+    if [ "$HEADLESS" -eq 1 ]; then
+        config_dirs=(zsh yazi git tmux nvim)
+        config_files=()
+    else
+        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux nvim)
+        config_files=(pavucontrol.ini QtProject.conf)
+    fi
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
 
@@ -278,14 +340,41 @@ phase_services() {
     }
 
     enable_system_service NetworkManager
-    enable_system_service bluetooth
     enable_system_service avahi-daemon
-    enable_user_service pipewire
-    enable_user_service pipewire-pulse
-    enable_user_service wireplumber
+
+    if [ "$HEADLESS" -eq 1 ]; then
+        enable_system_service sshd
+    else
+        enable_system_service bluetooth
+        enable_user_service pipewire
+        enable_user_service pipewire-pulse
+        enable_user_service wireplumber
+    fi
 }
 
-phase_display_manager() {
+phase_session() {
+    if [ "$HEADLESS" -eq 1 ]; then
+        print_phase "Phase 8: Session (multi-user.target, no DM)"
+
+        local dm
+        for dm in gdm sddm lightdm ly ly@tty1; do
+            if systemctl is-enabled --quiet "${dm}.service" 2>/dev/null; then
+                print_info "Disabling display manager: ${dm}.service"
+                sudo systemctl disable "${dm}.service"
+            fi
+        done
+
+        local current
+        current="$(systemctl get-default)"
+        if [ "$current" = "multi-user.target" ]; then
+            print_status "Default target already multi-user.target"
+        else
+            sudo systemctl set-default multi-user.target
+            print_status "Default target set to multi-user.target (was $current)"
+        fi
+        return
+    fi
+
     print_phase "Phase 8: Display Manager (ly)"
 
     local ly_unit=""
@@ -311,20 +400,40 @@ phase_display_manager() {
     fi
 }
 
+phase_state() {
+    mkdir -p "$(dirname "$STATE_FILE")"
+    if [ "$HEADLESS" -eq 1 ]; then
+        echo "headless" > "$STATE_FILE"
+    else
+        echo "full" > "$STATE_FILE"
+    fi
+}
 
 phase_reminders() {
     print_phase "Done"
 
     echo ""
-    echo -e "${GREEN}Installation complete.${NC} Reboot, then complete these manual steps:"
-    echo ""
-    echo -e "${BOLD}1. Configure your prompt${NC}"
-    echo "   Open a new terminal and run: p10k configure"
-    echo ""
-    echo -e "${BOLD}2. Sync private files (wallpapers, ssh hosts)${NC}"
-    echo "   bash $SCRIPT_DIR/sync-private.sh user@your-main-host"
-    echo ""
-    echo -e "${BOLD}3. Reboot and select Hyprland from ly${NC}"
+    if [ "$HEADLESS" -eq 1 ]; then
+        echo -e "${GREEN}Headless install complete.${NC} Follow-ups:"
+        echo ""
+        echo -e "${BOLD}1. Configure your prompt${NC}"
+        echo "   Open a new shell and run: p10k configure"
+        echo ""
+        echo -e "${BOLD}2. Verify sshd is reachable${NC}"
+        echo "   systemctl status sshd"
+        echo ""
+        echo -e "${BOLD}3. Reboot (or 'systemctl isolate multi-user.target') to drop the graphical session${NC}"
+    else
+        echo -e "${GREEN}Installation complete.${NC} Reboot, then complete these manual steps:"
+        echo ""
+        echo -e "${BOLD}1. Configure your prompt${NC}"
+        echo "   Open a new terminal and run: p10k configure"
+        echo ""
+        echo -e "${BOLD}2. Sync private files (wallpapers, ssh hosts)${NC}"
+        echo "   bash $SCRIPT_DIR/sync-private.sh user@your-main-host"
+        echo ""
+        echo -e "${BOLD}3. Reboot and select Hyprland from ly${NC}"
+    fi
     echo ""
 }
 
@@ -335,5 +444,6 @@ phase_directories
 phase_dotfiles
 phase_shell
 phase_services
-phase_display_manager
+phase_session
+phase_state
 phase_reminders

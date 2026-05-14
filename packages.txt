@@ -1,3 +1,43 @@
+# ================================================================
+# Headless / CLI base
+# Installed in all modes (with or without --headless).
+# Keep AUR-only packages out of this section so a fresh headless
+# bootstrap can complete before yay is fully operational.
+# ================================================================
+
+# Shell
+zsh
+
+# Editor
+neovim
+
+# Utilities
+git
+curl
+wget
+unzip
+rsync
+jq
+eza
+btop
+fastfetch
+yazi
+imagemagick
+
+# Remote access
+mosh
+openssh
+
+# Terminal multiplexer
+tmux
+
+# ================================================================
+# === GUI (skipped in headless mode) ===
+# Everything below is only installed when running install.sh
+# without --headless. The marker line above is parsed by
+# install.sh / update.sh — do not rename it.
+# ================================================================
+
 # Core Hyprland packages
 hyprland
 xdg-desktop-portal-hyprland
@@ -55,32 +95,11 @@ noto-fonts
 noto-fonts-emoji
 papirus-icon-theme
 
-# Shell
-zsh
-
 # Display manager
 ly
 
-# Editor
-neovim
-
-# Utilities
-git
-curl
-wget
-unzip
-rsync
-jq
-eza
-btop
-fastfetch
-yazi
+# File sharing
 localsend-go
+
+# Image upscaling
 realesrgan-ncnn-vulkan
-imagemagick
-
-# Remote shell
-mosh
-
-# Terminal multiplexer
-tmux
