@@ -82,6 +82,7 @@ phase_preflight() {
         echo "  - Configure zsh, oh-my-zsh, plugins, and powerlevel10k"
         echo "  - Enable NetworkManager, bluetooth, pipewire, pipewire-pulse, and wireplumber"
         echo "  - Enable the ly display manager"
+        echo "  - Install Librewolf extension policy (auto-installs uBO, Bitwarden, Dark Reader, etc.)"
     fi
     echo ""
     read -rp "Continue? [y/N] " confirm
@@ -409,6 +410,31 @@ phase_state() {
     fi
 }
 
+phase_browser_policies() {
+    if [ "$HEADLESS" -eq 1 ]; then
+        return
+    fi
+
+    print_phase "Phase 9: Browser Policies"
+
+    local src="$SCRIPT_DIR/librewolf/policies.json"
+    local dst="/etc/librewolf/policies/policies.json"
+
+    if [ ! -f "$src" ]; then
+        print_info "No librewolf/policies.json in repo — skipping"
+        return
+    fi
+
+    if [ -f "$dst" ] && cmp -s "$src" "$dst"; then
+        print_status "Librewolf policies already up to date"
+        return
+    fi
+
+    print_info "Installing Librewolf policies to $dst (requires sudo)..."
+    sudo install -Dm644 "$src" "$dst"
+    print_status "Librewolf policies installed; extensions will appear on next launch"
+}
+
 phase_reminders() {
     print_phase "Done"
 
@@ -446,4 +472,5 @@ phase_shell
 phase_services
 phase_session
 phase_state
+phase_browser_policies
 phase_reminders
