@@ -192,8 +192,33 @@ phase_dotfiles() {
     print_status "Dotfiles in sync"
 }
 
+phase_browser_policies() {
+    if [ "$HEADLESS" -eq 1 ]; then
+        return
+    fi
+
+    print_phase "Phase 4: Browser Policies"
+
+    local src="$SCRIPT_DIR/librewolf/policies.json"
+    local dst="/etc/librewolf/policies/policies.json"
+
+    if [ ! -f "$src" ]; then
+        print_info "No librewolf/policies.json in repo — skipping"
+        return
+    fi
+
+    if [ -f "$dst" ] && cmp -s "$src" "$dst"; then
+        print_status "Librewolf policies already up to date"
+        return
+    fi
+
+    print_info "Updating Librewolf policies at $dst (requires sudo)..."
+    sudo install -Dm644 "$src" "$dst"
+    print_status "Librewolf policies updated; restart Librewolf to pick up changes"
+}
+
 phase_reload() {
-    print_phase "Phase 4: Live Reload"
+    print_phase "Phase 5: Live Reload"
 
     if [ "$HEADLESS" -eq 1 ]; then
         print_info "Headless mode — no graphical components to reload"
@@ -218,6 +243,7 @@ phase_reload() {
 phase_pull
 phase_packages
 phase_dotfiles
+phase_browser_policies
 phase_reload
 
 echo ""

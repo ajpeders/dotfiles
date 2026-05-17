@@ -28,6 +28,8 @@
 !git/
 !tmux/
 !nvim/
+!librewolf/
+!librewolf/policies.json
 
 # Keep config files in tracked directories
 !.hermes/**
