@@ -39,7 +39,9 @@ alt-enter = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no'
 alt-t = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no'
 
 # Browser
-alt-e = 'exec-and-forget /Applications/LibreWolf.app/Contents/MacOS/librewolf --new-window about:blank'
+# MOZ_DISABLE_SAFE_MODE_KEY=1 stops LibreWolf from interpreting the held Option
+# key (from alt-e) as the Troubleshoot Mode trigger.
+alt-e = 'exec-and-forget env MOZ_DISABLE_SAFE_MODE_KEY=1 /Applications/LibreWolf.app/Contents/MacOS/librewolf --new-window about:blank'
 
 # btop
 alt-b = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no btop'
