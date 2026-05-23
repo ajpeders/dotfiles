@@ -21,19 +21,28 @@ outer.right = 8
 outer.top = 8
 outer.bottom = 8
 
+# ====== Window rules ======
+[[on-window-detected]]
+if.app-id = 'org.mozilla.librewolf'
+run = ['layout tiling']
+
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = ['layout tiling']
+
 # ====== Apps ======
 # alt = Option key (used as Super equivalent on macOS)
 
 [mode.main.binding]
 # Terminal
-alt-enter = 'exec-and-forget open -a Kitty'
-alt-t = 'exec-and-forget open -a Kitty'
+alt-enter = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no'
+alt-t = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no'
 
 # Browser
-alt-e = 'exec-and-forget open -a LibreWolf'
+alt-e = 'exec-and-forget open -na LibreWolf'
 
 # btop
-alt-b = 'exec-and-forget open -a Kitty --args btop'
+alt-b = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no btop'
 
 # Close window
 alt-q = 'close'
