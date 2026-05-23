@@ -39,7 +39,7 @@ alt-enter = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no'
 alt-t = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no'
 
 # Browser
-alt-e = 'exec-and-forget open -na LibreWolf'
+alt-e = 'exec-and-forget /Applications/LibreWolf.app/Contents/MacOS/librewolf --new-window about:blank'
 
 # btop
 alt-b = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no btop'
