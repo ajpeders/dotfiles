@@ -480,7 +480,7 @@
         "weatherTaliaMascotAlways": false
     },
     "network": {
-        "bluetoothAutoConnect": false,
+        "bluetoothAutoConnect": true,
         "bluetoothDetailsViewMode": "grid",
         "bluetoothHideUnnamedDevices": false,
         "bluetoothRssiPollIntervalMs": 60000,
@@ -698,14 +698,14 @@
         "favorites": [
             {
                 "appearance": "dark",
-                "colorScheme": "Kanagawa",
+                "colorScheme": "Ayu",
                 "darkMode": true,
                 "generationMethod": "tonal-spot",
                 "paletteColors": [
-                    "#76946a",
-                    "#c0a36e",
-                    "#7e9cd8",
-                    "#c34043"
+                    "#e6b450",
+                    "#aad94c",
+                    "#39bae6",
+                    "#d95757"
                 ],
                 "path": "/home/alex/Pictures/Wallpapers/maoguin.jpg",
                 "useWallpaperColors": false
