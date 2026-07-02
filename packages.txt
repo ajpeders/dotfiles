@@ -68,6 +68,10 @@ pipewire
 pipewire-pulse
 wireplumber
 
+# Bluetooth (bluez daemon + bluetoothctl; AirPods etc. via PipeWire A2DP)
+bluez
+bluez-utils
+
 # System tray applets
 network-manager-applet
 blueman
