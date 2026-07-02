@@ -178,15 +178,6 @@
                     ]
                 },
                 {
-                    "deviceNativePath": "__default__",
-                    "displayMode": "graphic-clean",
-                    "hideIfIdle": false,
-                    "hideIfNotDetected": true,
-                    "id": "Battery",
-                    "showNoctaliaPerformance": false,
-                    "showPowerProfiles": false
-                },
-                {
                     "compactMode": true,
                     "diskPath": "/",
                     "iconColor": "none",
@@ -243,6 +234,15 @@
                         "swayCommand": "swaymsg"
                     },
                     "id": "plugin:monitor-layout"
+                },
+                {
+                    "deviceNativePath": "__default__",
+                    "displayMode": "graphic",
+                    "hideIfIdle": false,
+                    "hideIfNotDetected": true,
+                    "id": "Battery",
+                    "showNoctaliaPerformance": false,
+                    "showPowerProfiles": false
                 }
             ]
         }

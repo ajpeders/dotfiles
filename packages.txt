@@ -82,6 +82,10 @@ playerctl
 # Brightness control
 brightnessctl
 
+# Power management (battery stats + power profiles in Noctalia via UPower)
+upower
+power-profiles-daemon
+
 # Display configuration
 nwg-displays
 
