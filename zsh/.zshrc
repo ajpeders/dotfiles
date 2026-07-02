@@ -126,6 +126,9 @@ fi
 alias ls='eza --icons'
 alias lc='eza -la --icons --group-directories-first'
 
+# Default cliamp to the Plex provider on launch
+alias cliamp='cliamp --provider plex'
+
 unset zle_bracketed_paste
 
 # Only fetch autosuggestions after 2+ characters to avoid freeze on single keys

@@ -110,7 +110,7 @@ phase_packages() {
     fi
 
     print_info "Syncing ${#pkgs[@]} packages (new packages will be installed)..."
-    if yay -S --needed --noconfirm "${pkgs[@]}"; then
+    if paru -S --needed --noconfirm "${pkgs[@]}"; then
         print_status "Packages up to date"
     else
         print_error "Package sync failed"

@@ -68,7 +68,7 @@ phase_preflight() {
 
     echo ""
     print_info "This script will:"
-    echo "  - Install yay if needed"
+    echo "  - Install paru if needed"
     if [ "$HEADLESS" -eq 1 ]; then
         echo "  - Install headless packages from packages.txt (GUI packages skipped)"
         echo "  - Link CLI dotfiles into ~/.config (shell, editor, tmux, yazi, git)"
@@ -89,26 +89,26 @@ phase_preflight() {
     [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 }
 
-phase_yay() {
-    print_phase "Phase 2: AUR Helper (yay)"
+phase_paru() {
+    print_phase "Phase 2: AUR Helper (paru)"
 
     print_info "Ensuring base-devel and git are installed..."
     sudo pacman -S --needed --noconfirm base-devel git
 
-    if command -v yay >/dev/null 2>&1; then
-        print_status "yay already installed ($(yay --version | head -n 1))"
+    if command -v paru >/dev/null 2>&1; then
+        print_status "paru already installed ($(paru --version | head -n 1))"
         return
     fi
 
     local tmp
     tmp="$(mktemp -d)"
 
-    print_info "Cloning yay into $tmp..."
-    git clone https://aur.archlinux.org/yay.git "$tmp/yay"
-    (cd "$tmp/yay" && makepkg -si --noconfirm)
+    print_info "Cloning paru into $tmp..."
+    git clone https://aur.archlinux.org/paru.git "$tmp/paru"
+    (cd "$tmp/paru" && makepkg -si --noconfirm)
     rm -rf "$tmp"
 
-    print_status "yay installed"
+    print_status "paru installed"
 }
 
 read_packages() {
@@ -144,9 +144,9 @@ phase_packages() {
     fi
 
     local failed=()
-    print_info "Installing ${#pkgs[@]} packages via yay; already-installed packages are skipped..."
+    print_info "Installing ${#pkgs[@]} packages via paru; already-installed packages are skipped..."
     for pkg in "${pkgs[@]}"; do
-        yay -S --needed --noconfirm "$pkg" || {
+        paru -S --needed --noconfirm "$pkg" || {
             print_error "Failed to install: $pkg (skipping)"
             failed+=("$pkg")
         }
@@ -464,7 +464,7 @@ phase_reminders() {
 }
 
 phase_preflight
-phase_yay
+phase_paru
 phase_packages
 phase_directories
 phase_dotfiles
