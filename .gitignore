@@ -28,6 +28,9 @@
 !git/
 !tmux/
 !nvim/
+!systemd/
+!systemd/user/
+!systemd/user/noctalia-shell.service
 !librewolf/
 !librewolf/policies.json
 
