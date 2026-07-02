@@ -25,7 +25,7 @@ cd ~/.config
 bash install.sh
 ```
 
-The Arch script installs `yay`, packages from `packages.txt`, symlinks configs into `~/.config`, sets up zsh, enables `NetworkManager`/`bluetooth`/`pipewire`/`wireplumber`, and installs the `ly` display manager.
+The Arch script installs `paru`, packages from `packages.txt`, symlinks configs into `~/.config`, sets up zsh, enables `NetworkManager`/`bluetooth`/`pipewire`/`wireplumber`, and installs the `ly` display manager.
 
 After reboot:
 ```bash

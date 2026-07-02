@@ -2,7 +2,7 @@
 # Headless / CLI base
 # Installed in all modes (with or without --headless).
 # Keep AUR-only packages out of this section so a fresh headless
-# bootstrap can complete before yay is fully operational.
+# bootstrap can complete before paru is fully operational.
 # ================================================================
 
 # Shell
@@ -13,6 +13,7 @@ neovim
 
 # Utilities
 git
+github-cli
 curl
 wget
 unzip
@@ -23,6 +24,10 @@ btop
 fastfetch
 yazi
 imagemagick
+fd
+ripgrep
+fzf
+zoxide
 
 # Remote access
 mosh
@@ -103,3 +108,6 @@ localsend-go
 
 # Image upscaling
 realesrgan-ncnn-vulkan
+
+# Music player (terminal, Winamp-style; Plex creds via `cliamp setup`)
+cliamp
