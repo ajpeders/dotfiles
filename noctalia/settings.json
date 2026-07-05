@@ -39,7 +39,7 @@
         "mprisBlacklist": [
         ],
         "preferredPlayer": "cider",
-        "spectrumFrameRate": 144,
+        "spectrumFrameRate": 60,
         "spectrumMirrored": true,
         "visualizerType": "linear",
         "volumeFeedback": false,
@@ -94,22 +94,6 @@
                     "id": "Clock",
                     "tooltipFormat": "HH:mm ddd, MMM dd",
                     "useCustomFont": false
-                },
-                {
-                    "compactMode": true,
-                    "hideMode": "hidden",
-                    "hideWhenIdle": false,
-                    "id": "MediaMini",
-                    "maxWidth": 500,
-                    "panelShowAlbumArt": true,
-                    "scrollingMode": "hover",
-                    "showAlbumArt": true,
-                    "showArtistFirst": true,
-                    "showProgressRing": true,
-                    "showVisualizer": true,
-                    "textColor": "none",
-                    "useFixedWidth": false,
-                    "visualizerType": "linear"
                 }
             ],
             "left": [
@@ -148,7 +132,7 @@
                     "colorizeIcons": false,
                     "hideMode": "hidden",
                     "id": "ActiveWindow",
-                    "maxWidth": 750,
+                    "maxWidth": 475,
                     "scrollingMode": "hover",
                     "showIcon": true,
                     "showText": true,
@@ -157,6 +141,22 @@
                 }
             ],
             "right": [
+                {
+                    "compactMode": true,
+                    "hideMode": "hidden",
+                    "hideWhenIdle": false,
+                    "id": "MediaMini",
+                    "maxWidth": 190,
+                    "panelShowAlbumArt": true,
+                    "scrollingMode": "hover",
+                    "showAlbumArt": true,
+                    "showArtistFirst": true,
+                    "showProgressRing": true,
+                    "showVisualizer": true,
+                    "textColor": "none",
+                    "useFixedWidth": false,
+                    "visualizerType": "linear"
+                },
                 {
                     "displayMode": "onhover",
                     "iconColor": "none",
@@ -242,7 +242,7 @@
                     "hideIfNotDetected": true,
                     "id": "Battery",
                     "showNoctaliaPerformance": false,
-                    "showPowerProfiles": false
+                    "showPowerProfiles": true
                 }
             ]
         }
