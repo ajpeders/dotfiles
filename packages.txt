@@ -68,6 +68,12 @@ pipewire
 pipewire-pulse
 wireplumber
 
+# Asahi / Apple Silicon speaker stack (REQUIRED for built-in speakers on M-series
+# Macs; speakersafetyd protects the drivers, asahi-audio provides the DSP config).
+# Asahi-ARM only — do NOT merge to main / x86 machines.
+asahi-audio
+speakersafetyd
+
 # Bluetooth (bluez daemon + bluetoothctl; AirPods etc. via PipeWire A2DP)
 bluez
 bluez-utils
