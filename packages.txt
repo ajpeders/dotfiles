@@ -90,6 +90,9 @@ brightnessctl
 upower
 power-profiles-daemon
 
+# Idle management (dim/lock/screen-off/suspend on idle; config in hypr/hypridle.conf)
+hypridle
+
 # Display configuration
 nwg-displays
 
