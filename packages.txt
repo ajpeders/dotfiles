@@ -120,6 +120,15 @@ papirus-icon-theme
 # Display manager
 ly
 
+# VPN — AmneziaWG (obfuscated WireGuard; home server runs wg-easy/AmneziaWG).
+# Userspace impl (amneziawg-go) instead of a DKMS kernel module — the Asahi
+# kernel makes out-of-tree modules fragile. Client config: ~/.config/wireguard/
+# (NOT in this repo). Bring up: awg-quick up ~/.config/wireguard/alex.conf
+amneziawg-tools
+amneziawg-go
+# resolvconf shim so awg-quick can push the VPN DNS into systemd-resolved
+systemd-resolvconf
+
 # File sharing
 localsend-go
 
