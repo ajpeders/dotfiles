@@ -1,10 +1,13 @@
 -- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 -- ┃                   Hyprland Configuration (Lua)              ┃
 -- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
--- Migrated from hyprland.conf (hyprlang). Legacy .conf files kept
--- untouched: monitors.conf (nwg-displays) and noctalia-colors.conf
--- (noctalia-shell) are still generated as hyprlang and parsed by
--- config/monitors.lua and config/noctalia_colors.lua.
+-- Migrated from hyprland.conf (hyprlang). noctalia-colors.conf is
+-- still generated as hyprlang by noctalia-shell and parsed by
+-- config/noctalia_colors.lua.
+--
+-- Monitors are now hand-written in config/monitors.lua, keyed by EDID
+-- description rather than connector name so one file serves every
+-- setup. monitors.conf (nwg-displays) is dead — see HOWTO.md.
 
 require("config.environment")
 require("config.variables")

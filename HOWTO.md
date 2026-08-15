@@ -59,7 +59,51 @@ bash update.sh
 
 ## Configure monitors
 
-Use `nwg-displays` GUI tool. It writes to `~/.config/hypr/monitors.conf` — don't hand-edit that file.
+Edit `hypr/config/monitors.lua` by hand. **Don't use `nwg-displays`** — it writes
+connector-keyed rules (`DP-2`, `DP-3`) to `monitors.conf`, which nothing reads
+anymore. Connector names identify a *port*, not a *panel*, so the same rule means
+a different monitor at a different desk.
+
+Two conventions keep one file working on every machine:
+
+- **Match by `desc:`** (EDID make/model), never by connector name. Partial matches
+  work, so serials are omitted and a rule matches any unit of that model.
+- **Position relatively** (`auto`, `auto-center-left/right/up/down`), never with
+  absolute coordinates. Relative layouts close up over any subset of monitors;
+  absolute ones leave a hole where an absent panel used to be. The first rule
+  that matches anchors at `0x0`; the rest grow outward in call order.
+
+Rules for panels that aren't connected are never matched, so every setup lives in
+the same file. Unknown displays fall through to the catch-all rule at the top.
+
+### Adding a new monitor
+
+You can only read a panel's EDID description while it's plugged in. At the new desk:
+
+```bash
+~/.config/hypr/scripts/capture-monitor.sh
+```
+
+It prints ready-to-paste `hl.monitor()` blocks for everything currently connected.
+Paste them into `hypr/config/monitors.lua` and fix up the positions.
+
+### Testing a change without reloading
+
+```bash
+hyprctl eval "hl.monitor({ output = 'desc:AOC 2460G4', mode = '1920x1080@144', position = 'auto-center-left', scale = 0.8 })"
+```
+
+Applies immediately; reverts on the next config reload. Use this to test a mode
+before committing to it.
+
+### Gotchas
+
+- **Scale must yield integer logical sizes.** `width / scale` and `height / scale`
+  must both be whole numbers or directional focus across monitors breaks.
+  `1920 / 0.8 = 2400` is fine; `1920 / 0.83 = 2313.25` is not.
+- **EDIDs can under-report the max refresh rate.** The Samsung G53F advertises
+  60 Hz in its EDID but runs 200 Hz. Don't trust the advertised list — test the
+  panel's rated refresh with `hyprctl eval` and keep it if the image is stable.
 
 ## macOS: mount luna SMB share on login
 
