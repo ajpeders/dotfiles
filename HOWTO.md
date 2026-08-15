@@ -101,9 +101,13 @@ before committing to it.
 - **Scale must yield integer logical sizes.** `width / scale` and `height / scale`
   must both be whole numbers or directional focus across monitors breaks.
   `1920 / 0.8 = 2400` is fine; `1920 / 0.83 = 2313.25` is not.
-- **EDIDs can under-report the max refresh rate.** The Samsung G53F advertises
-  60 Hz in its EDID but runs 200 Hz. Don't trust the advertised list — test the
-  panel's rated refresh with `hyprctl eval` and keep it if the image is stable.
+- **EDIDs can under-report the max refresh rate — but a mode lighting up is not
+  proof it holds.** The Samsung G53F advertises only 60 Hz in its EDID, so the
+  advertised mode list is useless. Forcing 200 Hz link-trains successfully and
+  looks perfectly normal on the desktop, then drops frames under load
+  (fullscreen games visibly judder). It runs 144 Hz cleanly, which is what the
+  config uses. Test a candidate mode **under load**, not just by checking that
+  the image appears.
 
 ## macOS: mount luna SMB share on login
 

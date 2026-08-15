@@ -41,7 +41,11 @@ cat <<'EOF'
 --   e.g. 1920/0.8 = 2400 OK; 1920/0.83 = 2313.25 BROKEN.
 --
 -- Check a monitor's real max refresh before trusting the mode above:
--- some EDIDs under-report (the Samsung G53F advertises 60Hz, runs 200).
--- Test live, then keep it if the image is stable:
---   hyprctl eval "hl.monitor({ output = 'desc:...', mode = '2560x1440@200', position = 'auto', scale = 1.0 })"
+-- some EDIDs under-report (the Samsung G53F advertises only 60Hz max).
+-- Test a higher mode live:
+--   hyprctl eval "hl.monitor({ output = 'desc:...', mode = '2560x1440@144', position = 'auto-right', scale = 1.0 })"
+--
+-- But a mode lighting up is NOT proof it holds. The G53F link-trains at
+-- 200Hz and looks fine idle, then drops frames under load. Verify with a
+-- fullscreen game before committing a mode to monitors.lua.
 EOF
