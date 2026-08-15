@@ -145,3 +145,6 @@ if (( ${+functions[_zsh_autosuggest_fetch]} )); then
 fi
 
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+
+# opencode
+export PATH=/home/alex/.opencode/bin:$PATH
