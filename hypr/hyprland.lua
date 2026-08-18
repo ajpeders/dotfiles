@@ -19,6 +19,18 @@ require("config.keybinds")
 require("config.monitors")
 require("config.windowrules")
 
+-- ====== Primary monitor ======
+-- Hyprland has no "primary" flag; the closest thing is which monitor
+-- owns workspace 1 by default, since that's where the session lands on
+-- login and where unassigned windows go. Keyed by desc: like the
+-- monitor rules — on a machine without this panel the rule never
+-- matches and workspace 1 falls back to the normal monitor order.
+hl.workspace_rule({
+    workspace = "1",
+    monitor   = "desc:Samsung Electric Company LS27FG53x",
+    default   = true,
+})
+
 -- ====== Workspace Names ======
 hl.workspace_rule({ workspace = "6",  default_name = "dev" })
 hl.workspace_rule({ workspace = "7",  default_name = "server" })

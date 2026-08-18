@@ -12,7 +12,7 @@ Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, 
 - [x] Keybinds updated for Noctalia IPC
 - [x] Install/update scripts updated
 - [x] Stale waybar/rofi/swaync/quickshell references cleaned up
-- [x] Portable monitor config — EDID-keyed, relatively positioned, one file for all setups
+- [x] Portable monitor config — EDID-keyed, one file for all setups
 - [x] Established that the Samsung G53F's EDID under-reports (claims 60Hz max).
       Settled on 144Hz: 200Hz link-trains and looks fine idle but drops frames
       under load. Don't raise it without testing a fullscreen game.

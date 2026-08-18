@@ -12,49 +12,72 @@
 --      port holds a different monitor at a different desk. Partial
 --      matches work, so we omit per-unit serials.
 --
---   2. Position relatively (auto-left/right/up/down), never with
---      absolute coordinates. Absolute coordinates leave a hole in the
---      layout when a panel is absent; relative placement closes up
---      over any subset.
+--   2. Panels of a known desk get absolute coordinates; everything
+--      else falls through to the "auto" catch-all. Relative auto-*
+--      placement was tried first and can't express a three-panel
+--      arrangement: auto-right measures against the WHOLE layout
+--      bounding box (the panel below pushed the right monitor 1920px
+--      out, leaving a hole in the row) and auto-center-down centers
+--      under one neighbour, not under the row. Absolute coordinates are
+--      also independent of Hyprland's monitor placement order, which is
+--      the connection order and therefore not knowable from this file.
+--
+--   3. Bottom-align a row of unequal-height panels rather than
+--      top-aligning it, so every panel shares an exact edge with its
+--      neighbours. Directional focus across monitors needs exactly
+--      aligned edges.
 --
 -- Rules for panels that aren't plugged in are simply never matched,
--- so every setup can coexist in this one file.
---
--- Two hard-won constraints on the positioning — don't undo these:
---
---   * EVERY monitor gets an explicit direction. Never bare "auto".
---     Monitors are placed in Hyprland's internal connection order, not
---     in the order of the calls below, so we can't know which one gets
---     placed first. A direction on the first-placed monitor is a no-op
---     (it anchors at 0x0) and every other monitor then arranges around
---     it correctly. The absolute origin shifts with plug order; the
---     relative arrangement doesn't.
---
---   * Use auto-left/right, NOT auto-center-left/right. The center
---     variants compute against the whole layout's bounding box, which
---     includes the monitor placed below — so the AOC's y jumped from
---     45 to 585 depending on whether the portable was connected first.
---     Plain auto-left/right top-aligns at y=0, which has no cross-axis
---     coupling and gives an exact shared edge (directional focus across
---     monitors needs exactly-aligned edges).
+-- so every setup can coexist in this one file. Absent panels leave
+-- their coordinates unused; the remaining ones don't overlap.
 
 -- Fallback for any display we don't know yet (hotel TV, projector, a
 -- laptop panel we haven't captured). Keep this FIRST: specific desc:
 -- rules below override it.
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
 
--- ====== Left of the row ======
+-- ====== Home desk: absolute layout ======
+-- These three are positioned absolutely, on purpose. The relative
+-- auto-* directives can't express this arrangement: the portable has
+-- to be centered under BOTH upper panels, and auto-center-down centers
+-- it under a single neighbour, not under the whole row. Absolute
+-- coordinates are also immune to Hyprland's monitor placement order,
+-- which is what used to leave a 1920px hole in the top row.
+--
+-- The layout, in logical pixels:
+--
+--     x=0        2400            4960
+--   y=0 +--------+---------------+
+--       | (gap)  |               |
+--    90 +--------+   Samsung     |   <- Samsung is the primary
+--       |  AOC   |   2560x1440   |
+--       | 2400   |               |
+--       | x1350  |               |
+--  1440 +--------+---------------+
+--       |   1520 | portable |    |
+--       |        | 1920x1080|    |
+--  2520          +----------+
+--
+-- The row is BOTTOM-aligned (AOC at y=90, not y=0) so all three panels
+-- share exact edges at y=1440 — directional focus across monitors needs
+-- exactly-aligned edges, and top-aligning would leave the AOC's bottom
+-- at 1350 with no shared edge to the portable below.
+--
+-- If one of these is unplugged its rule simply never matches; the
+-- others keep their coordinates and still tile without overlap.
+
+-- ====== Left ======
 -- scale 0.8 is load-bearing: 1920/0.8 = 2400 and 1080/0.8 = 1350, both
 -- integers. A fractional scale like 0.83 yields non-integer logical
 -- sizes and breaks directional focus across monitors.
 hl.monitor({
     output   = "desc:AOC 2460G4",
     mode     = "1920x1080@144",
-    position = "auto-left",
+    position = "0x90",
     scale    = 0.8,
 })
 
--- ====== Right of the row ======
+-- ====== Right (primary) ======
 -- Samsung Odyssey G5 G53F. Its EDID advertises 60Hz max, which is an
 -- under-report — the panel drives far higher. But 200 is past what it
 -- holds cleanly: it links up and looks fine on the desktop, then drops
@@ -63,16 +86,16 @@ hl.monitor({
 hl.monitor({
     output   = "desc:Samsung Electric Company LS27FG53x",
     mode     = "2560x1440@144",
-    position = "auto-right",
+    position = "2400x0",
     scale    = 1.0,
 })
 
--- ====== Below the row ======
--- Portable 16" panel.
+-- ====== Centered below both ======
+-- Portable 16" panel. x = 1520 = (4960 - 1920) / 2.
 hl.monitor({
     output   = "desc:AOP 16PM1Q",
     mode     = "1920x1080@60",
-    position = "auto-down",
+    position = "1520x1440",
     scale    = 1.0,
 })
 

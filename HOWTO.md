@@ -68,13 +68,26 @@ Two conventions keep one file working on every machine:
 
 - **Match by `desc:`** (EDID make/model), never by connector name. Partial matches
   work, so serials are omitted and a rule matches any unit of that model.
-- **Position relatively** (`auto`, `auto-center-left/right/up/down`), never with
-  absolute coordinates. Relative layouts close up over any subset of monitors;
-  absolute ones leave a hole where an absent panel used to be. The first rule
-  that matches anchors at `0x0`; the rest grow outward in call order.
+- **Give known panels absolute coordinates**, and let everything else fall
+  through to the `auto` catch-all at the top of the file. Relative `auto-*`
+  placement was tried and abandoned: `auto-right` measures against the whole
+  layout's bounding box, so a panel placed below pushes the right-hand monitor
+  clear of it and leaves a hole in the row, and `auto-center-down` centers under
+  one neighbour rather than under the row. Absolute coordinates are also
+  independent of Hyprland's placement order, which is the monitor *connection*
+  order and so isn't knowable from the config.
+- **Bottom-align a row of unequal-height panels.** Panels only hand focus to each
+  other across exactly aligned edges, so offset the shorter panel's `y` instead of
+  starting every panel at `y=0` (the AOC sits at `0x90` so its bottom edge lines
+  up with the Samsung's at `y=1440`).
 
 Rules for panels that aren't connected are never matched, so every setup lives in
-the same file. Unknown displays fall through to the catch-all rule at the top.
+the same file; an absent panel just leaves its coordinates unused. Unknown
+displays fall through to the catch-all rule at the top.
+
+The primary monitor is expressed as a workspace rule in `hypr/hyprland.lua` —
+Hyprland has no primary flag, so workspace 1 is pinned to the panel that should
+own the session on login (currently the Samsung).
 
 ### Adding a new monitor
 
@@ -90,7 +103,7 @@ Paste them into `hypr/config/monitors.lua` and fix up the positions.
 ### Testing a change without reloading
 
 ```bash
-hyprctl eval "hl.monitor({ output = 'desc:AOC 2460G4', mode = '1920x1080@144', position = 'auto-center-left', scale = 0.8 })"
+hyprctl eval "hl.monitor({ output = 'desc:AOC 2460G4', mode = '1920x1080@144', position = '0x90', scale = 0.8 })"
 ```
 
 Applies immediately; reverts on the next config reload. Use this to test a mode
