@@ -245,6 +245,12 @@
                     "id": "plugin:monitor-layout"
                 },
                 {
+                    "defaultSettings": {
+                        "connectedColor": "primary",
+                        "disableToastNotifications": false,
+                        "disconnectedColor": "none",
+                        "displayMode": "onhover"
+                    },
                     "id": "plugin:network-manager-vpn"
                 }
             ]
