@@ -18,6 +18,9 @@
 !theme/
 !kitty/
 !wallpapers/
+# Per-host $HOME dotfiles (see hosts/<name>/README.md)
+!hosts/
+!hosts/**
 !gtk-3.0/
 !gtk-4.0/
 !zsh/

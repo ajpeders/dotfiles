@@ -1,0 +1,8 @@
+[safe]
+	directory = /home/ween/homelab
+	directory = *
+[user]
+	name = alex
+	email = alexjpeders@gmail.com
+[init]
+	defaultBranch = main
