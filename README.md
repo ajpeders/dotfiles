@@ -43,6 +43,18 @@ bash install.sh --headless
 
 Installs only the CLI base from `packages.txt` (zsh, neovim, git, mosh, openssh, tmux, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), enables `sshd`, and switches the system to `multi-user.target` (no display manager). `update.sh` reads the mode from `~/.local/state/dotfiles-mode` and stays in headless mode on resync; pass `--full` to override.
 
+### Debian — headless
+
+For Debian/Raspberry Pi boxes (the GUI stack is Arch-only, so there is no full mode):
+
+```bash
+git clone git@git.thelunadog.com:alex/dotfiles.git ~/.config
+cd ~/.config
+bash install-debian.sh
+```
+
+The Debian counterpart to `install.sh --headless`: `apt`-installs the CLI base (Debian-named — `fd-find`, `openssh-server`, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), sets up zsh + oh-my-zsh + powerlevel10k, and enables `ssh`. Per-host `$HOME` files live under `hosts/<name>/`; `hosts/livingroom-pi/install.sh --full` links those and then runs this script.
+
 ### macOS
 
 ```bash
@@ -101,6 +113,7 @@ dotfiles/
 ├── theme/                 # Static colors
 ├── macos/                 # macOS-only: aerospace, LaunchAgents, install.sh
 ├── install.sh             # Arch bootstrap
+├── install-debian.sh      # Debian headless bootstrap (apt)
 ├── update.sh              # Arch resync
 ├── sync-private.sh        # Cross-platform private file sync
 ├── packages.txt           # Pacman + AUR package list
