@@ -60,3 +60,5 @@ zsh/.zsh_sessions/
 
 # Ignore editor/backup files anywhere in the tree
 **/*.bak
+# Ignore installer backups (install.sh writes <file>.pre-dotfiles before symlinking)
+**/*.pre-dotfiles
