@@ -7,49 +7,26 @@
 #   bash hosts/homeserver/install.sh            # links only
 #   bash hosts/homeserver/install.sh --full     # links + main install.sh --headless
 #
-# Safe to re-run. Anything in $HOME that would be replaced and is NOT already a
-# symlink into this repo is backed up alongside itself as <name>.pre-dotfiles.
+# Safe to re-run; replaced files are kept as <name>.pre-dotfiles.
 
 set -euo pipefail
 
-GREEN='\033[0;32m'; RED='\033[0;31m'; YELLOW='\033[1;33m'; NC='\033[0m'
-ok()   { echo -e "${GREEN}[✓]${NC} $1"; }
-err()  { echo -e "${RED}[✗]${NC} $1"; }
-info() { echo -e "${YELLOW}[i]${NC} $1"; }
+HOST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO="$(cd "$HOST_DIR/../.." && pwd)"
+# shellcheck source=../common.sh
+source "$HOST_DIR/../common.sh"
 
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO="$(cd "$HERE/../.." && pwd)"
-
-if [ "$EUID" -eq 0 ]; then
-    err "Run as your user, not root — symlinks must land in your \$HOME"
-    exit 1
-fi
+require_not_root
 
 FULL=0
 case "${1:-}" in
     --full) FULL=1 ;;
     "") ;;
-    --help|-h) sed -n '2,12p' "$0" | sed 's/^# \?//'; exit 0 ;;
+    --help|-h) sed -n '2,10p' "$0" | sed 's/^# \?//'; exit 0 ;;
     *) err "Unknown argument: ${1} (try --help)"; exit 1 ;;
 esac
 
-link_home() {
-    local name="$1"
-    local src="$HERE/$name"
-    local dst="$HOME/$name"
-    if [ "$(readlink -f "$dst" 2>/dev/null)" = "$src" ]; then
-        ok "$name already linked"
-        return
-    fi
-    if [ -e "$dst" ] && [ ! -L "$dst" ]; then
-        mv "$dst" "$dst.pre-dotfiles"
-        info "$name existed — backed up to $name.pre-dotfiles"
-    fi
-    ln -sfn "$src" "$dst"
-    ok "$name -> hosts/homeserver/$name"
-}
-
-info "Linking homeserver \$HOME dotfiles from $HERE"
+info "Linking homeserver \$HOME dotfiles from $HOST_DIR"
 link_home .zshrc
 link_home .gitconfig
 link_home .bashrc
