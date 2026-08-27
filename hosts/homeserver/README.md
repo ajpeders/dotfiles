@@ -12,10 +12,12 @@ that shouldn't follow to laptops.
 Install (from the repo root, i.e. `~/.config`):
 
 ```sh
-ln -sfn "$PWD/hosts/homeserver/.zshrc"     ~/.zshrc
-ln -sfn "$PWD/hosts/homeserver/.gitconfig" ~/.gitconfig
-ln -sfn "$PWD/hosts/homeserver/.bashrc"    ~/.bashrc
+bash hosts/homeserver/install.sh          # link the $HOME dotfiles (idempotent)
+bash hosts/homeserver/install.sh --full   # + run the main install.sh --headless
 ```
+
+Anything replaced that wasn't already a repo symlink is kept as
+`<name>.pre-dotfiles` next to the original.
 
 Nothing here is secret (verified before committing): no tokens, hosts, or
 addresses — safe for the public mirror.
