@@ -129,7 +129,8 @@ dotfiles/
 │   ├── install-debian.sh  # Debian headless bootstrap (apt)
 │   ├── update.sh          # Arch resync
 │   ├── sync-private.sh    # Cross-platform private file sync
-│   └── setup-llm.sh       # Point opencode at a local LLM server
+│   ├── setup-llm.sh       # Point opencode at a local LLM server
+│   └── setup-yabai.sh     # yabai scripting addition + sudoers (macOS)
 ├── packages.txt           # Pacman + AUR package list
 └── HOWTO.md, ARCHITECTURE.md, ROADMAP.md
 ```

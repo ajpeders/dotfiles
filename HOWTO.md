@@ -156,3 +156,48 @@ The LaunchAgent runs `osascript 'mount volume "smb://ween@share.thelunadog.com/s
 launchctl unload ~/Library/LaunchAgents/com.alex.mount.share.plist
 rm ~/Library/LaunchAgents/com.alex.mount.share.plist ~/share
 ```
+
+## macOS: switch between AeroSpace and yabai
+
+Both window managers are configured in the repo. They must never run at once —
+they both drive the Accessibility API and will fight over every window.
+
+**AeroSpace** (`macos/aerospace/`) needs no system changes and is the default.
+
+**yabai** (`macos/yabai/` + `macos/skhd/`) needs SIP partially disabled, because
+its scripting addition injects into `Dock.app` to manage spaces and displays.
+From Recovery (hold the power button → Options):
+
+```
+csrutil enable --without fs --without debug --without nvram
+```
+
+then, on Apple Silicon, after rebooting:
+
+```
+sudo nvram boot-args=-arm64e_preview_abi
+```
+
+Reboot again, quit AeroSpace and remove it from Login Items, then:
+
+```bash
+brew bundle --file=macos/Brewfile
+bash scripts/setup-yabai.sh
+```
+
+That installs the scripting addition, writes a hash-pinned sudoers rule so it
+loads without a password, starts both services, and creates the 9 macOS Spaces
+the `alt-1..9` bindings expect. Grant Accessibility permission to yabai *and*
+skhd when prompted.
+
+**Re-run `scripts/setup-yabai.sh` after every yabai upgrade** — the sudoers rule
+pins the binary's SHA-256, so an upgrade invalidates it by design. macOS updates
+can also reset SIP.
+
+Going back: `yabai --stop-service && skhd --stop-service`, then re-enable
+AeroSpace in Login Items. To restore full SIP, run `csrutil enable` in Recovery
+and `sudo nvram -d boot-args`.
+
+Trade-offs worth remembering: yabai uses *real* macOS Spaces rather than
+AeroSpace's emulated workspaces, and reduced SIP can break Apple Pay, iPhone
+Mirroring and DRM'd playback.

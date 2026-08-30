@@ -1,0 +1,73 @@
+# skhd — hotkeys for yabai, ported 1:1 from macos/aerospace/aerospace.toml.
+# alt = Option, used as the Super equivalent, same as the AeroSpace config.
+#
+# yabai has no built-in hotkey daemon (AeroSpace did), so bindings live here.
+# Reload after editing with: skhd --reload   (or alt + shift - r below)
+
+# ====== Apps ======
+# -d ~ is required for the same reason as under AeroSpace: skhd is started by
+# launchd, whose working directory is /, and spawned processes inherit it.
+alt - return : /opt/homebrew/bin/kitty --single-instance=no -d ~
+alt - t      : /opt/homebrew/bin/kitty --single-instance=no -d ~
+alt - b      : /opt/homebrew/bin/kitty --single-instance=no -d ~ btop
+
+# MOZ_DISABLE_SAFE_MODE_KEY=1 stops LibreWolf reading the held Option key as
+# the Troubleshoot Mode trigger.
+alt - e : env MOZ_DISABLE_SAFE_MODE_KEY=1 /Applications/LibreWolf.app/Contents/MacOS/librewolf --new-window about:blank
+
+# ====== Window ======
+alt - q         : yabai -m window --close
+alt - f         : yabai -m window --toggle zoom-fullscreen
+alt + shift - f : yabai -m window --toggle float
+alt - j         : yabai -m window --toggle split
+
+# ====== Focus ======
+alt - left  : yabai -m window --focus west
+alt - right : yabai -m window --focus east
+alt - up    : yabai -m window --focus north
+alt - down  : yabai -m window --focus south
+
+# ====== Move ======
+alt + shift - left  : yabai -m window --warp west
+alt + shift - right : yabai -m window --warp east
+alt + shift - up    : yabai -m window --warp north
+alt + shift - down  : yabai -m window --warp south
+
+# ====== Resize ======
+# yabai resizes a named edge, so a window with no neighbour that way fails;
+# fall back to the opposite edge in that case.
+alt + ctrl - left  : yabai -m window --resize right:-50:0  || yabai -m window --resize left:-50:0
+alt + ctrl - right : yabai -m window --resize right:50:0   || yabai -m window --resize left:50:0
+alt + ctrl - up    : yabai -m window --resize bottom:0:-50 || yabai -m window --resize top:0:-50
+alt + ctrl - down  : yabai -m window --resize bottom:0:50  || yabai -m window --resize top:0:50
+
+# ====== Spaces ======
+# Unlike AeroSpace's emulated workspaces, these are real macOS Spaces and must
+# already exist — scripts/setup-yabai.sh creates them up to 9.
+alt - 1 : yabai -m space --focus 1
+alt - 2 : yabai -m space --focus 2
+alt - 3 : yabai -m space --focus 3
+alt - 4 : yabai -m space --focus 4
+alt - 5 : yabai -m space --focus 5
+alt - 6 : yabai -m space --focus 6
+alt - 7 : yabai -m space --focus 7
+alt - 8 : yabai -m space --focus 8
+alt - 9 : yabai -m space --focus 9
+
+alt + shift - 1 : yabai -m window --space 1 --focus
+alt + shift - 2 : yabai -m window --space 2 --focus
+alt + shift - 3 : yabai -m window --space 3 --focus
+alt + shift - 4 : yabai -m window --space 4 --focus
+alt + shift - 5 : yabai -m window --space 5 --focus
+alt + shift - 6 : yabai -m window --space 6 --focus
+alt + shift - 7 : yabai -m window --space 7 --focus
+alt + shift - 8 : yabai -m window --space 8 --focus
+alt + shift - 9 : yabai -m window --space 9 --focus
+
+# ====== Displays ======
+alt - tab         : yabai -m display --focus next
+alt + shift - tab : yabai -m space --display next; yabai -m display --focus next
+
+# ====== Misc ======
+alt + shift - b : yabai -m space --balance
+alt + shift - r : yabai --restart-service && skhd --reload

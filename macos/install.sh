@@ -111,6 +111,8 @@ phase_dotfiles() {
 
     # macOS-only
     link "$SCRIPT_DIR/aerospace" "$HOME/.config/aerospace"
+    link "$SCRIPT_DIR/yabai" "$HOME/.config/yabai"
+    link "$SCRIPT_DIR/skhd" "$HOME/.config/skhd"
     link "$SCRIPT_DIR/com.alex.mount.share.plist" "$HOME/Library/LaunchAgents/com.alex.mount.share.plist"
 
     # Cross-platform configs from the repo root
