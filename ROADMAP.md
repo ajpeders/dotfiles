@@ -21,8 +21,9 @@ Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, 
 
 - [ ] Capture the home desk's second 1440p panel into `hypr/config/monitors.lua`
       (run `hypr/scripts/capture-monitor.sh` while at that desk). Until then it
-      falls through to the catch-all rule. `hypr/monitors.conf.home-backup` records
-      the old connector-keyed settings but not the panel's EDID description.
+      falls through to the catch-all rule. The old connector-keyed settings are in
+      git history (`git show a328eb5:hypr/monitors.conf.home-backup`), but they
+      never recorded the panel's EDID description.
 - [ ] Capture the laptop's internal panel (`eDP-1`) the same way, and confirm the
       relative layout behaves when docking/undocking there
 - [ ] Test install.sh on a fresh system

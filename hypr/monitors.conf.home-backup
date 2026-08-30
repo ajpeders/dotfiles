@@ -1,5 +1,0 @@
-# Original home setup (pre-vacation, 2026-08-14). Restore by copying over monitors.conf.
-monitor=DP-2,2560x1440@144.0,2560x0,1.0
-monitor=DP-3,2560x1440@143.97,0x0,1.0
-monitor=HDMI-A-2,disable
-monitor=DP-4,1920x1080@60.0,1428x1440,1.0
