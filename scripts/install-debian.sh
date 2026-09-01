@@ -36,6 +36,8 @@ STATE_FILE="$HOME/.local/state/dotfiles-mode"
 #   Arch github-cli -> gh (only in trixie+/GitHub apt repo; tolerated if absent)
 #   Arch fd         -> fd-find      (binary fdfind; symlinked to ~/.local/bin/fd)
 #   Arch openssh    -> openssh-server + openssh-client
+#   Arch tailscale  -> only in Tailscale's own apt repo, not Debian main; if it
+#                     lands in the unavailable list, run: curl -fsSL https://tailscale.com/install.sh | sh
 #   Arch yazi/fastfetch may be absent on older Debian; failures are tolerated.
 APT_PACKAGES=(
     zsh
@@ -58,6 +60,7 @@ APT_PACKAGES=(
     mosh
     openssh-server
     openssh-client
+    tailscale
     tmux
     ca-certificates
 )
@@ -297,6 +300,8 @@ phase_services() {
     fi
     enable_system_service NetworkManager
     enable_system_service avahi-daemon
+    # Skipped automatically if Tailscale was not installable via apt above.
+    enable_system_service tailscaled
 }
 
 phase_opencode() {

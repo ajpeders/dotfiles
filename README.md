@@ -12,7 +12,7 @@ Cross-platform dotfiles. Hyprland desktop on Arch Linux, AeroSpace tiling on mac
 | Shell | Zsh + Oh My Zsh + Powerlevel10k | Zsh + Oh My Zsh + Powerlevel10k |
 | File manager | Yazi (TUI) / Thunar (GUI) | Yazi (TUI) / Finder |
 | Display manager | ly | macOS login |
-| VPN | WireGuard (CLI) | WireGuard (App Store) |
+| VPN | WireGuard (CLI) + Tailscale (`tailscaled.service`) | WireGuard (App Store) + Tailscale (LaunchAgent `com.alex.tailscale`) |
 | SMB share | autofs / systemd | LaunchAgent (`com.alex.mount.share`) |
 
 ## Fresh Install
@@ -63,7 +63,7 @@ cd ~/dotfiles
 bash macos/install.sh
 ```
 
-The macOS script installs Homebrew, AeroSpace, kitty, `mas` + WireGuard (App Store), symlinks configs into `~/.config` and `~/Library/LaunchAgents`, and interactively seeds the SMB Keychain entry. See `HOWTO.md` for the manual follow-ups (Full Disk Access for kitty, etc.).
+The macOS script installs Homebrew, AeroSpace, kitty, Tailscale, `mas` + WireGuard (App Store), symlinks configs into `~/.config` and `~/Library/LaunchAgents`, and interactively seeds the SMB Keychain entry. See `HOWTO.md` for the manual follow-ups (Full Disk Access for kitty, etc.).
 
 ## Keep in Sync
 
@@ -78,7 +78,7 @@ bash scripts/sync-private.sh user@host
 ```
 
 ```bash
-# Both — point opencode at a local llama.cpp / OpenAI-compatible server
+# Both — point opencode at a local Ollama / llama.cpp / OpenAI-compatible server
 bash scripts/setup-llm.sh [base-url]
 ```
 

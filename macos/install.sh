@@ -37,7 +37,7 @@ phase_preflight() {
 
     print_info "This script will:"
     echo "  - Install Homebrew if missing"
-    echo "  - Install AeroSpace (tiling WM) and kitty"
+    echo "  - Install AeroSpace (tiling WM), kitty and Tailscale"
     echo "  - Symlink macOS configs into ~/.config and ~/Library/LaunchAgents"
     echo "  - Print follow-up instructions for SMB Keychain seeding"
     echo ""
@@ -114,6 +114,7 @@ phase_dotfiles() {
     link "$SCRIPT_DIR/yabai" "$HOME/.config/yabai"
     link "$SCRIPT_DIR/skhd" "$HOME/.config/skhd"
     link "$SCRIPT_DIR/com.alex.mount.share.plist" "$HOME/Library/LaunchAgents/com.alex.mount.share.plist"
+    link "$SCRIPT_DIR/com.alex.tailscale.plist" "$HOME/Library/LaunchAgents/com.alex.tailscale.plist"
 
     # Cross-platform configs from the repo root
     link "$REPO_DIR/kitty" "$HOME/.config/kitty"
@@ -161,12 +162,26 @@ phase_keychain() {
 phase_launchagents() {
     print_phase "Phase 6: LaunchAgents"
 
-    local plist="$HOME/Library/LaunchAgents/com.alex.mount.share.plist"
-    if launchctl list | grep -q com.alex.mount.share; then
-        print_status "SMB mount agent already loaded"
-    else
+    load_agent() {
+        local label="$1"
+        local plist="$HOME/Library/LaunchAgents/${label}.plist"
+
+        if launchctl list | grep -q "$label"; then
+            print_status "Already loaded: $label"
+            return
+        fi
         launchctl load "$plist"
-        print_status "SMB mount agent loaded"
+        print_status "Loaded: $label"
+    }
+
+    load_agent com.alex.mount.share
+
+    # Tailscale's standalone build ships TailscaleStartOnLogin=0 and registers no
+    # login item, so this agent is what actually brings it up at login.
+    if [ -d /Applications/Tailscale.app ]; then
+        load_agent com.alex.tailscale
+    else
+        print_info "Tailscale.app not found; skipping its login agent"
     fi
 }
 
@@ -189,7 +204,11 @@ phase_reminders() {
     echo -e "${BOLD}4. Start AeroSpace${NC}"
     echo "   open -a AeroSpace"
     echo ""
-    echo -e "${BOLD}5. Connect WireGuard${NC}"
+    echo -e "${BOLD}5. Sign in to Tailscale${NC}"
+    echo "   Tailscale starts at login via com.alex.tailscale; on a fresh machine"
+    echo "   authenticate once with: tailscale up"
+    echo ""
+    echo -e "${BOLD}6. Connect WireGuard${NC}"
     echo "   Open the WireGuard app and import ~/.config/wireguard/alex.conf"
     echo "   (or drag-and-drop the .conf onto the app)."
     echo ""

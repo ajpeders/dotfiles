@@ -344,6 +344,9 @@ phase_services() {
 
     enable_system_service NetworkManager
     enable_system_service avahi-daemon
+    # Tailscale: the unit is enough to bring the tunnel up at boot; the node
+    # still needs a one-time `sudo tailscale up` to authenticate.
+    enable_system_service tailscaled
 
     if [ "$HEADLESS" -eq 1 ]; then
         enable_system_service sshd

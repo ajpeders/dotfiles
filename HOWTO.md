@@ -157,6 +157,41 @@ launchctl unload ~/Library/LaunchAgents/com.alex.mount.share.plist
 rm ~/Library/LaunchAgents/com.alex.mount.share.plist ~/share
 ```
 
+## Tailscale at login
+
+Handled by `scripts/install.sh` (Arch/Debian) and `macos/install.sh` — nothing to do
+by hand on a fresh machine beyond authenticating once.
+
+**Linux:** `tailscale` is in the headless base of `packages.txt`; the installer runs
+`systemctl enable tailscaled`. Authenticate once with `sudo tailscale up`.
+
+**macOS:** the `tailscale-app` cask installs the standalone build
+(`io.tailscale.ipn.macsys`). That build ships `TailscaleStartOnLogin = 0` and
+registers no login item, so startup is driven by a LaunchAgent instead of the GUI
+toggle:
+
+```bash
+ln -sfn ~/dotfiles/macos/com.alex.tailscale.plist ~/Library/LaunchAgents/com.alex.tailscale.plist
+launchctl load ~/Library/LaunchAgents/com.alex.tailscale.plist
+```
+
+The agent runs `open -g /Applications/Tailscale.app` at login; the app reconnects the
+tunnel from its saved profile. `open` is a no-op when the app is already running, so
+the agent is safe to re-trigger (`launchctl start com.alex.tailscale`).
+
+Authenticate a fresh machine with `tailscale up` — `/usr/local/bin/tailscale` is a
+shim the app installs, pointing at the binary inside the bundle.
+
+### Gotchas
+
+- Don't mix the `tailscale` **formula** with the `tailscale-app` **cask**: the formula
+  drops `/Library/LaunchDaemons/homebrew.mxcl.tailscale.plist`, which fights the app's
+  own network extension over the tunnel. If it's left over from an old install:
+  `sudo launchctl unload /Library/LaunchDaemons/homebrew.mxcl.tailscale.plist &&
+  sudo rm /Library/LaunchDaemons/homebrew.mxcl.tailscale.plist`.
+- The standalone build has no `install-system-daemon` subcommand — that's the open
+  source `tailscaled`, not this app. Tailscale here is per-login, not per-boot.
+
 ## macOS: switch between AeroSpace and yabai
 
 Both window managers are configured in the repo. They must never run at once —
