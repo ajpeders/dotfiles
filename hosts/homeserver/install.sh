@@ -5,7 +5,7 @@
 #
 # Usage, from the repo root (i.e. ~/.config):
 #   bash hosts/homeserver/install.sh            # links only
-#   bash hosts/homeserver/install.sh --full     # links + main install.sh --headless
+#   bash hosts/homeserver/install.sh --full     # links + main scripts/install.sh --headless
 #
 # Safe to re-run; replaced files are kept as <name>.pre-dotfiles.
 
@@ -33,7 +33,7 @@ link_home .bashrc
 
 if [ "$FULL" -eq 1 ]; then
     info "Handing off to the main bootstrap (--headless)"
-    bash "$REPO/install.sh" --headless
+    bash "$REPO/scripts/install.sh" --headless
 else
     info "Links done. For packages/shell/services on a fresh box:"
     info "  bash hosts/homeserver/install.sh --full"

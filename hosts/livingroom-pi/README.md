@@ -12,7 +12,7 @@ bash hosts/livingroom-pi/install.sh          # link the $HOME dotfiles (idempote
 bash hosts/livingroom-pi/install.sh --full   # + run the repo's Debian bootstrap
 ```
 
-Links only by default: the repo's main `install.sh` is Arch-specific and
-doesn't apply on Debian. `--full` hands off to `install-debian.sh`, which
+Links only by default: the repo's main `scripts/install.sh` is Arch-specific and
+doesn't apply on Debian. `--full` hands off to `scripts/install-debian.sh`, which
 `apt`-installs the CLI base and sets up zsh + oh-my-zsh + powerlevel10k (no GUI,
 ever). Replaced files are kept as `<name>.pre-dotfiles`.

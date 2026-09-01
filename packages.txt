@@ -40,7 +40,7 @@ tmux
 # === GUI (skipped in headless mode) ===
 # Everything below is only installed when running install.sh
 # without --headless. The marker line above is parsed by
-# install.sh / update.sh — do not rename it.
+# scripts/install.sh and scripts/update.sh — do not rename it.
 # ================================================================
 
 # Core Hyprland packages

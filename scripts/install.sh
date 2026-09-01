@@ -1,6 +1,6 @@
 #!/bin/bash
 # Arch Linux dotfiles bootstrap script.
-# Usage: bash install.sh [--headless]
+# Usage: bash scripts/install.sh [--headless]
 # Run from within the cloned dotfiles repo as a non-root user.
 # Safe to re-run: each phase checks whether its work is already done.
 #
@@ -23,6 +23,8 @@ print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase() { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# The repo root is one level up: this script lives in <repo>/scripts/.
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
 STATE_FILE="$HOME/.local/state/dotfiles-mode"
 
@@ -60,11 +62,11 @@ phase_preflight() {
     fi
     print_status "Running as non-root user: $USER"
 
-    if [ ! -f "$SCRIPT_DIR/packages.txt" ]; then
+    if [ ! -f "$REPO_DIR/packages.txt" ]; then
         print_error "packages.txt not found; run this script from within the dotfiles repo"
         exit 1
     fi
-    print_status "Dotfiles repo found at: $SCRIPT_DIR"
+    print_status "Dotfiles repo found at: $REPO_DIR"
 
     echo ""
     print_info "This script will:"
@@ -129,7 +131,7 @@ read_packages() {
         line="${line//[[:space:]]/}"
         [ -n "$line" ] || continue
         pkgs+=("$line")
-    done < "$SCRIPT_DIR/packages.txt"
+    done < "$REPO_DIR/packages.txt"
 }
 
 phase_packages() {
@@ -241,15 +243,15 @@ phase_dotfiles() {
 
     local dir
     for dir in "${config_dirs[@]}"; do
-        if [ -d "$SCRIPT_DIR/$dir" ]; then
-            backup_and_link "$SCRIPT_DIR/$dir" "$HOME/.config/$dir"
+        if [ -d "$REPO_DIR/$dir" ]; then
+            backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
         fi
     done
 
     local file
     for file in "${config_files[@]}"; do
-        if [ -f "$SCRIPT_DIR/$file" ]; then
-            backup_and_link "$SCRIPT_DIR/$file" "$HOME/.config/$file"
+        if [ -f "$REPO_DIR/$file" ]; then
+            backup_and_link "$REPO_DIR/$file" "$HOME/.config/$file"
         fi
     done
 
@@ -417,7 +419,7 @@ phase_browser_policies() {
 
     print_phase "Phase 9: Browser Policies"
 
-    local src="$SCRIPT_DIR/librewolf/policies.json"
+    local src="$REPO_DIR/librewolf/policies.json"
     local dst="/etc/librewolf/policies/policies.json"
 
     if [ ! -f "$src" ]; then

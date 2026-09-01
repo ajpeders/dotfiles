@@ -22,7 +22,7 @@ Cross-platform dotfiles. Hyprland desktop on Arch Linux, AeroSpace tiling on mac
 ```bash
 git clone git@git.thelunadog.com:alex/dotfiles.git ~/.config
 cd ~/.config
-bash install.sh
+bash scripts/install.sh
 ```
 
 The Arch script installs `paru`, packages from `packages.txt`, symlinks configs into `~/.config`, sets up zsh, enables `NetworkManager`/`bluetooth`/`pipewire`/`wireplumber`, and installs the `ly` display manager.
@@ -38,10 +38,10 @@ Then log out and pick **Hyprland** from ly.
 For servers / boxes you only SSH into:
 
 ```bash
-bash install.sh --headless
+bash scripts/install.sh --headless
 ```
 
-Installs only the CLI base from `packages.txt` (zsh, neovim, git, mosh, openssh, tmux, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), enables `sshd`, and switches the system to `multi-user.target` (no display manager). `update.sh` reads the mode from `~/.local/state/dotfiles-mode` and stays in headless mode on resync; pass `--full` to override.
+Installs only the CLI base from `packages.txt` (zsh, neovim, git, mosh, openssh, tmux, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), enables `sshd`, and switches the system to `multi-user.target` (no display manager). `scripts/update.sh` reads the mode from `~/.local/state/dotfiles-mode` and stays in headless mode on resync; pass `--full` to override.
 
 ### Debian — headless
 
@@ -50,10 +50,10 @@ For Debian/Raspberry Pi boxes (the GUI stack is Arch-only, so there is no full m
 ```bash
 git clone git@git.thelunadog.com:alex/dotfiles.git ~/.config
 cd ~/.config
-bash install-debian.sh
+bash scripts/install-debian.sh
 ```
 
-The Debian counterpart to `install.sh --headless`: `apt`-installs the CLI base (Debian-named — `fd-find`, `openssh-server`, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), sets up zsh + oh-my-zsh + powerlevel10k, and enables `ssh`. Per-host `$HOME` files live under `hosts/<name>/`; `hosts/livingroom-pi/install.sh --full` links those and then runs this script.
+The Debian counterpart to `scripts/install.sh --headless`: `apt`-installs the CLI base (Debian-named — `fd-find`, `openssh-server`, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), sets up zsh + oh-my-zsh + powerlevel10k, and enables `ssh`. Per-host `$HOME` files live under `hosts/<name>/`; `hosts/livingroom-pi/install.sh --full` links those and then runs this script.
 
 ### macOS
 
@@ -69,12 +69,12 @@ The macOS script installs Homebrew, AeroSpace, kitty, `mas` + WireGuard (App Sto
 
 ```bash
 # Arch only — pull + reinstall packages + relink + hyprctl reload
-bash update.sh
+bash scripts/update.sh
 ```
 
 ```bash
 # Both — sync private files (wallpapers, SSH hosts, librewolf profile) from a remote host
-bash sync-private.sh user@host
+bash scripts/sync-private.sh user@host
 ```
 
 ## Key Bindings
@@ -112,10 +112,11 @@ dotfiles/
 ├── gtk-3.0/, gtk-4.0/     # GTK theme (Linux)
 ├── theme/                 # Static colors
 ├── macos/                 # macOS-only: aerospace, LaunchAgents, install.sh
-├── install.sh             # Arch bootstrap
-├── install-debian.sh      # Debian headless bootstrap (apt)
-├── update.sh              # Arch resync
-├── sync-private.sh        # Cross-platform private file sync
+├── scripts/               # Bootstrap + maintenance entry points
+│   ├── install.sh         # Arch bootstrap
+│   ├── install-debian.sh  # Debian headless bootstrap (apt)
+│   ├── update.sh          # Arch resync
+│   └── sync-private.sh    # Cross-platform private file sync
 ├── packages.txt           # Pacman + AUR package list
 └── HOWTO.md, ARCHITECTURE.md, ROADMAP.md
 ```

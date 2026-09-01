@@ -1,6 +1,6 @@
 # Dotfiles — ~/.config
 
-Arch Linux + Hyprland desktop dotfiles. Git repo in `~/.config/`, `install.sh` symlinks everything on a fresh machine.
+Arch Linux + Hyprland desktop dotfiles. Git repo in `~/.config/`, `scripts/install.sh` symlinks everything on a fresh machine.
 
 ## Stack
 

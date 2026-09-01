@@ -48,14 +48,14 @@ Then reload: `hyprctl reload`
 ```bash
 git clone <repo-url> ~/.config
 cd ~/.config
-bash install.sh
+bash scripts/install.sh
 ```
 
 ## Update existing install
 
 ```bash
 cd ~/.config
-bash update.sh
+bash scripts/update.sh
 ```
 
 ## Configure monitors

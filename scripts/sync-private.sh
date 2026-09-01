@@ -1,7 +1,7 @@
 #!/bin/bash
 # Sync private files (wallpapers, SSH hosts, etc.) from a remote server.
-# Usage: bash sync-private.sh [user@host]
-# Run after install.sh on a fresh machine, or anytime to update private files.
+# Usage: bash scripts/sync-private.sh [user@host]
+# Run after scripts/install.sh on a fresh machine, or anytime to update private files.
 # If no argument is provided, prompts for the SSH connection string.
 
 set -euo pipefail

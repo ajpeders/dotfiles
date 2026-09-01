@@ -1,10 +1,10 @@
 #!/bin/bash
 # Debian headless dotfiles bootstrap (apt).
-# Usage: bash install-debian.sh
+# Usage: bash scripts/install-debian.sh
 # Run from within the cloned dotfiles repo as a non-root user.
 # Safe to re-run: each phase checks whether its work is already done.
 #
-# This is the Debian counterpart to the Arch `install.sh --headless`. There is
+# This is the Debian counterpart to the Arch `scripts/install.sh --headless`. There is
 # no full-desktop mode: the GUI stack (Hyprland, Noctalia, ly, ...) is
 # Arch-only, so on Debian this script is headless, always. It installs the CLI
 # base via apt, links the shared CLI dotfiles, sets up zsh + oh-my-zsh +
@@ -27,6 +27,8 @@ print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase() { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# The repo root is one level up: this script lives in <repo>/scripts/.
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 STATE_FILE="$HOME/.local/state/dotfiles-mode"
 
 # CLI base, Debian/apt names. Kept in sync with the "Headless / CLI base"
@@ -71,7 +73,7 @@ phase_preflight() {
 
     if [ ! -f /etc/debian_version ]; then
         print_error "This script requires Debian/Ubuntu (/etc/debian_version not found)"
-        print_error "On Arch, use: bash install.sh --headless"
+        print_error "On Arch, use: bash scripts/install.sh --headless"
         exit 1
     fi
     print_status "Running on Debian $(cat /etc/debian_version)"
@@ -87,11 +89,11 @@ phase_preflight() {
         exit 1
     fi
 
-    if [ ! -d "$SCRIPT_DIR/zsh" ]; then
+    if [ ! -d "$REPO_DIR/zsh" ]; then
         print_error "zsh/ not found; run this script from within the dotfiles repo (~/.config)"
         exit 1
     fi
-    print_status "Dotfiles repo found at: $SCRIPT_DIR"
+    print_status "Dotfiles repo found at: $REPO_DIR"
 
     echo ""
     print_info "This script will:"
@@ -194,8 +196,8 @@ phase_dotfiles() {
 
     local dir
     for dir in "${config_dirs[@]}"; do
-        if [ -d "$SCRIPT_DIR/$dir" ]; then
-            backup_and_link "$SCRIPT_DIR/$dir" "$HOME/.config/$dir"
+        if [ -d "$REPO_DIR/$dir" ]; then
+            backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
         fi
     done
 

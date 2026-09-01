@@ -1,10 +1,10 @@
 #!/bin/bash
 # Arch Linux dotfiles update script.
-# Usage: bash update.sh [--headless | --full]
+# Usage: bash scripts/update.sh [--headless | --full]
 # Run from within the dotfiles repo. Pulls latest changes and syncs everything.
 #
 # If no flag is given, mode is read from ~/.local/state/dotfiles-mode
-# (written by install.sh); falls back to full-desktop mode if absent.
+# (written by scripts/install.sh); falls back to full-desktop mode if absent.
 
 set -euo pipefail
 
@@ -20,6 +20,8 @@ print_info()   { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase()  { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# The repo root is one level up: this script lives in <repo>/scripts/.
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
 STATE_FILE="$HOME/.local/state/dotfiles-mode"
 
@@ -56,7 +58,7 @@ fi
 phase_pull() {
     print_phase "Phase 1: Pull Latest Changes"
 
-    cd "$SCRIPT_DIR"
+    cd "$REPO_DIR"
 
     if ! git diff --quiet || ! git diff --cached --quiet; then
         print_info "Uncommitted changes detected:"
@@ -82,7 +84,7 @@ phase_pull() {
 phase_packages() {
     print_phase "Phase 2: Package Sync"
 
-    if [ ! -f "$SCRIPT_DIR/packages.txt" ]; then
+    if [ ! -f "$REPO_DIR/packages.txt" ]; then
         print_error "packages.txt not found"
         return 1
     fi
@@ -102,7 +104,7 @@ phase_packages() {
         line="${line//[[:space:]]/}"
         [ -n "$line" ] || continue
         pkgs+=("$line")
-    done < "$SCRIPT_DIR/packages.txt"
+    done < "$REPO_DIR/packages.txt"
 
     if [ "${#pkgs[@]}" -eq 0 ]; then
         print_info "No packages in packages.txt"
@@ -167,12 +169,12 @@ phase_dotfiles() {
 
     local dir
     for dir in "${config_dirs[@]}"; do
-        [ -d "$SCRIPT_DIR/$dir" ] && backup_and_link "$SCRIPT_DIR/$dir" "$HOME/.config/$dir"
+        [ -d "$REPO_DIR/$dir" ] && backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
     done
 
     local file
     for file in "${config_files[@]}"; do
-        [ -f "$SCRIPT_DIR/$file" ] && backup_and_link "$SCRIPT_DIR/$file" "$HOME/.config/$file"
+        [ -f "$REPO_DIR/$file" ] && backup_and_link "$REPO_DIR/$file" "$HOME/.config/$file"
     done
 
     # Ensure ~/.zshenv is configured
@@ -199,7 +201,7 @@ phase_browser_policies() {
 
     print_phase "Phase 4: Browser Policies"
 
-    local src="$SCRIPT_DIR/librewolf/policies.json"
+    local src="$REPO_DIR/librewolf/policies.json"
     local dst="/etc/librewolf/policies/policies.json"
 
     if [ ! -f "$src" ]; then

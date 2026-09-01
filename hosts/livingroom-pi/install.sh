@@ -1,11 +1,11 @@
 #!/bin/bash
 # Living-room Pi (Debian 13, bash) dotfiles: link this host profile's $HOME
-# files. The main Arch install.sh does not apply here; for the CLI base + shell
+# files. The main Arch scripts/install.sh does not apply here; for the CLI base + shell
 # on a fresh box, --full hands off to the repo's Debian bootstrap instead.
 #
 # Usage, from the repo root (i.e. ~/.config):
 #   bash hosts/livingroom-pi/install.sh            # links only
-#   bash hosts/livingroom-pi/install.sh --full     # links + install-debian.sh
+#   bash hosts/livingroom-pi/install.sh --full     # links + scripts/install-debian.sh
 #
 # Safe to re-run; replaced files are kept as <name>.pre-dotfiles.
 
@@ -32,7 +32,7 @@ link_home .profile
 
 if [ "$FULL" -eq 1 ]; then
     info "Handing off to the Debian bootstrap (install-debian.sh)"
-    bash "$REPO/install-debian.sh"
+    bash "$REPO/scripts/install-debian.sh"
 else
     info "Links done. For the CLI base + zsh/oh-my-zsh on a fresh box:"
     info "  bash hosts/livingroom-pi/install.sh --full"

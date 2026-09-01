@@ -2,7 +2,7 @@
 
 ## Overview
 
-Dotfiles managed as a git repo at `~/.config/`. The `install.sh` script symlinks tracked directories into `~/.config` on a fresh machine. Updates are pulled and synced with `update.sh`.
+Dotfiles managed as a git repo at `~/.config/`. The `scripts/install.sh` script symlinks tracked directories into `~/.config` on a fresh machine. Updates are pulled and synced with `scripts/update.sh`. Bootstrap and maintenance entry points all live in `scripts/`; they resolve the repo root as `$REPO_DIR` (one level up from the script).
 
 ## Layers
 

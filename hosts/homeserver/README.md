@@ -13,7 +13,7 @@ Install (from the repo root, i.e. `~/.config`):
 
 ```sh
 bash hosts/homeserver/install.sh          # link the $HOME dotfiles (idempotent)
-bash hosts/homeserver/install.sh --full   # + run the main install.sh --headless
+bash hosts/homeserver/install.sh --full   # + run the main scripts/install.sh --headless
 ```
 
 Anything replaced that wasn't already a repo symlink is kept as

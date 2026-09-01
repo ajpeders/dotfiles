@@ -26,7 +26,7 @@ Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, 
       never recorded the panel's EDID description.
 - [ ] Capture the laptop's internal panel (`eDP-1`) the same way, and confirm the
       relative layout behaves when docking/undocking there
-- [ ] Test install.sh on a fresh system
+- [ ] Test scripts/install.sh on a fresh system
 - [ ] Review wlsunset — Noctalia has built-in night light, may be redundant
 
 ## Ideas
