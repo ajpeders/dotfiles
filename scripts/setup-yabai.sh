@@ -90,9 +90,12 @@ rule="$(whoami) ALL=(root) NOPASSWD: sha256:$hash $YABAI_BIN --load-sa"
 tmp="$(mktemp)"
 echo "$rule" > "$tmp"
 # Never install an unvalidated sudoers file: a malformed one can break sudo.
-if ! sudo visudo -cf "$tmp" >/dev/null 2>&1; then
-    rm -f "$tmp"
+# visudo -c needs no root here (the temp file is ours), so a failure below is a
+# genuine syntax problem rather than a sudo authentication one.
+if ! visudo -cf "$tmp" >/dev/null 2>&1; then
     print_error "Generated sudoers rule failed validation; nothing was changed"
+    visudo -cf "$tmp" 2>&1 | head -3 || true
+    rm -f "$tmp"
     exit 1
 fi
 sudo install -m 0440 -o root -g wheel "$tmp" /private/etc/sudoers.d/yabai
@@ -116,14 +119,50 @@ print_status "Scripting addition installed and loaded"
 print_info "Starting yabai and skhd..."
 yabai --start-service 2>/dev/null || yabai --restart-service
 skhd --start-service 2>/dev/null || skhd --reload
+sleep 2
+
+# Both abort instantly without Accessibility access, and macOS never shows a
+# prompt for a launchd-started CLI binary — it has to be granted by hand.
+accessibility_help() {
+    echo ""
+    print_error "Accessibility permission is missing."
+    echo ""
+    echo -e "${BOLD}System Settings → Privacy & Security → Accessibility${NC}, then '+' and"
+    echo "add BOTH of these (⌘⇧G in the file picker to paste a path):"
+    echo ""
+    for b in yabai skhd; do
+        p="$(command -v "$b" 2>/dev/null)" || continue
+        # Homebrew's bin/ entry is a symlink; macOS records the Cellar path, so
+        # an upgrade moves it and the permission must be granted again.
+        echo "    $(python3 -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$p" 2>/dev/null || echo "$p")"
+    done
+    echo ""
+    echo "Then re-run this script."
+    echo ""
+    echo "  open 'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility'"
+    echo ""
+}
+
+if ! pgrep -qx yabai || ! pgrep -qx skhd; then
+    if grep -qi "accessibility" "/tmp/yabai_$USER.err.log" "/tmp/skhd_$USER.err.log" 2>/dev/null; then
+        accessibility_help
+    else
+        print_error "yabai or skhd failed to start; check the logs:"
+        print_info "  tail -20 /tmp/yabai_$USER.err.log /tmp/skhd_$USER.err.log"
+    fi
+    exit 1
+fi
 print_status "Services started"
 
 # ---------- 6. Spaces ----------
 
 # skhdrc binds alt-1..9 to real macOS Spaces, which (unlike AeroSpace's
 # emulated workspaces) have to exist before they can be focused.
-sleep 2
-count="$(yabai -m query --spaces 2>/dev/null | jq 'length' || echo 0)"
+count="$(yabai -m query --spaces 2>/dev/null | jq 'length' 2>/dev/null || echo 0)"
+if [ "$count" -eq 0 ]; then
+    print_error "yabai is running but not answering queries; check its log"
+    exit 1
+fi
 if [ "$count" -lt 9 ]; then
     print_info "Creating spaces ($count of 9 exist)..."
     while [ "$count" -lt 9 ]; do
