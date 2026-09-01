@@ -46,14 +46,14 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" 
 --
 -- The layout, in logical pixels:
 --
---     x=0        2400            4960
---   y=0 +--------+---------------+
---       | (gap)  |               |
---    90 +--------+   Samsung     |   <- Samsung is the primary
---       |  AOC   |   2560x1440   |
---       | 2400   |               |
---       | x1350  |               |
---  1440 +--------+---------------+
+--     x=0             2560       4960
+--   y=0 +---------------+--------+
+--       |               | (gap)  |
+--    90 |   Samsung     +--------+   <- Samsung is the primary
+--       |   2560x1440   |  AOC   |
+--       |               | 2400   |
+--       |               | x1350  |
+--  1440 +---------------+--------+
 --       |   1520 | portable |    |
 --       |        | 1920x1080|    |
 --  2520          +----------+
@@ -66,18 +66,18 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" 
 -- If one of these is unplugged its rule simply never matches; the
 -- others keep their coordinates and still tile without overlap.
 
--- ====== Left ======
+-- ====== Middle ======
 -- scale 0.8 is load-bearing: 1920/0.8 = 2400 and 1080/0.8 = 1350, both
 -- integers. A fractional scale like 0.83 yields non-integer logical
 -- sizes and breaks directional focus across monitors.
 hl.monitor({
     output   = "desc:AOC 2460G4",
     mode     = "1920x1080@144",
-    position = "0x90",
+    position = "2560x90",
     scale    = 0.8,
 })
 
--- ====== Right (primary) ======
+-- ====== Left (primary) ======
 -- Samsung Odyssey G5 G53F. Its EDID advertises 60Hz max, which is an
 -- under-report — the panel drives far higher. But 200 is past what it
 -- holds cleanly: it links up and looks fine on the desktop, then drops
@@ -86,7 +86,7 @@ hl.monitor({
 hl.monitor({
     output   = "desc:Samsung Electric Company LS27FG53x",
     mode     = "2560x1440@144",
-    position = "2400x0",
+    position = "0x0",
     scale    = 1.0,
 })
 
