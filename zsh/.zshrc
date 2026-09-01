@@ -146,5 +146,6 @@ fi
 
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 
-# opencode
-export PATH=/home/alex/.opencode/bin:$PATH
+# opencode — packaged on Arch (pacman) and macOS (brew), so this only
+# matters where upstream's installer put it in ~/.opencode/bin (Debian).
+[ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"

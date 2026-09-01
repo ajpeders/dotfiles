@@ -41,7 +41,7 @@ For servers / boxes you only SSH into:
 bash scripts/install.sh --headless
 ```
 
-Installs only the CLI base from `packages.txt` (zsh, neovim, git, mosh, openssh, tmux, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), enables `sshd`, and switches the system to `multi-user.target` (no display manager). `scripts/update.sh` reads the mode from `~/.local/state/dotfiles-mode` and stays in headless mode on resync; pass `--full` to override.
+Installs only the CLI base from `packages.txt` (zsh, neovim, git, mosh, openssh, tmux, opencode, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), enables `sshd`, and switches the system to `multi-user.target` (no display manager). `scripts/update.sh` reads the mode from `~/.local/state/dotfiles-mode` and stays in headless mode on resync; pass `--full` to override.
 
 ### Debian — headless
 
@@ -53,7 +53,7 @@ cd ~/.config
 bash scripts/install-debian.sh
 ```
 
-The Debian counterpart to `scripts/install.sh --headless`: `apt`-installs the CLI base (Debian-named — `fd-find`, `openssh-server`, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), sets up zsh + oh-my-zsh + powerlevel10k, and enables `ssh`. Per-host `$HOME` files live under `hosts/<name>/`; `hosts/livingroom-pi/install.sh --full` links those and then runs this script.
+The Debian counterpart to `scripts/install.sh --headless`: `apt`-installs the CLI base (Debian-named — `fd-find`, `openssh-server`, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), sets up zsh + oh-my-zsh + powerlevel10k, enables `ssh`, and installs `opencode` via upstream's installer (Debian has no package; Arch gets it from `packages.txt`, macOS from the `Brewfile`). Per-host `$HOME` files live under `hosts/<name>/`; `hosts/livingroom-pi/install.sh --full` links those and then runs this script.
 
 ### macOS
 

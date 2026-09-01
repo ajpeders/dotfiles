@@ -36,6 +36,9 @@ openssh
 # Terminal multiplexer
 tmux
 
+# AI coding agent
+opencode
+
 # ================================================================
 # === GUI (skipped in headless mode) ===
 # Everything below is only installed when running install.sh

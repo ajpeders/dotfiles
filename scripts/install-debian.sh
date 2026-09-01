@@ -299,6 +299,25 @@ phase_services() {
     enable_system_service avahi-daemon
 }
 
+phase_opencode() {
+    print_phase "Phase 7: opencode"
+
+    # Arch gets opencode from packages.txt and macOS from the Brewfile; Debian
+    # has no package, so fall back to upstream's installer. It drops a static
+    # binary in ~/.opencode/bin, which zsh/.zshrc adds to PATH when present.
+    if command -v opencode >/dev/null 2>&1; then
+        print_status "Already installed: opencode ($(opencode --version 2>/dev/null || echo 'version unknown'))"
+        return
+    fi
+
+    if ! curl -fsSL https://opencode.ai/install | bash; then
+        print_error "opencode install failed (non-fatal); install it later with:"
+        print_error "  curl -fsSL https://opencode.ai/install | bash"
+        return
+    fi
+    print_status "Installed: opencode"
+}
+
 phase_state() {
     mkdir -p "$(dirname "$STATE_FILE")"
     echo "headless" > "$STATE_FILE"
@@ -326,5 +345,6 @@ phase_directories
 phase_dotfiles
 phase_shell
 phase_services
+phase_opencode
 phase_state
 phase_reminders

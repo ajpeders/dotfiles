@@ -1,3 +1,4 @@
+tap "anomalyco/tap"
 tap "antoniorodr/memo"
 tap "nikitabobko/tap"
 brew "btop"
@@ -35,6 +36,7 @@ brew "xcodegen"
 brew "yazi"
 brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
+brew "anomalyco/tap/opencode"
 brew "antoniorodr/memo/memo"
 cask "nikitabobko/tap/aerospace"
 cask "bluebubbles", args: { appdir: "/Users/openclaw/Applications" }
