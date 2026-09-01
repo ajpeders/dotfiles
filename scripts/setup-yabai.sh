@@ -75,16 +75,13 @@ if pgrep -qx AeroSpace 2>/dev/null || pgrep -qf 'AeroSpace.app' 2>/dev/null; the
 fi
 print_status "AeroSpace is not running"
 
-# ---------- 3. Scripting addition ----------
+# ---------- 3. Sudoers rule ----------
 
 YABAI_BIN="$(command -v yabai)"
 
-print_info "Installing the scripting addition (needs sudo)..."
-sudo "$YABAI_BIN" --install-sa
-print_status "Scripting addition installed"
-
-# ---------- 4. Sudoers rule ----------
-
+# Written before loading the addition, so the load below is already passwordless
+# and this doubles as a check that the rule works.
+#
 # The hash pins this rule to the exact binary, so a yabai upgrade invalidates it
 # by design — that is why this script is re-run after upgrades.
 hash="$(shasum -a 256 "$YABAI_BIN" | cut -d ' ' -f 1)"
@@ -101,6 +98,18 @@ fi
 sudo install -m 0440 -o root -g wheel "$tmp" /private/etc/sudoers.d/yabai
 rm -f "$tmp"
 print_status "Sudoers rule installed at /private/etc/sudoers.d/yabai"
+
+# ---------- 4. Scripting addition ----------
+
+# yabai v7 merged install into --load-sa; the separate --install-sa of v6 is gone.
+print_info "Installing and loading the scripting addition..."
+if ! sudo "$YABAI_BIN" --load-sa; then
+    print_error "Could not load the scripting addition"
+    print_info "Check SIP with 'csrutil status' and yabai's log:"
+    print_info "  tail -50 /tmp/yabai_\$USER.err.log"
+    exit 1
+fi
+print_status "Scripting addition installed and loaded"
 
 # ---------- 5. Services ----------
 
