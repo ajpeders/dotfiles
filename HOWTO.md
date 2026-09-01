@@ -34,10 +34,11 @@ pkill quickshell; qs -c noctalia-shell &
 
 ## Add a Hyprland keybind
 
-Edit `~/.config/hypr/config/keybinds.conf`. Use `$ipc` variable for Noctalia commands:
+Edit `~/.config/hypr/config/keybinds.lua`. The file already defines `mod` (from
+`config.defaults`) and an `ipc` string for Noctalia commands:
 
-```
-bind = $mainMod, X, exec, $ipc <target> <function>
+```lua
+hl.bind(mod .. " + X", hl.dsp.exec_cmd(ipc .. " <target> <function>"))
 ```
 
 Then reload: `hyprctl reload`
@@ -60,8 +61,7 @@ bash update.sh
 ## Configure monitors
 
 Edit `hypr/config/monitors.lua` by hand. **Don't use `nwg-displays`** — it writes
-connector-keyed rules (`DP-2`, `DP-3`) to `monitors.conf`, which nothing reads
-anymore. Connector names identify a *port*, not a *panel*, so the same rule means
+connector-keyed rules (`DP-2`, `DP-3`) to `monitors.conf`, which no longer exists. Connector names identify a *port*, not a *panel*, so the same rule means
 a different monitor at a different desk.
 
 Two conventions keep one file working on every machine:

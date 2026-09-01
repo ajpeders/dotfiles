@@ -4,17 +4,17 @@ Arch Linux + Hyprland desktop dotfiles. Git repo in `~/.config/`, `install.sh` s
 
 ## Stack
 
-- **WM:** Hyprland — entry point `hypr/hyprland.conf`, sub-configs in `hypr/config/`
+- **WM:** Hyprland — native Lua config; entry point `hypr/hyprland.lua`, sub-configs in `hypr/config/*.lua`
 - **Shell:** Noctalia — desktop shell (bar, launcher, notifications, OSD, control center, lock screen)
 - **Terminal:** Kitty
 - **Shell:** Zsh (Oh My Zsh + Powerlevel10k) at `zsh/` via `ZDOTDIR`
 - **Wallpaper:** Noctalia (built-in wallpaper manager)
-- **Theming:** static (Catppuccin-ish palette in `hypr/config/colors.conf`); wallust was removed
+- **Theming:** Hyprland border colors come from Noctalia via `hypr/config/noctalia_colors.lua`; wallust was removed
 - **IPC:** `qs -c noctalia-shell ipc call <target> <function>` for keybinds
 
 ## Key Details
 
-- Monitors live in `hypr/config/monitors.lua`, hand-written — matched by `desc:` (EDID make/model). Known panels get absolute coordinates, unknown ones fall through to an `auto` catch-all, so all setups share one file. Don't use nwg-displays; `monitors.conf` is dead.
+- Monitors live in `hypr/config/monitors.lua`, hand-written — matched by `desc:` (EDID make/model). Known panels get absolute coordinates, unknown ones fall through to an `auto` catch-all, so all setups share one file. Don't use nwg-displays; `monitors.conf` is gone.
 - Named workspaces: dev(6), server(7), work(8), game(9), config, magic(scratchpad)
 - Noctalia replaces waybar, rofi, swaync — those configs are legacy (kept on `quickshell` branch)
 - Noctalia uses `noctalia-qs` (forked Quickshell), not upstream `quickshell`

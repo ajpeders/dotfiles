@@ -11,6 +11,7 @@
 !HOWTO.md
 !update.sh
 !install.sh
+!install-debian.sh
 !sync-private.sh
 !packages.txt
 !.hermes/
@@ -18,6 +19,9 @@
 !theme/
 !kitty/
 !wallpapers/
+# Per-host $HOME dotfiles (see hosts/<name>/README.md)
+!hosts/
+!hosts/**
 !gtk-3.0/
 !gtk-4.0/
 !zsh/
@@ -57,3 +61,5 @@ zsh/.zsh_sessions/
 
 # Ignore editor/backup files anywhere in the tree
 **/*.bak
+# Ignore installer backups (install.sh writes <file>.pre-dotfiles before symlinking)
+**/*.pre-dotfiles
