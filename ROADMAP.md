@@ -19,6 +19,17 @@ Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, 
 
 ## Next
 
+- [ ] **Re-enable SIP on the MacBook Air.** Partially disabled on 2026-09-01 to
+      try yabai (`csrutil enable --without fs --without debug --without nvram`
+      plus `sudo nvram boot-args=-arm64e_preview_abi`). yabai never worked —
+      its scripting addition cannot inject into Dock.app on Apple Silicon +
+      Sequoia (asmvik/yabai #2686, #2747) — so the machine is running with
+      reduced security for no benefit. From Recovery: `csrutil enable`, then
+      after rebooting `sudo nvram -d boot-args`. Watch meanwhile for broken
+      Apple Pay, iPhone Mirroring and DRM'd playback.
+      The yabai configs stay in the repo in case upstream ever fixes it.
+- [ ] Migrate `macos/aerospace/aerospace.toml` to `config-version = 2`
+      (AeroSpace warns that version 1 is outdated on every reload)
 - [ ] Capture the home desk's second 1440p panel into `hypr/config/monitors.lua`
       (run `hypr/scripts/capture-monitor.sh` while at that desk). Until then it
       falls through to the catch-all rule. The old connector-keyed settings are in
