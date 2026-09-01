@@ -199,10 +199,10 @@ phase_dotfiles() {
     local config_dirs
     local config_files
     if [ "$HEADLESS" -eq 1 ]; then
-        config_dirs=(zsh yazi git tmux nvim)
+        config_dirs=(zsh yazi git tmux nvim opencode)
         config_files=()
     else
-        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux nvim)
+        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux nvim opencode)
         config_files=(pavucontrol.ini QtProject.conf)
     fi
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"

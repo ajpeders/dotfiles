@@ -77,6 +77,18 @@ bash scripts/update.sh
 bash scripts/sync-private.sh user@host
 ```
 
+```bash
+# Both — point opencode at a local llama.cpp / OpenAI-compatible server
+bash scripts/setup-llm.sh [base-url]
+```
+
+Prompts for the server's base URL (or takes it as an argument), confirms it
+responds on `/v1/models`, lets you pick from the models it serves, and writes
+the choice into `opencode/opencode.json`. The URL itself goes to
+`~/.local/state/dotfiles/llm.env` as `LLM_SERVER_URL`, which `zsh/.zshrc`
+sources — kept out of the repo because it is a per-machine LAN address, and
+because on Arch the repo *is* `~/.config`.
+
 ## Key Bindings
 
 Keybinds match between Hyprland and AeroSpace, with mac substituting `alt` for `super`.
@@ -116,7 +128,8 @@ dotfiles/
 │   ├── install.sh         # Arch bootstrap
 │   ├── install-debian.sh  # Debian headless bootstrap (apt)
 │   ├── update.sh          # Arch resync
-│   └── sync-private.sh    # Cross-platform private file sync
+│   ├── sync-private.sh    # Cross-platform private file sync
+│   └── setup-llm.sh       # Point opencode at a local LLM server
 ├── packages.txt           # Pacman + AUR package list
 └── HOWTO.md, ARCHITECTURE.md, ROADMAP.md
 ```

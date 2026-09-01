@@ -158,7 +158,7 @@ phase_directories() {
 phase_dotfiles() {
     print_phase "Phase 4: Dotfiles"
 
-    local config_dirs=(zsh yazi git tmux nvim)
+    local config_dirs=(zsh yazi git tmux nvim opencode)
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
 

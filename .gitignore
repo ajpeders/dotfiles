@@ -9,12 +9,10 @@
 !ARCHITECTURE.md
 !ROADMAP.md
 !HOWTO.md
-!update.sh
-!install.sh
-!install-debian.sh
-!sync-private.sh
+# Bootstrap + maintenance entry points (moved here from the repo root)
+!scripts/
+!scripts/**
 !packages.txt
-!.hermes/
 !hypr/
 !theme/
 !kitty/
@@ -28,6 +26,8 @@
 !noctalia/
 !noctalia/**
 !yazi/
+!opencode/
+!opencode/**
 !macos/
 !git/
 !tmux/
@@ -39,7 +39,6 @@
 !librewolf/policies.json
 
 # Keep config files in tracked directories
-!.hermes/**
 !hypr/**
 !theme/**
 !kitty/**

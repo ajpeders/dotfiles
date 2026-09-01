@@ -149,3 +149,7 @@ fi
 # opencode — packaged on Arch (pacman) and macOS (brew), so this only
 # matters where upstream's installer put it in ~/.opencode/bin (Debian).
 [ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"
+
+# LLM_SERVER_URL for opencode, written per-machine by scripts/setup-llm.sh.
+# Under ~/.local/state, not ~/.config: on Arch the repo is ~/.config itself.
+[ -f "$HOME/.local/state/dotfiles/llm.env" ] && . "$HOME/.local/state/dotfiles/llm.env"
