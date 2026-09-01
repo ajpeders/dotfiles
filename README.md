@@ -83,11 +83,28 @@ bash scripts/setup-llm.sh [base-url]
 ```
 
 Prompts for the server's base URL (or takes it as an argument), confirms it
-responds on `/v1/models`, lets you pick from the models it serves, and writes
-the choice into `opencode/opencode.json`. The URL itself goes to
-`~/.local/state/dotfiles/llm.env` as `LLM_SERVER_URL`, which `zsh/.zshrc`
-sources — kept out of the repo because it is a per-machine LAN address, and
-because on Arch the repo *is* `~/.config`.
+responds on `/v1/models`, and lets you pick from the models it serves. Both the
+URL and the chosen model go to `~/.local/state/dotfiles/llm.env` as
+`LLM_SERVER_URL` and `LLM_MODEL`, which `zsh/.zshrc` sources — kept out of the
+repo because both differ per machine, and because on Arch the repo *is*
+`~/.config`.
+
+`opencode/opencode.json` stays machine-agnostic: it is a *catalog* declaring
+context/output limits per model, and `{env:LLM_MODEL}` selects the default. The
+script never rewrites it, so running setup on a second machine no longer dirties
+the working tree. Add a `models` entry when you want explicit limits for a model
+the catalog does not list yet.
+
+The same run also writes `~/.continue/.env` with `LLM_SERVER_BASE`, which
+`continue/config.yaml` reads as `${{ secrets.LLM_SERVER_BASE }}`. Continue's
+`ollama` provider speaks the native API, so that value is the bare root with no
+`/v1` — unlike opencode, which is OpenAI-compatible and needs it.
+
+Only `config.yaml` and `.continuerc.json` are linked out of `~/.continue`;
+`sessions/`, `index/` and `dev_data/` stay out of the repo. `.continuerc.json` is
+tracked purely to pin `disableIndexing: false` — Continue writes that file with
+`true` on first run, which silently disables `@codebase` retrieval and leaves the
+configured embedding model unused.
 
 ## Key Bindings
 

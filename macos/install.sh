@@ -122,6 +122,14 @@ phase_dotfiles() {
     link "$REPO_DIR/zsh" "$HOME/.config/zsh"
     link "$REPO_DIR/tmux" "$HOME/.config/tmux"
     link "$REPO_DIR/opencode" "$HOME/.config/opencode"
+    # Continue (VS Code): link only the config files — ~/.continue also holds
+    # sessions/, index/ and dev_data/, which must stay out of the repo.
+    # .continuerc.json is pinned because Continue writes it with
+    # disableIndexing: true on first run, which silently kills @codebase.
+    if [ -d "$HOME/.continue" ]; then
+        link "$REPO_DIR/continue/config.yaml" "$HOME/.continue/config.yaml"
+        link "$REPO_DIR/continue/.continuerc.json" "$HOME/.continue/.continuerc.json"
+    fi
     link "$REPO_DIR/git/.gitconfig" "$HOME/.gitconfig"
 
     # ZDOTDIR so zsh reads ~/.config/zsh/.zshrc

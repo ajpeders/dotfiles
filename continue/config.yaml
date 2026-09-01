@@ -1,0 +1,49 @@
+name: Main Config
+version: 1.0.0
+schema: v1
+
+# Tracked in dotfiles. The tailnet address is NOT in this file: Continue
+# resolves ${{ secrets.LLM_SERVER_BASE }} from ~/.continue/.env, which
+# scripts/setup-llm.sh writes per-machine (same reasoning as llm.env).
+# Note: Continue's ollama provider wants the bare root, with no /v1 —
+# unlike opencode, which speaks OpenAI-compat and does need /v1.
+#
+# Split setup:
+#   chat/edit/apply -> archdesktop over Tailscale (Radeon AI PRO R9700, 32GB VRAM)
+#   autocomplete    -> this Mac (latency-sensitive; archdesktop runs
+#                      OLLAMA_MAX_LOADED_MODELS=1, so a second remote model
+#                      would thrash the 18GB chat model in and out of VRAM)
+#   embed           -> this Mac (indexing is bulk work, keep it off the tailnet)
+
+models:
+  # --- remote: archdesktop ---------------------------------------------------
+  - name: Qwen3-Coder 30B (archdesktop)
+    provider: ollama
+    model: qwen3-coder:30b
+    apiBase: ${{ secrets.LLM_SERVER_BASE }}
+    roles:
+      - chat
+      - edit
+      - apply
+
+  # --- local: this Mac -------------------------------------------------------
+  - name: Qwen2.5-Coder 1.5B (local)
+    provider: ollama
+    model: qwen2.5-coder:1.5b-base
+    roles:
+      - autocomplete
+
+  - name: Nomic Embed (local)
+    provider: ollama
+    model: nomic-embed-text:latest
+    roles:
+      - embed
+
+  # Offline fallback for chat when the tailnet is unreachable.
+  - name: Qwen3 8B (local fallback)
+    provider: ollama
+    model: qwen3:8b
+    roles:
+      - chat
+      - edit
+      - apply

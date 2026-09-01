@@ -255,6 +255,19 @@ phase_dotfiles() {
         fi
     done
 
+    # Continue (VS Code): link only the config files — ~/.continue also holds
+    # sessions/, index/ and dev_data/, which must stay out of the repo.
+    # .continuerc.json is pinned because Continue writes it with
+    # disableIndexing: true on first run, which silently kills @codebase.
+    if [ -d "$HOME/.continue" ]; then
+        local cfg
+        for cfg in config.yaml .continuerc.json; do
+            if [ -f "$REPO_DIR/continue/$cfg" ]; then
+                backup_and_link "$REPO_DIR/continue/$cfg" "$HOME/.continue/$cfg"
+            fi
+        done
+    fi
+
     if [ ! -f "$HOME/.zshenv" ]; then
         printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
         print_status "Created ~/.zshenv with ZDOTDIR"

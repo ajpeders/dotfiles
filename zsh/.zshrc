@@ -150,6 +150,10 @@ fi
 # matters where upstream's installer put it in ~/.opencode/bin (Debian).
 [ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"
 
-# LLM_SERVER_URL for opencode, written per-machine by scripts/setup-llm.sh.
-# Under ~/.local/state, not ~/.config: on Arch the repo is ~/.config itself.
+# LLM_SERVER_URL + LLM_MODEL for opencode, written per-machine by
+# scripts/setup-llm.sh. Under ~/.local/state, not ~/.config: on Arch the repo
+# is ~/.config itself.
 [ -f "$HOME/.local/state/dotfiles/llm.env" ] && . "$HOME/.local/state/dotfiles/llm.env"
+# opencode.json resolves {env:LLM_MODEL}; unset would leave it a bare "ollama/",
+# which only fails at request time. Fall back to the catalog's coding default.
+export LLM_MODEL="${LLM_MODEL:-qwen3-coder:30b}"

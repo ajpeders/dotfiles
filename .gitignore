@@ -28,6 +28,15 @@
 !yazi/
 !opencode/
 !opencode/**
+!continue/
+!continue/**
+# ...but opencode writes its own runtime cruft into its config dir,
+# and that dir is a symlink to this repo. Keep it out of the tree.
+opencode/node_modules/
+opencode/package.json
+opencode/package-lock.json
+opencode/bun.lock
+opencode/.gitignore
 !macos/
 !git/
 !tmux/

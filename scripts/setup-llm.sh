@@ -1,14 +1,15 @@
 #!/bin/bash
-# Point the local LLM coding tools (opencode) at a llama.cpp / OpenAI-compatible
-# server, and record the URL per-machine.
+# Point the local LLM coding tools (opencode) at an Ollama / llama.cpp /
+# OpenAI-compatible server, and record the URL per-machine.
 # Usage: bash scripts/setup-llm.sh [base-url]
-#   e.g. bash scripts/setup-llm.sh http://r9700.lan:8080/v1
+#   e.g. bash scripts/setup-llm.sh http://<host>:11434/v1   # Ollama
 #
-# The URL is written to ~/.local/state/dotfiles/llm.env as LLM_SERVER_URL and
-# sourced by zsh/.zshrc. It lives under ~/.local/state (next to dotfiles-mode)
-# rather than ~/.config because on Arch the repo IS ~/.config — anything there
-# would be inside the working tree. It is a LAN address that differs per machine
-# and must not reach the public mirror.
+# The URL and the chosen model are written to ~/.local/state/dotfiles/llm.env as
+# LLM_SERVER_URL and LLM_MODEL, and sourced by zsh/.zshrc. That lives under
+# ~/.local/state (next to dotfiles-mode) rather than ~/.config because on Arch
+# the repo IS ~/.config — anything there would be inside the working tree. The
+# URL is a LAN address that differs per machine and must not reach the public
+# mirror. Continue (VS Code) gets the same address in ~/.continue/.env.
 #
 # Safe to re-run; re-running just re-probes and rewrites the same file.
 
@@ -21,7 +22,8 @@ REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ENV_DIR="$HOME/.local/state/dotfiles"
 ENV_FILE="$ENV_DIR/llm.env"
 OPENCODE_CONFIG="$REPO_DIR/opencode/opencode.json"
-PROVIDER="llama.cpp"
+CONTINUE_ENV="$HOME/.continue/.env"
+PROVIDER="ollama"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -35,7 +37,8 @@ print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 
 for arg in "$@"; do
     case "$arg" in
-        --help|-h) sed -n '2,13p' "$0" | sed -E 's/^# ?//'; exit 0 ;;
+        # Print the header comment block, however long it happens to be.
+        --help|-h) awk 'NR>1{ if (!/^#/) exit; sub(/^# ?/,""); print }' "$0"; exit 0 ;;
     esac
 done
 
@@ -87,7 +90,7 @@ case "$BASE_URL" in
 esac
 
 if [ "${BASE_URL##*/}" != "v1" ]; then
-    print_info "URL does not end in /v1 — most llama.cpp and vLLM servers expect it."
+    print_info "URL does not end in /v1 — most Ollama, llama.cpp and vLLM servers expect it."
     read -rp "Append /v1? [Y/n]: " append_v1
     case "${append_v1:-y}" in
         [Yy]*|"") BASE_URL="$BASE_URL/v1" ;;
@@ -150,40 +153,46 @@ fi
 mkdir -p "$ENV_DIR"
 cat > "$ENV_FILE" <<EOF
 # Written by scripts/setup-llm.sh — per-machine, intentionally outside the repo.
-# opencode reads this via {env:LLM_SERVER_URL} in opencode/opencode.json.
+# opencode reads both of these via {env:...} in opencode/opencode.json. The URL
+# and the default model both differ per machine, so neither belongs in the repo.
 export LLM_SERVER_URL="$BASE_URL"
+export LLM_MODEL="$MODEL_ID"
 EOF
 print_status "Wrote $ENV_FILE"
 
-# ---------- 5. Point opencode at the chosen model ----------
-
-if [ ! -f "$OPENCODE_CONFIG" ]; then
-    print_info "No opencode config at $OPENCODE_CONFIG, skipping model wiring"
+# Continue (VS Code) keeps its own secrets file. Its ollama provider speaks the
+# native API, so it wants the bare root without the /v1 that opencode needs.
+if [ -d "$(dirname "$CONTINUE_ENV")" ]; then
+    CONTINUE_BASE="${BASE_URL%/v1}"
+    CONTINUE_BASE="${CONTINUE_BASE%/}"
+    cat > "$CONTINUE_ENV" <<EOF
+# Written by scripts/setup-llm.sh — per-machine, intentionally outside the repo.
+# Continue resolves \${{ secrets.LLM_SERVER_BASE }} in continue/config.yaml here.
+LLM_SERVER_BASE=$CONTINUE_BASE
+EOF
+    chmod 600 "$CONTINUE_ENV"
+    print_status "Wrote $CONTINUE_ENV"
 else
-    if ! jq -e . "$OPENCODE_CONFIG" >/dev/null 2>&1; then
-        print_error "$OPENCODE_CONFIG is not valid JSON; fix it and re-run"
-        exit 1
-    fi
+    print_info "No ~/.continue directory; skipping Continue wiring"
+fi
 
-    # Keep whatever display name / limits the model entry already had, so a
-    # hand-tuned context window survives a re-run.
-    tmp="$(mktemp)"
-    jq --arg provider "$PROVIDER" --arg model "$MODEL_ID" '
-        .model = ($provider + "/" + $model)
-        | .provider[$provider].models |= (
-            if has($model) then .
-            else . + { ($model): { "name": $model } }
-            end
-          )
-    ' "$OPENCODE_CONFIG" > "$tmp"
+# ---------- 5. Check the model has a catalog entry ----------
 
-    if ! jq -e . "$tmp" >/dev/null 2>&1; then
-        rm -f "$tmp"
-        print_error "Failed to update $OPENCODE_CONFIG"
-        exit 1
-    fi
-    mv "$tmp" "$OPENCODE_CONFIG"
-    print_status "opencode default model: $PROVIDER/$MODEL_ID"
+# opencode.json is a machine-agnostic catalog: it declares context/output limits
+# per model, and {env:LLM_MODEL} picks which of them is the default. This script
+# deliberately does NOT rewrite it — doing so dirtied the repo on every machine
+# that served a different model.
+if [ ! -f "$OPENCODE_CONFIG" ]; then
+    print_info "No opencode config at $OPENCODE_CONFIG, skipping catalog check"
+elif ! jq -e . "$OPENCODE_CONFIG" >/dev/null 2>&1; then
+    print_error "$OPENCODE_CONFIG is not valid JSON; fix it and re-run"
+    exit 1
+elif jq -e --arg p "$PROVIDER" --arg m "$MODEL_ID" \
+        '.provider[$p].models | has($m)' "$OPENCODE_CONFIG" >/dev/null 2>&1; then
+    print_status "Catalog entry present: $PROVIDER/$MODEL_ID"
+else
+    print_info "No catalog entry for \"$MODEL_ID\" in opencode/opencode.json."
+    print_info "It still works; add one to declare its context/output limits."
 fi
 
 # ---------- 6. Done ----------
@@ -194,7 +203,7 @@ echo ""
 echo -e "${BOLD}Server:${NC} $BASE_URL"
 echo -e "${BOLD}Model: ${NC} $MODEL_ID"
 echo ""
-if [ "${LLM_SERVER_URL:-}" != "$BASE_URL" ]; then
-    echo "Start a new shell (or 'source $ENV_FILE') to pick up LLM_SERVER_URL."
+if [ "${LLM_SERVER_URL:-}" != "$BASE_URL" ] || [ "${LLM_MODEL:-}" != "$MODEL_ID" ]; then
+    echo "Start a new shell (or 'source $ENV_FILE') to pick up the new values."
     echo ""
 fi
