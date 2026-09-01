@@ -59,7 +59,10 @@ zsh/.zcompdump*
 zsh/.zsh_history
 zsh/.zsh_sessions/
 
-# Ignore editor/backup files anywhere in the tree
+# Ignore editor/backup files anywhere in the tree.
+# The -* variant catches timestamped backups (aerospace.toml.bak-20260901-004455),
+# which plain *.bak does not match.
 **/*.bak
+**/*.bak-*
 # Ignore installer backups (install.sh writes <file>.pre-dotfiles before symlinking)
 **/*.pre-dotfiles
