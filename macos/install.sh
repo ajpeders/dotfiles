@@ -170,15 +170,20 @@ phase_keychain() {
 phase_launchagents() {
     print_phase "Phase 6: LaunchAgents"
 
+    # `launchctl load` is the deprecated legacy syntax and reports success even
+    # when it does nothing. bootstrap/print target the GUI domain explicitly,
+    # which is also what HOWTO.md documents for manual use.
+    local domain="gui/$(id -u)"
+
     load_agent() {
         local label="$1"
         local plist="$HOME/Library/LaunchAgents/${label}.plist"
 
-        if launchctl list | grep -q "$label"; then
+        if launchctl print "$domain/$label" >/dev/null 2>&1; then
             print_status "Already loaded: $label"
             return
         fi
-        launchctl load "$plist"
+        launchctl bootstrap "$domain" "$plist"
         print_status "Loaded: $label"
     }
 
@@ -204,7 +209,7 @@ phase_reminders() {
     echo "   (Required to read /Volumes/share from the terminal.)"
     echo ""
     echo -e "${BOLD}2. Trigger SMB mount${NC}"
-    echo "   launchctl start com.alex.mount.share"
+    echo "   launchctl kickstart -k gui/\$(id -u)/com.alex.mount.share"
     echo ""
     echo -e "${BOLD}3. (Optional) symlink the share to home${NC}"
     echo "   ln -s /Volumes/share ~/share"

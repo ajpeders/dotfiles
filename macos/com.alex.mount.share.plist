@@ -4,14 +4,31 @@
 <dict>
     <key>Label</key>
     <string>com.alex.mount.share</string>
+
+    <!-- Run through sh so $HOME expands: launchd itself does not expand ~,
+         and hardcoding /Users/<name> would not survive a different machine. -->
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/bin/osascript</string>
-        <string>-e</string>
-        <string>mount volume "smb://ween@share.thelunadog.com/share"</string>
+        <string>/bin/sh</string>
+        <string>-c</string>
+        <string>exec "$HOME/dotfiles/macos/mount-share.sh"</string>
     </array>
+
     <key>RunAtLoad</key>
     <true/>
+
+    <!-- The script exits non-zero while the share is unreachable, so relaunch
+         on failure only. Once it mounts it exits 0 and launchd leaves it alone.
+         Throttled so a machine that boots off-network retries every 5 min
+         instead of spinning. -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+    <key>ThrottleInterval</key>
+    <integer>300</integer>
+
     <key>StandardErrorPath</key>
     <string>/tmp/com.alex.mount.share.err</string>
     <key>StandardOutPath</key>

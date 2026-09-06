@@ -124,36 +124,91 @@ before committing to it.
 
 ## macOS: mount luna SMB share on login
 
-The share lives on the home server (`192.168.0.176` / `share.thelunadog.com`) and only answers SMB from the LAN or VPN. Public DDNS (`luna-server.ddns.net`) is unreliable — port 445 is blocked end-to-end. Mount lands at `/Volumes/share` with a `~/share` symlink.
+The share lives on the home server ISIS and is mounted as
+`smb://ween@share.thelunadog.com/share`, landing at `/Volumes/share` with a `~/share` symlink.
+
+`share.thelunadog.com` resolves to `192.168.0.176`. That LAN address is reachable from
+anywhere on the tailnet because ISIS advertises `192.168.0.0/24` as a subnet route, so the
+mount works at home and remotely with no DDNS involved. Public DDNS (`luna-server.ddns.net`)
+is a dead end — port 445 is blocked end-to-end.
+
+> **Use `share.thelunadog.com`, never `smb.thelunadog.com`** — see the abandoned migration
+> below before changing this hostname.
 
 ### One-time setup per macOS machine
 
 ```bash
 # 1. Seed Keychain with the SMB password (prompts, no plaintext on disk).
+#    The server name here MUST match the hostname in the mount URL.
 security add-internet-password -a ween -s share.thelunadog.com -r 'smb ' -w
 
 # 2. Symlink the LaunchAgent and load it.
 ln -sfn ~/dotfiles/macos/com.alex.mount.share.plist ~/Library/LaunchAgents/com.alex.mount.share.plist
-launchctl load ~/Library/LaunchAgents/com.alex.mount.share.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.alex.mount.share.plist
 
 # 3. Convenience symlink.
 ln -s /Volumes/share ~/share
 ```
 
-The LaunchAgent runs `osascript 'mount volume "smb://ween@share.thelunadog.com/share"'` at login — Finder pulls the password from Keychain. Manual trigger: `launchctl start com.alex.mount.share`.
+The agent runs `macos/mount-share.sh`, which waits for the share to answer on port 445 and
+then hands off to `osascript 'mount volume ...'` — Finder pulls the password from Keychain and
+creates the mount point itself. Manual trigger:
+
+```bash
+launchctl kickstart -k gui/$(id -u)/com.alex.mount.share
+```
+
+### The login race
+
+At login the agent fires before Tailscale finishes bringing up the tunnel, so the subnet route
+to `192.168.0.176` does not exist yet and the mount fails. The original agent called `osascript`
+directly with `RunAtLoad` and no retry, so one early failure meant no share until you mounted it
+by hand.
+
+`mount-share.sh` closes this from both ends:
+
+- it polls port 445 for roughly 60s before attempting the mount, and
+- it exits non-zero if that never succeeds, so the agent's `KeepAlive`/`SuccessfulExit=false`
+  makes launchd retry, throttled to every 5 minutes.
+
+The effect is that the share mounts a few seconds after the tunnel comes up, and a machine
+booted off-network mounts itself whenever it reconnects. The script exits 0 immediately when
+`/Volumes/share` is already mounted, so the retries are harmless.
+
+### Abandoned: moving to `smb.thelunadog.com` / the tailnet address
+
+A change on 2026-09-01 repointed the mount at ISIS's tailnet address behind a new
+`smb.thelunadog.com` name. It silently broke the login mount for four days and was reverted on
+2026-09-05. Two preconditions were written down but never actually satisfied on ISIS:
+
+1. `smb.thelunadog.com` must resolve to ISIS's tailnet address (`tailscale ip -4 isis`) — it
+   still resolves to `192.168.0.176`.
+2. Samba on ISIS must bind the Tailscale interface — port 445 on that address is still closed.
+
+The rename alone is enough to break the mount even when the host is perfectly reachable:
+**macOS keys SMB credentials by server name**, so the Keychain entry saved under
+`share.thelunadog.com` is not found when mounting `smb.thelunadog.com`. Finder ends up with no
+password and, with nobody to prompt at login, the agent dies with AppleScript error `-5014`.
+
+To retry this properly: fix DNS and Samba's bind address on ISIS first, confirm with
+`nc -z "$(tailscale ip -4 isis)" 445`, re-seed the Keychain under the new name, and only then change the
+mount URL in the plist, `mount-share.sh`, and `macos/install.sh` together.
 
 ### Gotchas hit while setting this up
 
+- **AppleScript error `-5014` is misleading.** It reads like a network failure, but the host
+  pings fine and 445 is open. It is what you get when Finder has no usable credential — most
+  often the Keychain entry's server name not matching the mount hostname.
 - **`/mnt` doesn't exist on macOS** — SIP makes the root read-only. Use `/Volumes/<name>`.
 - **`mount -t smbfs` fails as a regular user** with `invalid file system`. Use `mount_smbfs` directly instead, which doesn't need sudo.
 - **Mount-point ownership matters.** If `/Volumes/share` is owned by root, `mount_smbfs` returns `Operation not permitted`. Fix: `sudo chown $(whoami):staff /Volumes/share` before mounting. Using `osascript 'mount volume ...'` (the LaunchAgent path) sidesteps this — Finder creates the mount point itself.
 - **Terminal TCC permissions.** Kitty (and other non-default terminals) need **System Settings → Privacy & Security → Full Disk Access** to read mounted network volumes. Without it, `ls /Volumes/share` returns `Permission denied` even though the mount is up. Restart kitty fully after granting.
-- **Public DDNS is a dead end.** `luna-server.ddns.net:445` is blocked by ISP/router; only LAN IP or VPN works. The plist uses the wildcard rewrite hostname which resolves correctly when on-VPN.
+- **Public DDNS is a dead end.** `luna-server.ddns.net:445` is blocked by ISP/router; only the LAN address (via the tailnet subnet route) works.
 
 ### Uninstall
 
 ```bash
-launchctl unload ~/Library/LaunchAgents/com.alex.mount.share.plist
+launchctl bootout gui/$(id -u)/com.alex.mount.share
 rm ~/Library/LaunchAgents/com.alex.mount.share.plist ~/share
 ```
 
