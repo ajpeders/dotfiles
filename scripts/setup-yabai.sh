@@ -13,6 +13,8 @@
 
 set -euo pipefail
 
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -36,12 +38,20 @@ fi
 
 # ---------- 1. Prerequisites ----------
 
-for bin in yabai skhd jq; do
+# yabai and skhd are deliberately absent from macos/Brewfile — installing them
+# is part of opting into this path, not part of the default macOS setup.
+for bin in yabai skhd; do
     if ! command -v "$bin" >/dev/null 2>&1; then
-        print_error "$bin not found — run 'brew bundle --file=macos/Brewfile' first"
+        print_error "$bin not found. Install both with:"
+        print_info "  brew install koekeishiya/formulae/yabai koekeishiya/formulae/skhd"
         exit 1
     fi
 done
+
+if ! command -v jq >/dev/null 2>&1; then
+    print_error "jq not found — run 'brew bundle --file=macos/Brewfile' first"
+    exit 1
+fi
 
 sip="$(csrutil status 2>/dev/null || true)"
 missing=""
@@ -75,7 +85,32 @@ if pgrep -qx AeroSpace 2>/dev/null || pgrep -qf 'AeroSpace.app' 2>/dev/null; the
 fi
 print_status "AeroSpace is not running"
 
-# ---------- 3. Sudoers rule ----------
+# ---------- 3. Configs ----------
+
+# macos/install.sh deliberately does not link these — see the comment there.
+# yabai and skhd only read ~/.config/<name>/, so without this the services start
+# with stock defaults and none of the keybindings below exist.
+for name in yabai skhd; do
+    src="$REPO_DIR/macos/$name"
+    dst="$HOME/.config/$name"
+
+    if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+        print_status "Already linked: ~/.config/$name"
+        continue
+    fi
+
+    if [ -e "$dst" ] || [ -L "$dst" ]; then
+        backup="${dst}.backup.$(date +%Y%m%d_%H%M%S)"
+        mv "$dst" "$backup"
+        print_info "Backed up existing ~/.config/$name to $backup"
+    fi
+
+    mkdir -p "$(dirname "$dst")"
+    ln -sfn "$src" "$dst"
+    print_status "Linked: ~/.config/$name"
+done
+
+# ---------- 4. Sudoers rule ----------
 
 YABAI_BIN="$(command -v yabai)"
 
@@ -102,7 +137,7 @@ sudo install -m 0440 -o root -g wheel "$tmp" /private/etc/sudoers.d/yabai
 rm -f "$tmp"
 print_status "Sudoers rule installed at /private/etc/sudoers.d/yabai"
 
-# ---------- 4. Scripting addition ----------
+# ---------- 5. Scripting addition ----------
 
 # yabai v7 merged install into --load-sa; the separate --install-sa of v6 is gone.
 print_info "Installing and loading the scripting addition..."
@@ -114,7 +149,7 @@ if ! sudo "$YABAI_BIN" --load-sa; then
 fi
 print_status "Scripting addition installed and loaded"
 
-# ---------- 5. Services ----------
+# ---------- 6. Services ----------
 
 print_info "Starting yabai and skhd..."
 yabai --start-service 2>/dev/null || yabai --restart-service
@@ -154,7 +189,7 @@ if ! pgrep -qx yabai || ! pgrep -qx skhd; then
 fi
 print_status "Services started"
 
-# ---------- 6. Spaces ----------
+# ---------- 7. Spaces ----------
 
 # skhdrc binds alt-1..9 to real macOS Spaces, which (unlike AeroSpace's
 # emulated workspaces) have to exist before they can be focused.

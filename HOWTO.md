@@ -271,13 +271,15 @@ sudo nvram boot-args=-arm64e_preview_abi
 Reboot again, quit AeroSpace and remove it from Login Items, then:
 
 ```bash
-brew bundle --file=macos/Brewfile
+brew install koekeishiya/formulae/yabai koekeishiya/formulae/skhd
 bash scripts/setup-yabai.sh
 ```
 
-That installs the scripting addition, writes a hash-pinned sudoers rule so it
-loads without a password, starts both services, and creates the 9 macOS Spaces
-the `alt-1..9` bindings expect. Grant Accessibility permission to yabai *and*
+That links `macos/yabai/` and `macos/skhd/` into `~/.config/` (the default
+`macos/install.sh` deliberately doesn't, since this path is opt-in), installs the
+scripting addition, writes a hash-pinned sudoers rule so it loads without a
+password, starts both services, and creates the 9 macOS Spaces the `alt-1..9`
+bindings expect. Grant Accessibility permission to yabai *and*
 skhd when prompted.
 
 **Re-run `scripts/setup-yabai.sh` after every yabai upgrade** — the sudoers rule

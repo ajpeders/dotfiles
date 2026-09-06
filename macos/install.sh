@@ -111,8 +111,9 @@ phase_dotfiles() {
 
     # macOS-only
     link "$SCRIPT_DIR/aerospace" "$HOME/.config/aerospace"
-    link "$SCRIPT_DIR/yabai" "$HOME/.config/yabai"
-    link "$SCRIPT_DIR/skhd" "$HOME/.config/skhd"
+    # yabai/skhd are a deliberate opt-in alternative to AeroSpace: they need SIP
+    # partially disabled, so the default install neither brews nor links them.
+    # scripts/setup-yabai.sh does both once you've made that choice.
     link "$SCRIPT_DIR/com.alex.mount.share.plist" "$HOME/Library/LaunchAgents/com.alex.mount.share.plist"
     link "$SCRIPT_DIR/com.alex.tailscale.plist" "$HOME/Library/LaunchAgents/com.alex.tailscale.plist"
 
