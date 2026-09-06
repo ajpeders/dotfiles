@@ -17,16 +17,13 @@
     <key>RunAtLoad</key>
     <true/>
 
-    <!-- The script exits non-zero while the share is unreachable, so relaunch
-         on failure only. Once it mounts it exits 0 and launchd leaves it alone.
-         Throttled so a machine that boots off-network retries every 5 min
-         instead of spinning. -->
-    <key>KeepAlive</key>
-    <dict>
-        <key>SuccessfulExit</key>
-        <false/>
-    </dict>
-    <key>ThrottleInterval</key>
+    <!-- Re-run every 5 minutes, rather than relaunching only on failure.
+         KeepAlive/SuccessfulExit=false retried until the first success and then
+         stopped, so a share dropped mid-session — sleep, a tunnel blip, the
+         server rebooting — stayed gone until the next login. A plain interval
+         covers that as well as a machine booted off-network, and costs nothing:
+         the script exits 0 in milliseconds when the share is already mounted. -->
+    <key>StartInterval</key>
     <integer>300</integer>
 
     <key>StandardErrorPath</key>

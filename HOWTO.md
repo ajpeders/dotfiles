@@ -167,13 +167,23 @@ by hand.
 
 `mount-share.sh` closes this from both ends:
 
-- it polls port 445 for roughly 60s before attempting the mount, and
-- it exits non-zero if that never succeeds, so the agent's `KeepAlive`/`SuccessfulExit=false`
-  makes launchd retry, throttled to every 5 minutes.
+- it polls port 445 for roughly 60s before attempting the mount, so the usual case is covered
+  within one run of the agent, and
+- the agent re-runs it every 5 minutes (`StartInterval`), so anything slower than that is
+  covered too.
 
 The effect is that the share mounts a few seconds after the tunnel comes up, and a machine
 booted off-network mounts itself whenever it reconnects. The script exits 0 immediately when
-`/Volumes/share` is already mounted, so the retries are harmless.
+`/Volumes/share` is already mounted, so the re-runs are almost free.
+
+The interval matters beyond login: an earlier version used `KeepAlive` with
+`SuccessfulExit=false`, which retries a *failing* job but stops the moment one succeeds. That
+covered the login race and nothing else — a share dropped mid-session by sleep or a tunnel blip
+stayed gone until the next login, because launchd considered the job done.
+
+**Known gap:** a *stale* mount — the entry still listed by `mount` while I/O hangs — is not
+self-healed, since the already-mounted check believes it. macOS usually tears these down on its
+own; if it does not, `umount -f /Volumes/share` and let the next run remount.
 
 ### Abandoned: moving to `smb.thelunadog.com` / the tailnet address
 

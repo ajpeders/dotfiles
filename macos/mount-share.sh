@@ -7,8 +7,11 @@
 # gives up. Instead: wait for port 445 to answer, then hand off to Finder via
 # osascript so it pulls the password from Keychain and makes the mount point.
 #
-# Exits non-zero when the share never became reachable, which is what drives
-# the agent's KeepAlive/SuccessfulExit retry.
+# Runs every 5 minutes from the agent, so it is written to be re-entrant and
+# cheap: the common case is "already mounted", which returns immediately. The
+# non-zero exit when the share never became reachable drives no retry by itself
+# (the interval does that) — it is there so `launchctl print` and a manual
+# kickstart report the failure honestly.
 
 HOST=share.thelunadog.com   # MUST match the Keychain entry's server name
 SHARE=share
@@ -18,7 +21,7 @@ INTERVAL=2
 
 log() { /usr/bin/logger -t mount.share "$1"; echo "$1"; }
 
-# Already mounted (e.g. a retry firing after success) — nothing to do.
+# Already mounted — the common case on the 5-minute re-run.
 if /sbin/mount | /usr/bin/grep -q " on $MOUNTPOINT "; then
 	exit 0
 fi
