@@ -33,6 +33,11 @@ zoxide
 mosh
 openssh
 
+# VPN — Tailscale (mesh/tailnet; official repo, so it's headless-safe here).
+# tailscaled is deliberately NOT enabled at boot — start it on demand via the
+# `ts-up` helper in zsh/.zshrc. See HOWTO.md for first-time login.
+tailscale
+
 # Terminal multiplexer
 tmux
 
@@ -123,7 +128,8 @@ ly
 # VPN — AmneziaWG (obfuscated WireGuard; home server runs wg-easy/AmneziaWG).
 # Userspace impl (amneziawg-go) instead of a DKMS kernel module — the Asahi
 # kernel makes out-of-tree modules fragile. Client config: ~/.config/wireguard/
-# (NOT in this repo). Bring up: awg-quick up ~/.config/wireguard/alex.conf
+# (NOT in this repo). Bring up with the `vpn-up` helper in zsh/.zshrc, or
+# directly: awg-quick up ~/.config/wireguard/alex.conf. See HOWTO.md.
 amneziawg-tools
 amneziawg-go
 # resolvconf shim so awg-quick can push the VPN DNS into systemd-resolved

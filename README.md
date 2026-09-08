@@ -12,7 +12,7 @@ Cross-platform dotfiles. Hyprland desktop on Arch Linux, AeroSpace tiling on mac
 | Shell | Zsh + Oh My Zsh + Powerlevel10k | Zsh + Oh My Zsh + Powerlevel10k |
 | File manager | Yazi (TUI) / Thunar (GUI) | Yazi (TUI) / Finder |
 | Display manager | ly | macOS login |
-| VPN | WireGuard (CLI) | WireGuard (App Store) |
+| VPN | AmneziaWG (`vpn-up`) + Tailscale (`ts-up`) — see [HOWTO](HOWTO.md#vpn) | WireGuard (App Store) |
 | SMB share | autofs / systemd | LaunchAgent (`com.alex.mount.share`) |
 
 ## Fresh Install
