@@ -4,16 +4,47 @@ Cross-platform dotfiles. Hyprland desktop on Arch Linux, AeroSpace tiling on mac
 
 ## Stack
 
+Linux comes in two flavours; the scripts detect which one a machine runs (see
+[Desktop stacks](#desktop-stacks)).
+
 | Role | Arch Linux | macOS |
 |------|-----------|-------|
 | Window manager | Hyprland | AeroSpace |
-| Desktop shell | Noctalia (bar, launcher, notifications, OSD, control center) | macOS Finder |
+| Desktop shell | Omarchy shell, or Noctalia on pre-Omarchy boxes | macOS Finder |
 | Terminal | Kitty | Kitty |
 | Shell | Zsh + Oh My Zsh + Powerlevel10k | Zsh + Oh My Zsh + Powerlevel10k |
 | File manager | Yazi (TUI) / Thunar (GUI) | Yazi (TUI) / Finder |
-| Display manager | ly | macOS login |
+| Display manager | sddm (Omarchy) / ly (Noctalia) | macOS login |
 | VPN | AmneziaWG (`vpn-up`) + Tailscale (`ts-up`) — see [HOWTO](HOWTO.md#vpn) | WireGuard (App Store) |
 | SMB share | autofs / systemd | LaunchAgent (`com.alex.mount.share`) |
+
+## Desktop stacks
+
+Omarchy 4.x ships its own Hyprland config, shell, themes and display manager.
+Where it is installed it owns the desktop, and this repo only carries the
+personal overrides on top. Older Linux machines keep the original
+Noctalia + `ly` desktop.
+
+`install.sh` and `update.sh` choose by checking for the `omarchy` package:
+
+```bash
+bash install.sh                # auto-detect
+bash install.sh --no-omarchy   # force the Noctalia stack
+bash install.sh --omarchy      # force the Omarchy stack
+```
+
+The result is recorded in `~/.local/state/dotfiles-desktop`. `packages.txt` is
+split by the same markers, so an Omarchy box never installs `noctalia-shell`,
+`ly` or `hypridle`, and a Noctalia box never installs upstream `quickshell`.
+
+> **Do not install `noctalia-qs` on an Omarchy machine.** It declares both
+> `Provides: quickshell` and `Conflicts: quickshell`, so pacman treats
+> Omarchy's dependency as already satisfied and the Omarchy shell dies at
+> startup with a Qt symbol lookup error — no bar, no notifications, no OSD.
+
+On the Omarchy stack, personal Hyprland overrides live in `hypr/*.lua` and load
+*after* Omarchy's defaults. Check bindings with `omarchy menu keybindings
+--print`, and validate any change with `hyprctl reload && hyprctl configerrors`.
 
 ## Fresh Install
 
@@ -25,13 +56,15 @@ cd ~/.config
 bash install.sh
 ```
 
-The Arch script installs `paru`, packages from `packages.txt`, symlinks configs into `~/.config`, sets up zsh, enables `NetworkManager`/`bluetooth`/`pipewire`/`wireplumber`, and installs the `ly` display manager.
+The Arch script installs `paru`, packages from `packages.txt`, symlinks configs into `~/.config`, sets up zsh, and enables `NetworkManager`/`bluetooth`/`pipewire`/`wireplumber`. On a Noctalia machine it also installs and enables the `ly` display manager; on an Omarchy machine it leaves the display manager alone, since Omarchy depends on sddm and enabling `ly` would disable it.
 
 After reboot:
 ```bash
 p10k configure
 ```
-Then log out and pick **Hyprland** from ly.
+On a Noctalia machine, log out and pick **Hyprland** from ly. On an Omarchy
+machine sddm starts the session directly; confirm the bar came up with
+`omarchy restart shell`.
 
 ### Arch Linux — headless
 
@@ -67,7 +100,14 @@ bash sync-private.sh user@host
 
 ## Key Bindings
 
-Keybinds match between Hyprland and AeroSpace, with mac substituting `alt` for `super`.
+**On the Omarchy stack this table does not apply** — Omarchy ships ~238 of its
+own bindings and they are the source of truth. List them with `omarchy menu
+keybindings --print`. `hypr/bindings.lua` documents how each binding below maps
+onto its Omarchy equivalent, with ready-to-uncomment overrides if the defaults
+fight muscle memory.
+
+The table below describes the Noctalia stack, where keybinds match between
+Hyprland and AeroSpace, with mac substituting `alt` for `super`.
 
 | Hyprland | AeroSpace | Action |
 |----------|-----------|--------|
@@ -92,8 +132,11 @@ Hyprland-only (no mac equivalent): Noctalia bindings (`N`, `,`, `A`, `L`, `O`), 
 ```
 dotfiles/
 ├── hypr/                  # Hyprland config (Linux)
+│   ├── *.lua              #   Omarchy stack: overrides loaded after its defaults
+│   └── hyprland.conf, config/  #   Noctalia stack: standalone config
+├── omarchy/               # Omarchy shell/bar, menu extensions, hooks (Linux)
 ├── kitty/                 # Terminal (shared)
-├── noctalia/              # Noctalia shell (Linux)
+├── noctalia/              # Noctalia shell (Linux, pre-Omarchy machines)
 ├── yazi/                  # File manager (shared)
 ├── zsh/                   # Zsh / p10k config (shared via ZDOTDIR)
 ├── wallpapers/            # Default wallpaper
