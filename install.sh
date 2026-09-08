@@ -8,6 +8,14 @@
 #   (default)    Full Hyprland desktop install.
 #   --headless   Skip GUI packages, desktop dotfiles, and the display manager.
 #                Sets the system to multi-user.target and enables sshd.
+#
+# Desktop stack (full mode only) is auto-detected:
+#   Omarchy present  -> Omarchy owns Hyprland, the shell and the display
+#                       manager; the Noctalia/ly packages and phases are
+#                       skipped. Override with --no-omarchy.
+#   Omarchy absent   -> the original Noctalia + ly desktop. Force the Omarchy
+#                       path on a machine where the package is not installed
+#                       yet with --omarchy.
 
 set -euo pipefail
 
@@ -24,12 +32,18 @@ print_phase() { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
+NOCTALIA_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*NOCTALIA'
+OMARCHY_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*OMARCHY'
 STATE_FILE="$HOME/.local/state/dotfiles-mode"
+DESKTOP_STATE_FILE="$HOME/.local/state/dotfiles-desktop"
 
 HEADLESS=0
+OMARCHY=-1   # -1 = auto-detect, 0 = Noctalia stack, 1 = Omarchy stack
 for arg in "$@"; do
     case "$arg" in
         --headless) HEADLESS=1 ;;
+        --omarchy) OMARCHY=1 ;;
+        --no-omarchy) OMARCHY=0 ;;
         --help|-h)
             sed -n '2,11p' "$0" | sed 's/^# \?//'
             exit 0
@@ -41,8 +55,29 @@ for arg in "$@"; do
     esac
 done
 
+# Omarchy installs itself as a pacman package and owns Hyprland, the shell and
+# the display manager. Its presence is what decides which desktop phases run.
+detect_desktop() {
+    if [ "$OMARCHY" -ne -1 ]; then
+        return
+    fi
+    if pacman -Qq omarchy >/dev/null 2>&1; then
+        OMARCHY=1
+    else
+        OMARCHY=0
+    fi
+}
+
+desktop_label() {
+    if [ "$OMARCHY" -eq 1 ]; then echo "Omarchy"; else echo "Noctalia"; fi
+}
+
 mode_label() {
-    if [ "$HEADLESS" -eq 1 ]; then echo "HEADLESS"; else echo "FULL DESKTOP"; fi
+    if [ "$HEADLESS" -eq 1 ]; then
+        echo "HEADLESS"
+    else
+        echo "FULL DESKTOP / $(desktop_label)"
+    fi
 }
 
 phase_preflight() {
@@ -116,13 +151,28 @@ read_packages() {
     # In headless mode, stops at the GUI marker line.
     pkgs=()
     local line
-    local in_gui=0
+    local section=base
     while IFS= read -r line; do
         if [[ "$line" =~ $GUI_MARKER_REGEX ]]; then
-            in_gui=1
+            section=gui
             continue
         fi
-        if [ "$in_gui" -eq 1 ] && [ "$HEADLESS" -eq 1 ]; then
+        if [[ "$line" =~ $NOCTALIA_MARKER_REGEX ]]; then
+            section=noctalia
+            continue
+        fi
+        if [[ "$line" =~ $OMARCHY_MARKER_REGEX ]]; then
+            section=omarchy
+            continue
+        fi
+        # Everything past the GUI marker is desktop-only.
+        if [ "$section" != base ] && [ "$HEADLESS" -eq 1 ]; then
+            continue
+        fi
+        if [ "$section" = noctalia ] && [ "$OMARCHY" -eq 1 ]; then
+            continue
+        fi
+        if [ "$section" = omarchy ] && [ "$OMARCHY" -ne 1 ]; then
             continue
         fi
         line="${line%%#*}"
@@ -200,8 +250,15 @@ phase_dotfiles() {
         config_dirs=(zsh yazi git tmux nvim)
         config_files=()
     else
-        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux nvim)
+        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim)
         config_files=(pavucontrol.ini QtProject.conf)
+        # Each desktop keeps its own config dir; linking the other one just
+        # leaves a dead directory behind.
+        if [ "$OMARCHY" -eq 1 ]; then
+            config_dirs+=(omarchy)
+        else
+            config_dirs+=(noctalia)
+        fi
     fi
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -376,6 +433,14 @@ phase_session() {
         return
     fi
 
+    if [ "$OMARCHY" -eq 1 ]; then
+        print_phase "Phase 8: Display Manager (managed by Omarchy)"
+        print_info "Omarchy depends on sddm and enables it itself; leaving the"
+        print_info "display manager alone. Do NOT enable ly here -- it would"
+        print_info "disable sddm and leave the machine without a login screen."
+        return
+    fi
+
     print_phase "Phase 8: Display Manager (ly)"
 
     local ly_unit=""
@@ -407,6 +472,7 @@ phase_state() {
         echo "headless" > "$STATE_FILE"
     else
         echo "full" > "$STATE_FILE"
+        echo "$(desktop_label | tr '[:upper:]' '[:lower:]')" > "$DESKTOP_STATE_FILE"
     fi
 }
 
@@ -458,10 +524,18 @@ phase_reminders() {
         echo -e "${BOLD}2. Sync private files (wallpapers, ssh hosts)${NC}"
         echo "   bash $SCRIPT_DIR/sync-private.sh user@your-main-host"
         echo ""
-        echo -e "${BOLD}3. Reboot and select Hyprland from ly${NC}"
+        if [ "$OMARCHY" -eq 1 ]; then
+            echo -e "${BOLD}3. Reboot${NC}"
+            echo "   sddm starts the Omarchy Hyprland session."
+            echo "   Check the bar came up with: omarchy restart shell"
+        else
+            echo -e "${BOLD}3. Reboot and select Hyprland from ly${NC}"
+        fi
     fi
     echo ""
 }
+
+detect_desktop
 
 phase_preflight
 phase_paru

@@ -21,13 +21,19 @@ print_phase()  { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
+NOCTALIA_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*NOCTALIA'
+OMARCHY_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*OMARCHY'
 STATE_FILE="$HOME/.local/state/dotfiles-mode"
+DESKTOP_STATE_FILE="$HOME/.local/state/dotfiles-desktop"
 
 HEADLESS=""
+OMARCHY=-1   # -1 = auto-detect, 0 = Noctalia stack, 1 = Omarchy stack
 for arg in "$@"; do
     case "$arg" in
         --headless) HEADLESS=1 ;;
         --full)     HEADLESS=0 ;;
+        --omarchy)     OMARCHY=1 ;;
+        --no-omarchy)  OMARCHY=0 ;;
         --help|-h)
             sed -n '2,8p' "$0" | sed 's/^# \?//'
             exit 0
@@ -47,10 +53,26 @@ if [ -z "$HEADLESS" ]; then
     fi
 fi
 
+# The installed omarchy package is the source of truth; the state file only
+# matters when the package database is unavailable.
+if [ "$OMARCHY" -eq -1 ]; then
+    if pacman -Qq omarchy >/dev/null 2>&1; then
+        OMARCHY=1
+    elif [ -r "$DESKTOP_STATE_FILE" ] && [ "$(cat "$DESKTOP_STATE_FILE")" = "omarchy" ]; then
+        OMARCHY=1
+    else
+        OMARCHY=0
+    fi
+fi
+
+desktop_label() {
+    if [ "$OMARCHY" -eq 1 ]; then echo "Omarchy"; else echo "Noctalia"; fi
+}
+
 if [ "$HEADLESS" -eq 1 ]; then
     print_info "Mode: HEADLESS (GUI packages and desktop dotfiles will be skipped)"
 else
-    print_info "Mode: FULL DESKTOP"
+    print_info "Mode: FULL DESKTOP / $(desktop_label)"
 fi
 
 phase_pull() {
@@ -89,13 +111,27 @@ phase_packages() {
 
     local pkgs=()
     local line
-    local in_gui=0
+    local section=base
     while IFS= read -r line; do
         if [[ "$line" =~ $GUI_MARKER_REGEX ]]; then
-            in_gui=1
+            section=gui
             continue
         fi
-        if [ "$in_gui" -eq 1 ] && [ "$HEADLESS" -eq 1 ]; then
+        if [[ "$line" =~ $NOCTALIA_MARKER_REGEX ]]; then
+            section=noctalia
+            continue
+        fi
+        if [[ "$line" =~ $OMARCHY_MARKER_REGEX ]]; then
+            section=omarchy
+            continue
+        fi
+        if [ "$section" != base ] && [ "$HEADLESS" -eq 1 ]; then
+            continue
+        fi
+        if [ "$section" = noctalia ] && [ "$OMARCHY" -eq 1 ]; then
+            continue
+        fi
+        if [ "$section" = omarchy ] && [ "$OMARCHY" -ne 1 ]; then
             continue
         fi
         line="${line%%#*}"
@@ -127,7 +163,12 @@ phase_dotfiles() {
         config_dirs=(zsh yazi git tmux nvim)
         config_files=()
     else
-        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux nvim)
+        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim)
+        if [ "$OMARCHY" -eq 1 ]; then
+            config_dirs+=(omarchy)
+        else
+            config_dirs+=(noctalia)
+        fi
         config_files=(pavucontrol.ini QtProject.conf)
     fi
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
@@ -233,8 +274,28 @@ phase_reload() {
 
     # Hyprland
     if command -v hyprctl >/dev/null 2>&1; then
-        hyprctl reload >/dev/null 2>&1 && print_status "Hyprland reloaded" \
-            || print_error "hyprctl reload failed (non-fatal)"
+        if hyprctl reload >/dev/null 2>&1; then
+            print_status "Hyprland reloaded"
+            # A reload succeeds even when the config has errors in it, so ask.
+            local cfg_errors
+            cfg_errors="$(hyprctl configerrors 2>/dev/null || true)"
+            if [ -n "${cfg_errors//[[:space:]]/}" ]; then
+                print_error "Hyprland reported config errors:"
+                echo "$cfg_errors"
+            else
+                print_status "Hyprland config is clean"
+            fi
+        else
+            print_error "hyprctl reload failed (non-fatal)"
+        fi
+    fi
+
+    # Desktop shell
+    if [ "$OMARCHY" -eq 1 ]; then
+        if command -v omarchy >/dev/null 2>&1; then
+            omarchy restart shell >/dev/null 2>&1 && print_status "Omarchy shell restarted" \
+                || print_error "omarchy restart shell failed (non-fatal)"
+        fi
     fi
 
     print_status "Live reload complete"
