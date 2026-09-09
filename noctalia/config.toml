@@ -48,11 +48,16 @@ enabled = false
 
 [bar.main]
 position           = "top"
+thickness          = 36
 background_opacity = 0.93
-radius             = 12
-start  = ["workspaces", "lock-keys", "active-window"]
-center = ["clock"]
-end    = ["media", "volume", "tray", "sysmon", "brightness", "notifications", "control-center", "battery"]
+radius             = 0
+margin_ends        = 0              # v5 default is 180 (floating pill); v4 bar was flush and full width
+margin_edge        = 0
+padding            = 8
+widget_spacing     = 6
+start  = ["launcher", "workspaces"]
+center = []
+end    = ["tray", "clock", "media", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
 
 [widget.clock]
-format = "{:%H:%M:%S}"
+format = "{:%a %b %-d}  {:%H:%M:%S}"
