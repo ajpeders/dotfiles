@@ -20,9 +20,13 @@ o.bind("SUPER + SHIFT + R", "Restart Omarchy shell", "omarchy restart shell")
 -- maximize on SUPER+ALT+F. Restored to the old split here.
 o.bind("SUPER + M", "Full screen", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 
--- was: Full screen. Omarchy's SUPER+ALT+F also maximizes and stays bound.
+-- was: Full screen.
 hl.unbind("SUPER + F")
 o.bind("SUPER + F", "Maximize", hl.dsp.window.fullscreen({ mode = "maximized" }))
+
+-- Drop Omarchy's other two fullscreen variants; SUPER+F and SUPER+M cover it.
+hl.unbind("SUPER + ALT + F")    -- was: Full width (maximize)
+hl.unbind("SUPER + CTRL + F")   -- was: Tiled full screen
 
 -- ===========================================================================
 -- Control centre submap (SUPER + A)
