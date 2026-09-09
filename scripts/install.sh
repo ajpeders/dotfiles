@@ -1,6 +1,6 @@
 #!/bin/bash
 # Arch Linux dotfiles bootstrap script.
-# Usage: bash scripts/install.sh [--headless]
+# Usage: bash scripts/install.sh [--headless] [--omarchy|--no-omarchy] [--install-omarchy]
 # Run from within the cloned dotfiles repo as a non-root user.
 # Safe to re-run: each phase checks whether its work is already done.
 #
@@ -8,6 +8,18 @@
 #   (default)    Full Hyprland desktop install.
 #   --headless   Skip GUI packages, desktop dotfiles, and the display manager.
 #                Sets the system to multi-user.target and enables sshd.
+#
+# Desktop stack (full mode only) is auto-detected:
+#   Omarchy present  -> Omarchy owns Hyprland, the shell and the display
+#                       manager; the Noctalia/ly packages and phases are
+#                       skipped. Override with --no-omarchy.
+#   Omarchy absent   -> the original Noctalia + ly desktop. Force the Omarchy
+#                       path on a machine where the package is not installed
+#                       yet with --omarchy.
+#
+#   --install-omarchy  Bootstrap Omarchy itself before applying dotfiles, on a
+#                      machine that does not have it yet. Implies --omarchy.
+#                      aarch64 only; see phase_omarchy for why.
 
 set -euo pipefail
 
@@ -26,14 +38,35 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # The repo root is one level up: this script lives in <repo>/scripts/.
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
+NOCTALIA_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*NOCTALIA'
+OMARCHY_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*OMARCHY'
 STATE_FILE="$HOME/.local/state/dotfiles-mode"
+DESKTOP_STATE_FILE="$HOME/.local/state/dotfiles-desktop"
+
+# Upstream Omarchy 4 installs from an ISO with no aarch64 build, which cannot
+# boot an Apple Silicon Mac. This fork builds the (arch=any) Omarchy packages
+# from a checkout and installs them the way the ISO would.
+OMARCHY_MAC_REPO="https://github.com/omacom/omarchy-mac.git"
+OMARCHY_MAC_BRANCH="quattro"
+# Omarchy's own shell integration reads from this path too (default/zsh/rc),
+# so it is the checkout location, not a scratch dir.
+OMARCHY_MAC_DIR="$HOME/.local/share/omarchy"
 
 HEADLESS=0
+OMARCHY=-1       # -1 = auto-detect, 0 = Noctalia stack, 1 = Omarchy stack
+INSTALL_OMARCHY=0
 for arg in "$@"; do
     case "$arg" in
         --headless) HEADLESS=1 ;;
+        --omarchy) OMARCHY=1 ;;
+        --no-omarchy) OMARCHY=0 ;;
+        # Installing a whole desktop layer must never be a side effect of a
+        # routine resync, so it takes an explicit flag.
+        --install-omarchy) INSTALL_OMARCHY=1; OMARCHY=1 ;;
         --help|-h)
-            sed -n '2,11p' "$0" | sed 's/^# \?//'
+            # Print the whole leading comment block, so editing the header
+            # above cannot silently truncate --help.
+            awk 'NR>1 { if (/^#/) { sub(/^# ?/, ""); print } else { exit } }' "$0"
             exit 0
             ;;
         *)
@@ -43,8 +76,131 @@ for arg in "$@"; do
     esac
 done
 
+# Omarchy installs itself as a pacman package and owns Hyprland, the shell and
+# the display manager. Its presence is what decides which desktop phases run.
+detect_desktop() {
+    if [ "$OMARCHY" -ne -1 ]; then
+        return
+    fi
+    if pacman -Qq omarchy >/dev/null 2>&1; then
+        OMARCHY=1
+    else
+        OMARCHY=0
+    fi
+}
+
+desktop_label() {
+    if [ "$OMARCHY" -eq 1 ]; then echo "Omarchy"; else echo "Noctalia"; fi
+}
+
 mode_label() {
-    if [ "$HEADLESS" -eq 1 ]; then echo "HEADLESS"; else echo "FULL DESKTOP"; fi
+    if [ "$HEADLESS" -eq 1 ]; then
+        echo "HEADLESS"
+    else
+        echo "FULL DESKTOP / $(desktop_label)"
+    fi
+}
+
+# Omarchy's shell (bar, notifications, OSD, lock screen) is one Quickshell
+# process. noctalia-qs declares both Provides: quickshell and Conflicts:
+# quickshell, so if it is present pacman considers Omarchy's dependency
+# satisfied and never installs the real package. The fork is built against an
+# older Qt, so omarchy-shell then dies at startup with a symbol lookup error
+# and the desktop comes up with no bar at all -- silently, because Hyprland
+# itself is fine. Fail loudly instead.
+verify_omarchy_shell_stack() {
+    local ok=0
+
+    if pacman -Qq noctalia-qs >/dev/null 2>&1; then
+        print_error "noctalia-qs is installed; it conflicts with quickshell and"
+        print_error "will break the Omarchy shell. Remove it and install quickshell:"
+        print_error "  sudo pacman -Rdd noctalia-qs && sudo pacman -S quickshell"
+        ok=1
+    fi
+
+    if ! pacman -Qq quickshell >/dev/null 2>&1; then
+        print_error "upstream quickshell is not installed; the Omarchy shell cannot run."
+        print_error "  sudo pacman -S quickshell"
+        ok=1
+    elif ! quickshell --version >/dev/null 2>&1; then
+        print_error "quickshell is installed but will not run (likely a Qt mismatch):"
+        quickshell --version 2>&1 | head -2
+        ok=1
+    fi
+
+    if [ "$ok" -eq 0 ]; then
+        print_status "Omarchy shell stack OK ($(quickshell --version 2>/dev/null | head -1))"
+    fi
+    return "$ok"
+}
+
+# Bootstraps Omarchy itself. Must run before phase_dotfiles: the fork's
+# installer ends in seed_user_defaults, which copies Omarchy's stock configs
+# into ~/.config and will overwrite tracked files (it replaced kitty.conf and
+# tmux.conf here). Applying dotfiles afterwards is what makes ours win.
+phase_omarchy() {
+    if [ "$HEADLESS" -eq 1 ] || [ "$OMARCHY" -ne 1 ]; then
+        return
+    fi
+
+    print_phase "Phase 2: Omarchy"
+
+    if pacman -Qq omarchy >/dev/null 2>&1; then
+        print_status "Omarchy already installed ($(pacman -Q omarchy | awk '{print $2}'))"
+        verify_omarchy_shell_stack || true
+        return
+    fi
+
+    if [ "$INSTALL_OMARCHY" -ne 1 ]; then
+        print_error "Omarchy is not installed, but the Omarchy stack was selected."
+        print_error "Re-run with --install-omarchy to bootstrap it, or --no-omarchy"
+        print_error "to use the Noctalia desktop instead."
+        exit 1
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    if [ "$arch" != "aarch64" ]; then
+        print_error "No scripted Omarchy install exists for $arch."
+        print_error "Upstream Omarchy 4 installs from its ISO -- see https://omarchy.org"
+        print_error "This flag only covers Apple Silicon, where the ISO cannot boot and"
+        print_error "$OMARCHY_MAC_REPO builds the packages instead."
+        exit 1
+    fi
+
+    # The fork's installer refuses to run as root and sudo's where it needs to.
+    if [ "$EUID" -eq 0 ]; then
+        print_error "Run this as your regular user, not root."
+        exit 1
+    fi
+
+    if [ -d "$OMARCHY_MAC_DIR/.git" ]; then
+        print_info "Updating existing checkout in $OMARCHY_MAC_DIR..."
+        git -C "$OMARCHY_MAC_DIR" fetch --quiet origin "$OMARCHY_MAC_BRANCH"
+        git -C "$OMARCHY_MAC_DIR" checkout --quiet "$OMARCHY_MAC_BRANCH"
+        git -C "$OMARCHY_MAC_DIR" merge --ff-only --quiet "origin/$OMARCHY_MAC_BRANCH"
+    else
+        if [ -e "$OMARCHY_MAC_DIR" ]; then
+            print_error "$OMARCHY_MAC_DIR exists but is not a git checkout; move it aside first."
+            exit 1
+        fi
+        print_info "Cloning $OMARCHY_MAC_REPO ($OMARCHY_MAC_BRANCH)..."
+        mkdir -p "$(dirname "$OMARCHY_MAC_DIR")"
+        git clone --quiet --branch "$OMARCHY_MAC_BRANCH" "$OMARCHY_MAC_REPO" "$OMARCHY_MAC_DIR"
+    fi
+    print_status "Checkout at $(git -C "$OMARCHY_MAC_DIR" rev-parse --short HEAD)"
+
+    print_info "Running Omarchy's installer. This adds pacman repos and keys,"
+    print_info "builds the Omarchy packages and installs its default package set."
+    print_info "It is long, interactive in places, and asks for sudo."
+    bash "$OMARCHY_MAC_DIR/install.sh"
+
+    if ! pacman -Qq omarchy >/dev/null 2>&1; then
+        print_error "Omarchy's installer finished but the omarchy package is absent."
+        exit 1
+    fi
+    print_status "Omarchy installed ($(pacman -Q omarchy | awk '{print $2}'))"
+    verify_omarchy_shell_stack || true
 }
 
 phase_preflight() {
@@ -92,7 +248,7 @@ phase_preflight() {
 }
 
 phase_paru() {
-    print_phase "Phase 2: AUR Helper (paru)"
+    print_phase "Phase 3: AUR Helper (paru)"
 
     print_info "Ensuring base-devel and git are installed..."
     sudo pacman -S --needed --noconfirm base-devel git
@@ -118,13 +274,28 @@ read_packages() {
     # In headless mode, stops at the GUI marker line.
     pkgs=()
     local line
-    local in_gui=0
+    local section=base
     while IFS= read -r line; do
         if [[ "$line" =~ $GUI_MARKER_REGEX ]]; then
-            in_gui=1
+            section=gui
             continue
         fi
-        if [ "$in_gui" -eq 1 ] && [ "$HEADLESS" -eq 1 ]; then
+        if [[ "$line" =~ $NOCTALIA_MARKER_REGEX ]]; then
+            section=noctalia
+            continue
+        fi
+        if [[ "$line" =~ $OMARCHY_MARKER_REGEX ]]; then
+            section=omarchy
+            continue
+        fi
+        # Everything past the GUI marker is desktop-only.
+        if [ "$section" != base ] && [ "$HEADLESS" -eq 1 ]; then
+            continue
+        fi
+        if [ "$section" = noctalia ] && [ "$OMARCHY" -eq 1 ]; then
+            continue
+        fi
+        if [ "$section" = omarchy ] && [ "$OMARCHY" -ne 1 ]; then
             continue
         fi
         line="${line%%#*}"
@@ -146,7 +317,7 @@ read_packages() {
 }
 
 phase_packages() {
-    print_phase "Phase 3: Packages"
+    print_phase "Phase 4: Packages"
 
     local pkgs
     read_packages
@@ -179,7 +350,7 @@ phase_packages() {
 }
 
 phase_directories() {
-    print_phase "Phase 4: Directories"
+    print_phase "Phase 5: Directories"
 
     local dirs
     if [ "$HEADLESS" -eq 1 ]; then
@@ -205,7 +376,7 @@ phase_directories() {
 }
 
 phase_dotfiles() {
-    print_phase "Phase 5: Dotfiles"
+    print_phase "Phase 6: Dotfiles"
 
     local config_dirs
     local config_files
@@ -213,8 +384,15 @@ phase_dotfiles() {
         config_dirs=(zsh yazi git tmux nvim opencode)
         config_files=()
     else
-        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh noctalia yazi git tmux nvim opencode)
+        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim opencode)
         config_files=(pavucontrol.ini QtProject.conf)
+        # Each desktop keeps its own config dir; linking the other one just
+        # leaves a dead directory behind.
+        if [ "$OMARCHY" -eq 1 ]; then
+            config_dirs+=(omarchy)
+        else
+            config_dirs+=(noctalia)
+        fi
     fi
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -283,7 +461,7 @@ phase_dotfiles() {
 }
 
 phase_shell() {
-    print_phase "Phase 6: Shell"
+    print_phase "Phase 7: Shell"
 
     if [ "${SHELL:-}" = "/usr/bin/zsh" ]; then
         print_status "zsh already default shell"
@@ -327,7 +505,7 @@ phase_shell() {
 }
 
 phase_services() {
-    print_phase "Phase 7: Services"
+    print_phase "Phase 8: Services"
 
     enable_system_service() {
         local svc="$1"
@@ -371,7 +549,7 @@ phase_services() {
 
 phase_session() {
     if [ "$HEADLESS" -eq 1 ]; then
-        print_phase "Phase 8: Session (multi-user.target, no DM)"
+        print_phase "Phase 9: Session (multi-user.target, no DM)"
 
         local dm
         for dm in gdm sddm lightdm ly ly@tty1; do
@@ -392,7 +570,15 @@ phase_session() {
         return
     fi
 
-    print_phase "Phase 8: Display Manager (ly)"
+    if [ "$OMARCHY" -eq 1 ]; then
+        print_phase "Phase 9: Display Manager (managed by Omarchy)"
+        print_info "Omarchy depends on sddm and enables it itself; leaving the"
+        print_info "display manager alone. Do NOT enable ly here -- it would"
+        print_info "disable sddm and leave the machine without a login screen."
+        return
+    fi
+
+    print_phase "Phase 9: Display Manager (ly)"
 
     local ly_unit=""
     local dm
@@ -423,6 +609,7 @@ phase_state() {
         echo "headless" > "$STATE_FILE"
     else
         echo "full" > "$STATE_FILE"
+        echo "$(desktop_label | tr '[:upper:]' '[:lower:]')" > "$DESKTOP_STATE_FILE"
     fi
 }
 
@@ -431,7 +618,7 @@ phase_browser_policies() {
         return
     fi
 
-    print_phase "Phase 9: Browser Policies"
+    print_phase "Phase 10: Browser Policies"
 
     local src="$REPO_DIR/librewolf/policies.json"
     local dst="/etc/librewolf/policies/policies.json"
@@ -474,12 +661,21 @@ phase_reminders() {
         echo -e "${BOLD}2. Sync private files (wallpapers, ssh hosts)${NC}"
         echo "   bash $SCRIPT_DIR/sync-private.sh user@your-main-host"
         echo ""
-        echo -e "${BOLD}3. Reboot and select Hyprland from ly${NC}"
+        if [ "$OMARCHY" -eq 1 ]; then
+            echo -e "${BOLD}3. Reboot${NC}"
+            echo "   sddm starts the Omarchy Hyprland session."
+            echo "   Check the bar came up with: omarchy restart shell"
+        else
+            echo -e "${BOLD}3. Reboot and select Hyprland from ly${NC}"
+        fi
     fi
     echo ""
 }
 
+detect_desktop
+
 phase_preflight
+phase_omarchy
 phase_paru
 phase_packages
 phase_directories

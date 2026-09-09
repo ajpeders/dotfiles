@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, notifications, volume, clipboard, lock screen) all working via Noctalia IPC.
+Desktops run Noctalia on Hyprland; the M1 Air runs Omarchy. Both stacks live on `main` since 2026-09-09 (the `alarm` and `omarchy` branches were merged), sharing one `hypr/hyprland.lua` that picks the stack at load time.
 
 ## Done
 
@@ -13,6 +13,8 @@ Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, 
 - [x] Install/update scripts updated
 - [x] Stale waybar/rofi/swaync/quickshell references cleaned up
 - [x] Portable monitor config — EDID-keyed, one file for all setups
+- [x] Merged the laptop branches: hypridle AC/battery profiles, touchpad gestures,
+      brightness submap, VPN helpers, and the Omarchy stack behind runtime detection
 - [x] Established that the Samsung G53F's EDID under-reports (claims 60Hz max).
       Settled on 144Hz: 200Hz link-trains and looks fine idle but drops frames
       under load. Don't raise it without testing a fullscreen game.

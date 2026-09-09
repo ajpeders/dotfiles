@@ -54,18 +54,11 @@ xdg-desktop-portal-hyprland
 # Terminal
 kitty
 
-# Desktop shell (Noctalia)
-noctalia-shell
-
 # Browser
 librewolf-bin
 
-# Authentication
-polkit-gnome
-
 # Clipboard
 wl-clipboard
-cliphist
 
 # Audio control
 pipewire
@@ -75,10 +68,6 @@ wireplumber
 # Bluetooth (bluez daemon + bluetoothctl; AirPods etc. via PipeWire A2DP)
 bluez
 bluez-utils
-
-# System tray applets
-network-manager-applet
-blueman
 
 # Screenshots
 grim
@@ -94,15 +83,6 @@ brightnessctl
 upower
 power-profiles-daemon
 
-# Idle management (dim/lock/screen-off/suspend on idle; config in hypr/hypridle.conf)
-hypridle
-
-# Display configuration
-nwg-displays
-
-# Night light
-wlsunset
-
 # Monitor brightness (desktop)
 ddcutil
 
@@ -114,9 +94,6 @@ ttf-jetbrains-mono-nerd
 noto-fonts
 noto-fonts-emoji
 papirus-icon-theme
-
-# Display manager
-ly
 
 # VPN — AmneziaWG (obfuscated WireGuard; home server runs wg-easy/AmneziaWG).
 # Userspace impl (amneziawg-go) instead of a DKMS kernel module — the Asahi
@@ -136,3 +113,49 @@ realesrgan-ncnn-vulkan
 
 # Music player (terminal, Winamp-style; Plex creds via `cliamp setup`)
 cliamp
+
+# ================================================================
+# === NOCTALIA DESKTOP (skipped on Omarchy machines) ===
+# The pre-Omarchy Hyprland desktop: Noctalia shell, ly display manager,
+# and the standalone daemons Omarchy replaces with its own shell.
+# Parsed by install.sh / update.sh — do not rename the marker line above.
+# ================================================================
+
+# Desktop shell
+noctalia-shell
+
+# Authentication agent (Omarchy's shell ships its own polkit agent)
+polkit-gnome
+
+# Clipboard history (Omarchy's shell keeps its own history)
+cliphist
+
+# System tray applets (Omarchy's bar has network/bluetooth widgets)
+network-manager-applet
+blueman
+
+# Idle management (Omarchy uses idle.screensaver / idle.lock in shell.json)
+hypridle
+
+# Display configuration (Omarchy: SUPER + CTRL + D)
+nwg-displays
+
+# Night light (Omarchy uses hyprsunset)
+wlsunset
+
+# Display manager (Omarchy uses sddm, which its package depends on)
+ly
+
+# ================================================================
+# === OMARCHY DESKTOP (skipped on non-Omarchy machines) ===
+# Omarchy itself is installed by its own installer, not from here.
+# This section only covers what a dotfiles resync must guarantee.
+# Parsed by install.sh / update.sh — do not rename the marker line above.
+# ================================================================
+
+# Upstream Quickshell, which the Omarchy shell (bar, notifications, OSD,
+# lock screen) runs on. This must be the real `quickshell` package: the
+# Noctalia fork `noctalia-qs` also Provides+Conflicts `quickshell`, so if it
+# is installed first, pacman treats Omarchy's dependency as satisfied and
+# omarchy-shell dies at startup with a Qt symbol lookup error.
+quickshell
