@@ -10,7 +10,7 @@ Linux comes in two flavours; the scripts detect which one a machine runs (see
 | Role | Arch Linux | macOS |
 |------|-----------|-------|
 | Window manager | Hyprland | AeroSpace |
-| Desktop shell | Omarchy shell, or Noctalia on pre-Omarchy boxes | macOS Finder |
+| Desktop shell | Noctalia 5 (desktops) or Omarchy shell (M1 Air) | macOS Finder |
 | Terminal | Kitty | Kitty |
 | Shell | Zsh + Oh My Zsh + Powerlevel10k | Zsh + Oh My Zsh + Powerlevel10k |
 | File manager | Yazi (TUI) / Thunar (GUI) | Yazi (TUI) / Finder |
@@ -34,8 +34,8 @@ bash scripts/install.sh --omarchy      # force the Omarchy stack
 ```
 
 The result is recorded in `~/.local/state/dotfiles-desktop`. `packages.txt` is
-split by the same markers, so an Omarchy box never installs `noctalia-shell`,
-`ly` or `hypridle`, and a Noctalia box never installs upstream `quickshell`.
+split by the same markers, so an Omarchy box never installs `noctalia`,
+`ly` or `hypridle`, and a Noctalia box never installs `quickshell`.
 
 ### Installing Omarchy from here
 
@@ -197,7 +197,7 @@ dotfiles/
 │   └── hyprland.conf, config/  #   Noctalia stack: standalone config
 ├── omarchy/               # Omarchy shell/bar, menu extensions, hooks (Linux)
 ├── kitty/                 # Terminal (shared)
-├── noctalia/              # Noctalia shell (Linux, pre-Omarchy machines)
+├── noctalia/              # Noctalia 5 config.toml (Linux desktops)
 ├── yazi/                  # File manager (shared)
 ├── zsh/                   # Zsh / p10k config (shared via ZDOTDIR)
 ├── wallpapers/            # Default wallpaper

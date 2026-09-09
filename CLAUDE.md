@@ -9,22 +9,22 @@ Scripts pick one automatically by checking whether the `omarchy` pacman package 
 | | **Noctalia** (desktops) | **Omarchy** (M1 Air, Asahi) |
 |---|---|---|
 | Hyprland config | `hypr/hyprland.lua` → `hypr/config/*.lua` | same entry point → Omarchy bootstrap + overrides in `hypr/omarchy/*.lua` |
-| Shell / bar | `noctalia-shell` systemd user service | Omarchy shell (Quickshell) via `omarchy-launch-shell` |
-| Quickshell pkg | `noctalia-qs` (fork) | upstream `quickshell` |
+| Shell / bar | Noctalia 5 (native C++) as `noctalia-shell.service` | Omarchy shell (Quickshell) via `omarchy-launch-shell` |
+| Quickshell pkg | none (v5 has no Qt) | upstream `quickshell` |
 | Display manager | `ly` | sddm (an `omarchy` dependency) |
 | Idle / lock | `hypr/hypridle-{ac,battery}.conf` + `hypr/scripts/hypridle-power.sh` | `omarchy/shell.json` → `idle.screensaver`, `idle.lock` |
-| Theming | Noctalia colors via `hypr/config/noctalia_colors.lua` | `omarchy theme set <name>` |
+| Theming | Noctalia templates render `hypr/noctalia.lua` + `kitty/themes/noctalia.conf` | `omarchy theme set <name>` |
 | Config dir linked | `noctalia/` | `omarchy/` |
 
 `hypr/hyprland.lua` branches at runtime on `/usr/share/omarchy` being present, so one file serves both. `packages.txt` has `NOCTALIA` / `OMARCHY` sections gated by the same detection; `packages-asahi.txt` is added on aarch64 only.
 
-**`noctalia-qs` and `quickshell` are mutually exclusive.** `noctalia-qs` declares `Provides: quickshell` *and* `Conflicts: quickshell`; if it is installed on an Omarchy machine the Omarchy shell dies at startup with a Qt symbol lookup error. `verify_omarchy_shell_stack` in install.sh fails loudly on this.
+**Never install the legacy `noctalia-qs`** (Noctalia 4's Quickshell fork) on an Omarchy machine: it Provides+Conflicts `quickshell` and the Omarchy shell dies with a Qt symbol lookup error. Noctalia 5 has no Quickshell dependency, so this only bites if v4 is reinstalled. `verify_omarchy_shell_stack` in install.sh checks for it.
 
 ## Noctalia stack
 
 - **WM:** Hyprland — native Lua config (0.56+); sub-configs in `hypr/config/*.lua`
-- **Shell:** Noctalia (bar, launcher, notifications, OSD, control center, lock screen); config at `~/.config/noctalia/`, shell files at `/etc/xdg/quickshell/noctalia-shell/`
-- **IPC:** `qs -c noctalia-shell ipc call <target> <function>` for keybinds
+- **Shell:** Noctalia 5 (bar, launcher, notifications, OSD, control center, lock screen, clipboard); hand-written config `noctalia/config.toml`, GUI overrides in `~/.local/state/noctalia/settings.toml` (they win)
+- **IPC:** `noctalia msg <command>` for keybinds; `noctalia msg --help` lists them
 - **Wallpaper / theming:** Noctalia built-in; wallust was removed
 - Monitors live in `hypr/config/monitors.lua`, hand-written, matched by `desc:` (EDID make/model). Known panels get absolute coordinates, unknown ones fall through to an `auto` catch-all. Don't use nwg-displays; `monitors.conf` is gone.
 - Named workspaces: dev(6), server(7), work(8), game(9), config(10), magic(scratchpad)

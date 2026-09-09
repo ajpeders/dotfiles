@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Desktops run Noctalia on Hyprland; the M1 Air runs Omarchy. Both stacks live on `main` since 2026-09-09 (the `alarm` and `omarchy` branches were merged), sharing one `hypr/hyprland.lua` that picks the stack at load time.
+Desktops run Noctalia 5 (native C++ rewrite, since 2026-09-09) on Hyprland; the M1 Air runs Omarchy. Both stacks live on `main` since 2026-09-09 (the `alarm` and `omarchy` branches were merged), sharing one `hypr/hyprland.lua` that picks the stack at load time.
 
 ## Done
 
@@ -13,6 +13,7 @@ Desktops run Noctalia on Hyprland; the M1 Air runs Omarchy. Both stacks live on 
 - [x] Install/update scripts updated
 - [x] Stale waybar/rofi/swaync/quickshell references cleaned up
 - [x] Portable monitor config — EDID-keyed, one file for all setups
+- [x] Noctalia 4 → 5: TOML config, `noctalia msg` IPC, theme templates for Hyprland + kitty
 - [x] Merged the laptop branches: hypridle AC/battery profiles, touchpad gestures,
       brightness submap, VPN helpers, and the Omarchy stack behind runtime detection
 - [x] Established that the Samsung G53F's EDID under-reports (claims 60Hz max).
