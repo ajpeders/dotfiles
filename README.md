@@ -95,17 +95,6 @@ script never rewrites it, so running setup on a second machine no longer dirties
 the working tree. Add a `models` entry when you want explicit limits for a model
 the catalog does not list yet.
 
-The same run also writes `~/.continue/.env` with `LLM_SERVER_BASE`, which
-`continue/config.yaml` reads as `${{ secrets.LLM_SERVER_BASE }}`. Continue's
-`ollama` provider speaks the native API, so that value is the bare root with no
-`/v1` — unlike opencode, which is OpenAI-compatible and needs it.
-
-Only `config.yaml` and `.continuerc.json` are linked out of `~/.continue`;
-`sessions/`, `index/` and `dev_data/` stay out of the repo. `.continuerc.json` is
-tracked purely to pin `disableIndexing: false` — Continue writes that file with
-`true` on first run, which silently disables `@codebase` retrieval and leaves the
-configured embedding model unused.
-
 ## Key Bindings
 
 Keybinds match between Hyprland and AeroSpace, with mac substituting `alt` for `super`.
@@ -146,8 +135,7 @@ dotfiles/
 │   ├── install-debian.sh  # Debian headless bootstrap (apt)
 │   ├── update.sh          # Arch resync
 │   ├── sync-private.sh    # Cross-platform private file sync
-│   ├── setup-llm.sh       # Point opencode at a local LLM server
-│   └── setup-yabai.sh     # yabai scripting addition + sudoers (macOS)
+│   └── setup-llm.sh       # Point opencode at a local LLM server
 ├── packages.txt           # Pacman + AUR package list
 └── HOWTO.md, ARCHITECTURE.md, ROADMAP.md
 ```

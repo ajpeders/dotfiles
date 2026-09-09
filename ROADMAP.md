@@ -27,7 +27,6 @@ Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, 
       reduced security for no benefit. From Recovery: `csrutil enable`, then
       after rebooting `sudo nvram -d boot-args`. Watch meanwhile for broken
       Apple Pay, iPhone Mirroring and DRM'd playback.
-      The yabai configs stay in the repo in case upstream ever fixes it.
 - [ ] Migrate `macos/aerospace/aerospace.toml` to `config-version = 2`
       (AeroSpace warns that version 1 is outdated on every reload)
 - [ ] Capture the home desk's second 1440p panel into `hypr/config/monitors.lua`
