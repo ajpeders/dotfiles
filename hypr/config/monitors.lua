@@ -91,11 +91,31 @@ hl.monitor({
 })
 
 -- ====== Centered below both ======
--- Portable 16" panel. x = 1520 = (4960 - 1920) / 2.
+-- Portable 16" panel. This panel travels, so its x depends on the desk:
+--   home:     1520 = (4960 - 1920) / 2  (centered under Samsung+AOC)
+--   vacation: 1600 = (5120 - 1920) / 2  (centered under the two LGs)
+-- Set to the vacation value while away (Sep 2026); restore 1520 at home.
 hl.monitor({
     output   = "desc:AOP 16PM1Q",
     mode     = "1920x1080@60",
-    position = "1520x1440",
+    position = "1600x1440",
+    scale    = 1.0,
+})
+
+-- ====== Vacation desk (Sep 2026): two LG UltraGears ======
+-- Same model string on both panels, so serials are REQUIRED here to
+-- tell left from right — the "omit serials" rule above only works for
+-- distinct models. Bottom edges at y=1440 align with the portable row.
+hl.monitor({
+    output   = "desc:LG Electronics LG ULTRAGEAR 407NTAB69288",
+    mode     = "2560x1440@144",
+    position = "0x0",
+    scale    = 1.0,
+})
+hl.monitor({
+    output   = "desc:LG Electronics LG ULTRAGEAR 302NTLEAD920",
+    mode     = "2560x1440@144",
+    position = "2560x0",
     scale    = 1.0,
 })
 
