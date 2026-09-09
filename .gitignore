@@ -12,6 +12,7 @@
 !update.sh
 !install.sh
 !sync-private.sh
+!omarchy-shell.sh
 !packages.txt
 !.hermes/
 !hypr/
