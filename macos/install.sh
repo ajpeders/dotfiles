@@ -118,6 +118,7 @@ phase_dotfiles() {
     link "$REPO_DIR/yazi" "$HOME/.config/yazi"
     link "$REPO_DIR/zsh" "$HOME/.config/zsh"
     link "$REPO_DIR/tmux" "$HOME/.config/tmux"
+    link "$REPO_DIR/opencode" "$HOME/.config/opencode"
     link "$REPO_DIR/git/.gitconfig" "$HOME/.gitconfig"
 
     # ZDOTDIR so zsh reads ~/.config/zsh/.zshrc

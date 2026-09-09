@@ -57,6 +57,17 @@ cd ~/.config
 bash update.sh
 ```
 
+## OpenCode local remote model
+
+The shared OpenCode config lives in `~/.config/opencode/opencode.json`. It uses
+the `local/coder` model through an OpenAI-compatible endpoint at
+`http://127.0.0.1:11434/v1`.
+
+For a model served from another machine, change
+`providers.local.settings.baseURL` to the host's reachable LAN or Tailscale URL,
+for example `http://100.x.y.z:11434/v1`. Keep API keys out of the repo; use
+OpenCode auth or an env-backed `apiKey` setting if the endpoint requires one.
+
 ## Configure monitors
 
 Use `nwg-displays` GUI tool. It writes to `~/.config/hypr/monitors.conf` — don't hand-edit that file.

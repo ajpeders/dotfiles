@@ -104,7 +104,7 @@ For servers / boxes you only SSH into:
 bash install.sh --headless
 ```
 
-Installs only the CLI base from `packages.txt` (zsh, neovim, git, mosh, openssh, tmux, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), enables `sshd`, and switches the system to `multi-user.target` (no display manager). `update.sh` reads the mode from `~/.local/state/dotfiles-mode` and stays in headless mode on resync; pass `--full` to override.
+Installs only the CLI base from `packages.txt` (zsh, neovim, git, mosh, openssh, tmux, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`, `opencode`), enables `sshd`, and switches the system to `multi-user.target` (no display manager). `update.sh` reads the mode from `~/.local/state/dotfiles-mode` and stays in headless mode on resync; pass `--full` to override.
 
 ### macOS
 
@@ -169,6 +169,7 @@ dotfiles/
 ├── noctalia/              # Noctalia shell (Linux, pre-Omarchy machines)
 ├── yazi/                  # File manager (shared)
 ├── zsh/                   # Zsh / p10k config (shared via ZDOTDIR)
+├── opencode/              # OpenCode config for the local remote model
 ├── wallpapers/            # Default wallpaper
 ├── gtk-3.0/, gtk-4.0/     # GTK theme (Linux)
 ├── theme/                 # Static colors
