@@ -48,10 +48,6 @@ tmux
 # install.sh / update.sh — do not rename it.
 # ================================================================
 
-# Core Hyprland packages
-hyprland
-xdg-desktop-portal-hyprland
-
 # Terminal
 kitty
 
@@ -127,6 +123,10 @@ cliamp
 # and the standalone daemons Omarchy replaces with its own shell.
 # Parsed by install.sh / update.sh — do not rename the marker line above.
 # ================================================================
+
+# Core Hyprland packages
+hyprland
+xdg-desktop-portal-hyprland
 
 # Desktop shell
 noctalia-shell
