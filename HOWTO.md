@@ -2,34 +2,45 @@
 
 ## Change wallpaper
 
-Noctalia manages wallpapers. Use IPC or the settings panel:
+Noctalia manages wallpapers. Use IPC or the settings window:
 
 ```bash
-qs -c noctalia-shell ipc call wallpaper set ~/Pictures/Wallpapers/image.jpg ""
-qs -c noctalia-shell ipc call wallpaper random ""
-qs -c noctalia-shell ipc call settings openTab wallpaper
+noctalia msg wallpaper-set ~/Pictures/Wallpapers/image.jpg
+noctalia msg wallpaper-random
+noctalia msg settings-open wallpaper
 ```
 
 ## Noctalia IPC
 
-All Noctalia commands follow: `qs -c noctalia-shell ipc call <target> <function>`
+All Noctalia commands follow: `noctalia msg <command>`
 
 ```bash
 # List all available commands
-qs -c noctalia-shell ipc show
+noctalia msg --help
 
 # Examples
-qs -c noctalia-shell ipc call launcher toggle
-qs -c noctalia-shell ipc call volume increase
-qs -c noctalia-shell ipc call notifications toggleHistory
-qs -c noctalia-shell ipc call settings toggle
-qs -c noctalia-shell ipc call colorScheme set Kanagawa
+noctalia msg panel-toggle launcher
+noctalia msg volume-up
+noctalia msg panel-toggle control-center history
+noctalia msg settings-toggle
+noctalia msg color-scheme-set builtin Kanagawa
 ```
+
+## Configure Noctalia
+
+Hand-written config is `noctalia/config.toml` (tracked). Anything changed in the
+settings GUI is written to `~/.local/state/noctalia/settings.toml`, which wins
+over the file. If a value in `config.toml` seems ignored, look there.
+`noctalia config validate` checks the file.
+
+Theme colours reach Hyprland and kitty through Noctalia's built-in templates
+(`builtin_ids` in `config.toml`): they render `hypr/noctalia.lua` and
+`kitty/themes/noctalia.conf`, both gitignored, on every palette change.
 
 ## Restart Noctalia
 
 ```bash
-pkill quickshell; qs -c noctalia-shell &
+systemctl --user restart noctalia-shell.service   # or SUPER+SHIFT+R
 ```
 
 ## Add a Hyprland keybind
@@ -38,7 +49,7 @@ Edit `~/.config/hypr/config/keybinds.lua`. The file already defines `mod` (from
 `config.defaults`) and an `ipc` string for Noctalia commands:
 
 ```lua
-hl.bind(mod .. " + X", hl.dsp.exec_cmd(ipc .. " <target> <function>"))
+hl.bind(mod .. " + X", hl.dsp.exec_cmd(ipc .. " <command>"))
 ```
 
 Then reload: `hyprctl reload`

@@ -121,14 +121,11 @@ cliamp
 # Parsed by install.sh / update.sh — do not rename the marker line above.
 # ================================================================
 
-# Desktop shell
-noctalia-shell
+# Desktop shell (v5, native C++; the v4 noctalia-shell/noctalia-qs pair is legacy)
+noctalia
 
 # Authentication agent (Omarchy's shell ships its own polkit agent)
 polkit-gnome
-
-# Clipboard history (Omarchy's shell keeps its own history)
-cliphist
 
 # System tray applets (Omarchy's bar has network/bluetooth widgets)
 network-manager-applet
@@ -154,8 +151,7 @@ ly
 # ================================================================
 
 # Upstream Quickshell, which the Omarchy shell (bar, notifications, OSD,
-# lock screen) runs on. This must be the real `quickshell` package: the
-# Noctalia fork `noctalia-qs` also Provides+Conflicts `quickshell`, so if it
-# is installed first, pacman treats Omarchy's dependency as satisfied and
-# omarchy-shell dies at startup with a Qt symbol lookup error.
+# lock screen) runs on. Must be the real `quickshell`: Noctalia 4's fork
+# `noctalia-qs` Provides+Conflicts it and breaks omarchy-shell. Noctalia 5
+# no longer uses Quickshell, so this only matters if v4 is ever reinstalled.
 quickshell

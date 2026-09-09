@@ -1,0 +1,58 @@
+# Noctalia v5 config. Hand-written layer; GUI overrides land in
+# ~/.local/state/noctalia/settings.toml and win over this file.
+# Reference: https://docs.noctalia.dev/noctalia/  (defaults: example.toml in the repo)
+
+[shell]
+font_family   = "Sans Serif"
+time_format   = "{:%H:%M:%S}"
+polkit_agent  = false               # polkit-gnome is started from hypr/config/autostart.lua
+clipboard_enabled = true            # replaces cliphist + wl-paste watchers
+
+[theme]
+mode    = "dark"
+source  = "builtin"
+builtin = "Ayu"
+
+[theme.templates]
+enable_builtin_templates = true
+# hyprland -> ~/.config/hypr/noctalia.lua (border colours), required from hyprland.lua
+# kitty    -> ~/.config/kitty/themes/noctalia.conf, included from kitty.conf
+builtin_ids = ["hyprland", "kitty"]
+
+[wallpaper]
+enabled             = true
+fill_mode           = "crop"
+directory           = "~/Pictures/Wallpapers"
+transition          = ["fade", "disc", "stripes", "wipe", "zoom", "honeycomb"]
+transition_duration = 1500
+
+[weather]
+enabled = true
+unit    = "celsius"
+
+[location]
+address = "Denver"
+
+[nightlight]
+enabled = false
+
+[lockscreen]
+enabled = true
+
+# Idle is owned by hypridle (hypr/hypridle-{ac,battery}.conf); it calls
+# `noctalia msg session lock`, so Noctalia's own idle timers stay off.
+[idle.behavior.lock]
+enabled = false
+[idle.behavior.screen-off]
+enabled = false
+
+[bar.main]
+position           = "top"
+background_opacity = 0.93
+radius             = 12
+start  = ["workspaces", "lock-keys", "active-window"]
+center = ["clock"]
+end    = ["media", "volume", "tray", "sysmon", "brightness", "notifications", "control-center", "battery"]
+
+[widget.clock]
+format = "{:%H:%M:%S}"

@@ -45,9 +45,8 @@ if omarchy_installed() then
 end
 
 -- ================= Noctalia stack =================
--- Migrated from hyprland.conf (hyprlang). noctalia-colors.conf is still
--- generated as hyprlang by noctalia-shell and parsed by
--- config/noctalia_colors.lua.
+-- Migrated from hyprland.conf (hyprlang). Border colours come from
+-- hypr/noctalia.lua, rendered by Noctalia 5's theme template (see the end).
 --
 -- Monitors are hand-written in config/monitors.lua, keyed by EDID
 -- description rather than connector name so one file serves every
@@ -82,5 +81,9 @@ hl.workspace_rule({ workspace = "8",  default_name = "work" })
 hl.workspace_rule({ workspace = "9",  default_name = "game" })
 hl.workspace_rule({ workspace = "10", default_name = "config" })
 
--- Noctalia theme colors last so they override defaults (as before)
-require("config.noctalia_colors")
+-- For Noctalia Color templates
+-- Noctalia's built-in "hyprland" template renders hypr/noctalia.lua (gitignored)
+-- from the active palette. Loaded last so the border colours win. Guarded so a
+-- fresh machine boots before Noctalia has rendered it once.
+local ok, noctalia = pcall(function() return require("noctalia") end)
+if ok and noctalia then noctalia.apply_theme() end

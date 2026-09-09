@@ -98,3 +98,7 @@ omarchy/hooks/**/*.hook
 
 # Editor/template backups left by the Omarchy config port.
 **/*.omarchy-template.bak
+
+# Rendered by Noctalia v5 theme templates on every palette change
+hypr/noctalia.lua
+kitty/themes/noctalia.conf
