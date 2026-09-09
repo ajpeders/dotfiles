@@ -82,6 +82,15 @@ else
     print_info "Mode: FULL DESKTOP / $(desktop_label)"
 fi
 
+aur_helper=""
+detect_aur_helper() {
+    if command -v paru >/dev/null 2>&1 && paru --version >/dev/null 2>&1; then
+        aur_helper="paru"
+        return 0
+    fi
+    return 1
+}
+
 phase_pull() {
     print_phase "Phase 1: Pull Latest Changes"
 
@@ -152,8 +161,13 @@ phase_packages() {
         return
     fi
 
-    print_info "Syncing ${#pkgs[@]} packages (new packages will be installed)..."
-    if paru -S --needed --noconfirm "${pkgs[@]}"; then
+    detect_aur_helper || {
+        print_error "No working paru found. Run install.sh once to rebuild paru, then rerun update.sh."
+        return 1
+    }
+
+    print_info "Syncing ${#pkgs[@]} packages with $aur_helper (new packages will be installed)..."
+    if "$aur_helper" -S --needed --noconfirm "${pkgs[@]}"; then
         print_status "Packages up to date"
     else
         print_error "Package sync failed"
