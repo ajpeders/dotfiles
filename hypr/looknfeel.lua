@@ -14,6 +14,12 @@ hl.config({
     dim_inactive = true,
     dim_strength = 0.15,
   },
+
+  dwindle = {
+    -- Omarchy defaults to force_split = 2, which makes new terminals split
+    -- from the focused terminal. Restore Hyprland's automatic placement.
+    force_split = 0,
+  },
 })
 
 -- The old desktop config ran blur (size 10, passes 3) and shadows. Omarchy

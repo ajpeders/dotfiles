@@ -29,6 +29,7 @@
 !git/
 !tmux/
 !nvim/
+!opencode/
 !systemd/
 !systemd/user/
 !systemd/user/noctalia-shell.service
@@ -59,6 +60,7 @@
 !git/**
 !tmux/**
 !nvim/**
+!opencode/opencode.json
 !omarchy/extensions/**
 !omarchy/branding/**
 !omarchy/themes/**

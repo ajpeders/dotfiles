@@ -227,7 +227,7 @@ phase_preflight() {
     echo "  - Install paru if needed"
     if [ "$HEADLESS" -eq 1 ]; then
         echo "  - Install headless packages from packages.txt (GUI packages skipped)"
-        echo "  - Link CLI dotfiles into ~/.config (shell, editor, tmux, yazi, git)"
+        echo "  - Link CLI dotfiles into ~/.config (shell, editor, tmux, yazi, git, opencode)"
         echo "  - Configure zsh, oh-my-zsh, plugins, and powerlevel10k"
         echo "  - Enable NetworkManager, avahi-daemon, and sshd"
         echo "  - Set the system default target to multi-user.target (no graphical login)"
@@ -368,10 +368,10 @@ phase_dotfiles() {
     local config_dirs
     local config_files
     if [ "$HEADLESS" -eq 1 ]; then
-        config_dirs=(zsh yazi git tmux nvim)
+        config_dirs=(zsh yazi git tmux nvim opencode)
         config_files=()
     else
-        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim)
+        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim opencode)
         config_files=(pavucontrol.ini QtProject.conf)
         # Each desktop keeps its own config dir; linking the other one just
         # leaves a dead directory behind.
