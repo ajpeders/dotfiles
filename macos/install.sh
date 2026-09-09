@@ -120,7 +120,7 @@ phase_dotfiles() {
     link "$REPO_DIR/zsh" "$HOME/.config/zsh"
     link "$REPO_DIR/tmux" "$HOME/.config/tmux"
     link "$REPO_DIR/opencode" "$HOME/.config/opencode"
-    link "$REPO_DIR/git/.gitconfig" "$HOME/.gitconfig"
+    link "$REPO_DIR/git" "$HOME/.config/git"
 
     # ZDOTDIR so zsh reads ~/.config/zsh/.zshrc
     if [ ! -f "$HOME/.zshenv" ]; then

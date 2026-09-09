@@ -6,8 +6,7 @@
 -- swapping files per machine:
 --
 --   Omarchy present  -> Omarchy's bootstrap + defaults, then the personal
---                       overrides in hypr/{monitors,input,bindings,
---                       looknfeel,autostart}.lua (M1 Air, Asahi).
+--                       overrides in hypr/omarchy/*.lua (M1 Air, Asahi).
 --   Omarchy absent   -> the Noctalia desktop from hypr/config/*.lua.
 --
 -- Same check scripts/install.sh uses (the `omarchy` package), expressed
@@ -25,7 +24,7 @@ if omarchy_installed() then
     -- Omarchy's bootstrap keeps path setup out of this user config.
     dofile(omarchy_path .. "/default/hypr/bootstrap.lua")
 
-    -- Disable all Omarchy default bindings. Add your own in hypr/bindings.lua.
+    -- Disable all Omarchy default bindings. Add your own in hypr/omarchy/bindings.lua.
     -- omarchy_default_bindings = false
     -- Or disable only bindings for Omarchy's preinstalled apps/web apps:
     -- omarchy_preinstalled_bindings = false
@@ -34,11 +33,11 @@ if omarchy_installed() then
 
     -- Personal overrides load after Omarchy's defaults so package updates
     -- can improve the defaults without rewriting these files.
-    require("hypr.monitors")
-    require("hypr.input")
-    require("hypr.bindings")
-    require("hypr.looknfeel")
-    require("hypr.autostart")
+    require("hypr.omarchy.monitors")
+    require("hypr.omarchy.input")
+    require("hypr.omarchy.bindings")
+    require("hypr.omarchy.looknfeel")
+    require("hypr.omarchy.autostart")
 
     -- Toggle config flags dynamically.
     require("default.hypr.toggles")

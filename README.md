@@ -73,7 +73,7 @@ cost a working desktop.
 > startup with a Qt symbol lookup error — no bar, no notifications, no OSD.
 
 Both stacks share `hypr/hyprland.lua`: it detects Omarchy at runtime and either
-bootstraps Omarchy and loads the personal overrides in `hypr/*.lua`, or loads the
+bootstraps Omarchy and loads the personal overrides in `hypr/omarchy/*.lua`, or loads the
 Noctalia config from `hypr/config/*.lua`. Omarchy overrides load *after* its defaults. Check bindings with `omarchy menu keybindings
 --print`, and validate any change with `hyprctl reload && hyprctl configerrors`.
 
@@ -163,7 +163,7 @@ the catalog does not list yet.
 
 **On the Omarchy stack this table does not apply** — Omarchy ships ~238 of its
 own bindings and they are the source of truth. List them with `omarchy menu
-keybindings --print`. `hypr/bindings.lua` documents how each binding below maps
+keybindings --print`. `hypr/omarchy/bindings.lua` documents how each binding below maps
 onto its Omarchy equivalent, with ready-to-uncomment overrides if the defaults
 fight muscle memory.
 

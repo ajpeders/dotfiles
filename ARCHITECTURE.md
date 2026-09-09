@@ -29,7 +29,7 @@ package (override with `--omarchy` / `--no-omarchy`); `packages.txt` has
   hypridle, hand-written monitors.
 - **Omarchy** (M1 Air, Asahi): Omarchy owns the desktop, shell, themes and
   display manager. The repo carries only the personal overrides in
-  `hypr/{monitors,input,bindings,looknfeel,autostart}.lua` plus the user-owned
+  `hypr/omarchy/*.lua` plus the user-owned
   `omarchy/` config dir.
 
 Both share `hypr/hyprland.lua`. It checks for `/usr/share/omarchy` at load
