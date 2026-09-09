@@ -28,6 +28,12 @@ o.bind("SUPER + F", "Maximize", hl.dsp.window.fullscreen({ mode = "maximized" })
 hl.unbind("SUPER + ALT + F")    -- was: Full width (maximize)
 hl.unbind("SUPER + CTRL + F")   -- was: Tiled full screen
 
+-- Both file-manager bindings. Nothing is bound on the F key afterwards except
+-- SUPER+F; reach the file manager from the Omarchy menu (SUPER+SPACE) or by
+-- launching nautilus directly.
+hl.unbind("SUPER + ALT + SHIFT + F")
+hl.unbind("SUPER + SHIFT + F")
+
 -- ===========================================================================
 -- Control centre submap (SUPER + A)
 -- ===========================================================================
