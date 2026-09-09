@@ -14,14 +14,15 @@ o.bind("SUPER + E", "Browser", { omarchy = "browser" })
 o.bind("SUPER + N", "Notification history", "omarchy-shell notifications showHistory")
 o.bind("SUPER + SHIFT + R", "Restart Omarchy shell", "omarchy restart shell")
 
--- True fullscreen. Note the old config had these swapped relative to Omarchy:
--- SUPER+M was `fullscreen, 0` (real fullscreen) and SUPER+F was `fullscreen, 1`
--- (maximize). Omarchy puts real fullscreen on SUPER+F and maximize on
--- SUPER+ALT+F, so SUPER+M below duplicates SUPER+F. To get the old split back,
--- uncomment the SUPER+F override too.
+-- The old config split these the other way round from Omarchy: SUPER+M was
+-- `fullscreen, 0` (real fullscreen) and SUPER+F was `fullscreen, 1` (maximize,
+-- which respects gaps and the bar). Omarchy puts real fullscreen on SUPER+F and
+-- maximize on SUPER+ALT+F. Restored to the old split here.
 o.bind("SUPER + M", "Full screen", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
--- hl.unbind("SUPER + F")
--- o.bind("SUPER + F", "Full width", hl.dsp.window.fullscreen({ mode = "maximized" }))
+
+-- was: Full screen. Omarchy's SUPER+ALT+F also maximizes and stays bound.
+hl.unbind("SUPER + F")
+o.bind("SUPER + F", "Maximize", hl.dsp.window.fullscreen({ mode = "maximized" }))
 
 -- ===========================================================================
 -- Control centre submap (SUPER + A)
