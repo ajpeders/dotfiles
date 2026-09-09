@@ -9,7 +9,7 @@
 # ~/.local/state (next to dotfiles-mode) rather than ~/.config because on Arch
 # the repo IS ~/.config — anything there would be inside the working tree. The
 # URL is a LAN address that differs per machine and must not reach the public
-# mirror. Continue (VS Code) gets the same address in ~/.continue/.env.
+# mirror.
 #
 # Safe to re-run; re-running just re-probes and rewrites the same file.
 
@@ -22,7 +22,6 @@ REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ENV_DIR="$HOME/.local/state/dotfiles"
 ENV_FILE="$ENV_DIR/llm.env"
 OPENCODE_CONFIG="$REPO_DIR/opencode/opencode.json"
-CONTINUE_ENV="$HOME/.continue/.env"
 PROVIDER="ollama"
 
 RED='\033[0;31m'
@@ -159,22 +158,6 @@ export LLM_SERVER_URL="$BASE_URL"
 export LLM_MODEL="$MODEL_ID"
 EOF
 print_status "Wrote $ENV_FILE"
-
-# Continue (VS Code) keeps its own secrets file. Its ollama provider speaks the
-# native API, so it wants the bare root without the /v1 that opencode needs.
-if [ -d "$(dirname "$CONTINUE_ENV")" ]; then
-    CONTINUE_BASE="${BASE_URL%/v1}"
-    CONTINUE_BASE="${CONTINUE_BASE%/}"
-    cat > "$CONTINUE_ENV" <<EOF
-# Written by scripts/setup-llm.sh — per-machine, intentionally outside the repo.
-# Continue resolves \${{ secrets.LLM_SERVER_BASE }} in continue/config.yaml here.
-LLM_SERVER_BASE=$CONTINUE_BASE
-EOF
-    chmod 600 "$CONTINUE_ENV"
-    print_status "Wrote $CONTINUE_ENV"
-else
-    print_info "No ~/.continue directory; skipping Continue wiring"
-fi
 
 # ---------- 5. Check the model has a catalog entry ----------
 
