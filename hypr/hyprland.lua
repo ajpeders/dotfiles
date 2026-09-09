@@ -1,11 +1,56 @@
 -- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 -- ┃                   Hyprland Configuration (Lua)              ┃
 -- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
--- Migrated from hyprland.conf (hyprlang). noctalia-colors.conf is
--- still generated as hyprlang by noctalia-shell and parsed by
+-- One entry point for two desktop stacks. Hyprland always loads this
+-- file, so the stack is chosen here at load time rather than by
+-- swapping files per machine:
+--
+--   Omarchy present  -> Omarchy's bootstrap + defaults, then the personal
+--                       overrides in hypr/{monitors,input,bindings,
+--                       looknfeel,autostart}.lua (M1 Air, Asahi).
+--   Omarchy absent   -> the Noctalia desktop from hypr/config/*.lua.
+--
+-- Same check scripts/install.sh uses (the `omarchy` package), expressed
+-- as the path that package owns.
+
+local omarchy_path = os.getenv("OMARCHY_PATH") or "/usr/share/omarchy"
+local function omarchy_installed()
+    local f = io.open(omarchy_path .. "/default/hypr/bootstrap.lua", "r")
+    if f then f:close() return true end
+    return false
+end
+
+if omarchy_installed() then
+    -- ================= Omarchy stack =================
+    -- Omarchy's bootstrap keeps path setup out of this user config.
+    dofile(omarchy_path .. "/default/hypr/bootstrap.lua")
+
+    -- Disable all Omarchy default bindings. Add your own in hypr/bindings.lua.
+    -- omarchy_default_bindings = false
+    -- Or disable only bindings for Omarchy's preinstalled apps/web apps:
+    -- omarchy_preinstalled_bindings = false
+
+    require("default.hypr.omarchy")
+
+    -- Personal overrides load after Omarchy's defaults so package updates
+    -- can improve the defaults without rewriting these files.
+    require("hypr.monitors")
+    require("hypr.input")
+    require("hypr.bindings")
+    require("hypr.looknfeel")
+    require("hypr.autostart")
+
+    -- Toggle config flags dynamically.
+    require("default.hypr.toggles")
+    return
+end
+
+-- ================= Noctalia stack =================
+-- Migrated from hyprland.conf (hyprlang). noctalia-colors.conf is still
+-- generated as hyprlang by noctalia-shell and parsed by
 -- config/noctalia_colors.lua.
 --
--- Monitors are now hand-written in config/monitors.lua, keyed by EDID
+-- Monitors are hand-written in config/monitors.lua, keyed by EDID
 -- description rather than connector name so one file serves every
 -- setup. monitors.conf (nwg-displays) is dead — see HOWTO.md.
 

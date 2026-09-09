@@ -18,6 +18,25 @@ Dotfiles managed as a git repo at `~/.config/`. The `scripts/install.sh` script 
 └─────────────────────────────────────────┘
 ```
 
+## Two Desktop Stacks
+
+Linux machines run one of two desktops on top of Hyprland. `scripts/install.sh`
+and `scripts/update.sh` detect which by checking for the `omarchy` pacman
+package (override with `--omarchy` / `--no-omarchy`); `packages.txt` has
+`NOCTALIA` and `OMARCHY` sections gated by the same check.
+
+- **Noctalia** (desktops): the config described below. Noctalia shell, `ly`,
+  hypridle, hand-written monitors.
+- **Omarchy** (M1 Air, Asahi): Omarchy owns the desktop, shell, themes and
+  display manager. The repo carries only the personal overrides in
+  `hypr/{monitors,input,bindings,looknfeel,autostart}.lua` plus the user-owned
+  `omarchy/` config dir.
+
+Both share `hypr/hyprland.lua`. It checks for `/usr/share/omarchy` at load
+time: present, it runs Omarchy's bootstrap and the overrides; absent, it
+`require`s the Noctalia modules from `hypr/config/`. Keeping one entry point
+means Hyprland's fixed config path never has to differ between machines.
+
 ## Config Structure
 
 Hyprland config is native Lua (Hyprland 0.56+), split across `hypr/config/*.lua`

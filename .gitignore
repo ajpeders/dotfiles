@@ -46,6 +46,15 @@ opencode/.gitignore
 !librewolf/
 !librewolf/policies.json
 
+# Omarchy (4.x) user-owned config. Omarchy itself lives in /usr/share/omarchy
+# and is package-managed; only these user override files belong in the repo.
+!omarchy/
+!omarchy/shell.json
+!omarchy/extensions/
+!omarchy/branding/
+!omarchy/themes/
+!omarchy/hooks/
+
 # Keep config files in tracked directories
 !hypr/**
 !theme/**
@@ -60,6 +69,10 @@ opencode/.gitignore
 !git/**
 !tmux/**
 !nvim/**
+!omarchy/extensions/**
+!omarchy/branding/**
+!omarchy/themes/**
+!omarchy/hooks/**
 
 # Ignore generated hypridle symlink (written by scripts/hypridle-power.sh;
 # points at hypridle-ac.conf or hypridle-battery.conf depending on power source)
@@ -77,3 +90,11 @@ zsh/.zsh_sessions/
 **/*.bak-*
 # Ignore installer backups (install.sh writes <file>.pre-dotfiles before symlinking)
 **/*.pre-dotfiles
+
+# Omarchy ships these as stock samples / installs them on update; they are not
+# user configuration and would churn on every `omarchy update`.
+omarchy/hooks/**/*.sample
+omarchy/hooks/**/*.hook
+
+# Editor/template backups left by the Omarchy config port.
+**/*.omarchy-template.bak
