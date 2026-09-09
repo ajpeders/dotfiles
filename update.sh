@@ -1,10 +1,15 @@
 #!/bin/bash
 # Arch Linux dotfiles update script.
-# Usage: bash update.sh [--headless | --full]
+# Usage: bash update.sh [--headless | --full] [--omarchy | --no-omarchy]
 # Run from within the dotfiles repo. Pulls latest changes and syncs everything.
 #
 # If no flag is given, mode is read from ~/.local/state/dotfiles-mode
 # (written by install.sh); falls back to full-desktop mode if absent.
+#
+# The desktop stack is detected from the installed omarchy package, falling
+# back to ~/.local/state/dotfiles-desktop. Override with --omarchy /
+# --no-omarchy. This script never installs Omarchy; use
+# `install.sh --install-omarchy` for that.
 
 set -euo pipefail
 
@@ -35,7 +40,9 @@ for arg in "$@"; do
         --omarchy)     OMARCHY=1 ;;
         --no-omarchy)  OMARCHY=0 ;;
         --help|-h)
-            sed -n '2,8p' "$0" | sed 's/^# \?//'
+            # Print the whole leading comment block, so editing the header
+            # above cannot silently truncate --help.
+            awk 'NR>1 { if (/^#/) { sub(/^# ?/, ""); print } else { exit } }' "$0"
             exit 0
             ;;
         *)

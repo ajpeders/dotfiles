@@ -27,6 +27,21 @@ Omarchy shell then crashes at startup with a Qt `symbol lookup error` and there
 is no bar, no notifications and no OSD. `packages.txt` puts each package in its
 own gated section so a resync can never reintroduce this.
 
+## Installing Omarchy
+
+`install.sh --install-omarchy` (aarch64 only, implies `--omarchy`) bootstraps
+Omarchy via [omarchy-mac](https://github.com/omacom/omarchy-mac) `quattro`,
+checked out to `~/.local/share/omarchy`. It runs as `phase_omarchy`, second,
+deliberately **before `phase_dotfiles`** — the fork's installer ends in
+`seed_user_defaults`, which overwrites tracked configs (it replaced
+`kitty.conf` and `tmux.conf` here), so dotfiles must be applied after it.
+
+Omarchy's `bootstrap.sh` is not used: it runs as root on a bare system and
+creates the user, which is upstream of this repo entirely.
+
+`verify_omarchy_shell_stack` runs whenever Omarchy is present and fails loudly
+on the `noctalia-qs` / `quickshell` conflict described above.
+
 ## Omarchy specifics
 
 - **Never edit `/usr/share/omarchy/`** — package-owned, overwritten on update.

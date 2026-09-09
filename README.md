@@ -37,6 +37,36 @@ The result is recorded in `~/.local/state/dotfiles-desktop`. `packages.txt` is
 split by the same markers, so an Omarchy box never installs `noctalia-shell`,
 `ly` or `hypridle`, and a Noctalia box never installs upstream `quickshell`.
 
+### Installing Omarchy from here
+
+On a machine that does not have Omarchy yet:
+
+```bash
+bash install.sh --install-omarchy     # implies --omarchy; aarch64 only
+```
+
+This runs *before* the dotfiles phase, because Omarchy's installer ends in
+`seed_user_defaults`, which copies its stock configs into `~/.config` and will
+overwrite tracked files. Applying dotfiles afterwards is what makes ours win.
+
+Apple Silicon cannot use the upstream route: Omarchy 4 installs from an ISO
+that has no aarch64 build and cannot boot a Mac. The flag therefore delegates
+to [omarchy-mac](https://github.com/omacom/omarchy-mac) (branch `quattro`),
+which builds the `arch=any` Omarchy packages from a checkout in
+`~/.local/share/omarchy` and installs them the way the ISO would. Without the
+flag nothing is installed — bootstrapping a desktop should never be a side
+effect of a resync. On x86_64 the phase refuses and points at omarchy.org
+rather than guessing.
+
+Omarchy's own `bootstrap.sh` is a different thing and is *not* wired in: it
+runs as root on a bare Asahi system and creates the user account, so it has to
+run before these dotfiles exist.
+
+After install (and on every run where Omarchy is present) the phase asserts the
+shell stack is sound — real `quickshell` present, `noctalia-qs` absent, and the
+binary actually executes. That combination failed silently on this machine and
+cost a working desktop.
+
 > **Do not install `noctalia-qs` on an Omarchy machine.** It declares both
 > `Provides: quickshell` and `Conflicts: quickshell`, so pacman treats
 > Omarchy's dependency as already satisfied and the Omarchy shell dies at
