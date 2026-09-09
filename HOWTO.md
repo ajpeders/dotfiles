@@ -122,6 +122,61 @@ before committing to it.
   config uses. Test a candidate mode **under load**, not just by checking that
   the image appears.
 
+## VPN
+
+Two independent VPNs. AmneziaWG is never enabled at boot; `tailscaled.service` is enabled by the installer but the tailnet stays down until `ts-up`. Helpers live in `zsh/.zshrc`.
+
+| | AmneziaWG (home server) | Tailscale |
+|---|---|---|
+| Reaches | wg-easy on the home server | any machine on the tailnet |
+| Routing | full-tunnel (`0.0.0.0/0`, `::/0`) | tailnet only (`100.64.0.0/10`) |
+| Up / down | `vpn-up [name]` / `vpn-down [name]` | `ts-up` / `ts-down` |
+| Status | `vpn-status` | `ts-status` |
+
+### WireGuard / AmneziaWG
+
+We use the userspace `amneziawg-go` rather than a DKMS kernel module, because out-of-tree modules are fragile on the Asahi kernel. `awg-quick` handles both obfuscated and plain WireGuard configs — with no `Jc`/`S1`/`S2`/`H1..H4` keys present it falls back to standard WireGuard framing — so `wireguard-tools` is not installed and `wg`/`wg-quick` are unavailable. Use `awg`/`awg-quick`.
+
+Client configs are **not in this repo** (they hold private keys). They live in `~/.config/wireguard/`, mode `600`, covered by the catch-all ignore in `.gitignore`. `vpn-list` shows what's available:
+
+| Config | Address | Issued | Obfuscation |
+|---|---|---|---|
+| `alex` | `10.8.0.2` | 2026-07-04 | AmneziaWG (all 9 params) |
+| `isis` | `10.8.0.16` | 2026-08-20 | none — plain WireGuard |
+
+Both point at the same server (`vpn.thelunadog.com:51820`, same peer public key); they're separate client slots with different preshared keys. `vpn-up` defaults to `$VPN_DEFAULT` (currently `alex`); pass a name to override:
+
+```bash
+vpn-up isis
+```
+
+**`awg-quick` names the interface after the filename, and Linux caps interface names at 15 characters.** wg-easy exports long names like `isis_alex_macm1_20260820.conf` (24 chars) which fail to come up — rename on install:
+
+```bash
+install -Dm600 /dev/stdin ~/.config/wireguard/<short-name>.conf   # paste, then Ctrl-D
+vpn-up <short-name>
+```
+
+### Tailscale
+
+First-time login on a machine (needs a browser for SSO — the URL is printed if you're headless):
+
+```bash
+sudo systemctl start tailscaled
+sudo tailscale up --accept-dns=false
+```
+
+After that, `ts-up` does both steps. `--accept-dns=false` is deliberate: Tailscale's MagicDNS and the AmneziaWG tunnel both want to own `systemd-resolved`, and whichever came up last would win. The cost is that MagicDNS short names don't resolve — use tailnet IPs or fully-qualified names. Drop the flag if you stop using the WireGuard tunnel.
+
+To route all traffic through a tailnet exit node instead: `ts-up --exit-node=<host>`.
+
+### Gotchas
+
+- **Don't run both full-tunnel at once.** The WireGuard tunnel already takes `0.0.0.0/0`; adding a Tailscale exit node on top means two competing default routes. Pick one. The same goes for two WireGuard configs — `vpn-down` the current one before bringing another up.
+- **`isis` is unverified.** It carries no obfuscation params, but the server was set up with AmneziaWG obfuscation specifically because plain WireGuard couldn't handshake. If `vpn-up isis` shows no handshake in `vpn-status`, the server hasn't been switched to plain WireGuard and `alex` is still the working config.
+- If `tailscale status` says it can't reach the daemon, `tailscaled.service` isn't running (older installs didn't enable it). `ts-up` starts it before connecting.
+- **MTU.** The tunnel is pinned to 1420. Tailscale inside the WireGuard tunnel means double encapsulation; if TCP stalls on large transfers while both are up, that's the first thing to suspect.
+
 ## macOS: mount luna SMB share on login
 
 The share lives on the home server ISIS and is mounted as

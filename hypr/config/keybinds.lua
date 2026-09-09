@@ -9,7 +9,7 @@ hl.bind(mod .. " + Return",    hl.dsp.exec_cmd(d.terminal))
 hl.bind(mod .. " + Q",         hl.dsp.window.close())
 hl.bind(mod .. " + SHIFT + Q", hl.dsp.exit())
 hl.bind(mod .. " + E",         hl.dsp.exec_cmd(d.browser))
-hl.bind(mod .. " + B",         hl.dsp.exec_cmd(d.terminal .. " btop"))
+hl.bind(mod .. " + SHIFT + B", hl.dsp.exec_cmd(d.terminal .. " btop"))
 hl.bind(mod .. " + Space",     hl.dsp.exec_cmd(ipc .. " launcher toggle"))
 hl.bind(mod .. " + V",         hl.dsp.exec_cmd(ipc .. " launcher clipboard"))
 hl.bind(mod .. " + J",         hl.dsp.layout("togglesplit"))
@@ -25,6 +25,29 @@ hl.bind(mod .. " + L",     hl.dsp.exec_cmd(ipc .. " lockScreen lock"))
 hl.bind(mod .. " + O",     hl.dsp.exec_cmd(ipc .. " sessionMenu toggle"))
 -- Restart the shell (recovery after a crash, e.g. Bluetooth disconnect segfault)
 hl.bind(mod .. " + SHIFT + R", hl.dsp.exec_cmd("systemctl --user restart noctalia-shell.service"))
+-- Keep-awake / caffeine: toggle the idle inhibitor (blocks hypridle dim/lock/suspend).
+-- SHIFT+A toggles indefinitely; CTRL+A keeps awake for 1 hour then auto-releases.
+hl.bind(mod .. " + SHIFT + A", hl.dsp.exec_cmd(ipc .. " idleInhibitor toggle"))
+hl.bind(mod .. " + CTRL + A",  hl.dsp.exec_cmd(ipc .. " idleInhibitor enableFor 3600"))
+
+-- ====== Brightness (laptop) ======
+-- SUPER+B opens a submap: Up/Down or +/- = screen, Left/Right = keyboard
+-- backlight, Esc/Enter/B exits. SUPER+K cycles the keyboard backlight 0->100->0.
+local kbd = "brightnessctl --device=kbd_backlight set"
+hl.define_submap("brightness", function()
+    hl.bind("up",    hl.dsp.exec_cmd(ipc .. " brightness increase"), { repeating = true })
+    hl.bind("down",  hl.dsp.exec_cmd(ipc .. " brightness decrease"), { repeating = true })
+    hl.bind("equal", hl.dsp.exec_cmd(ipc .. " brightness increase"), { repeating = true })
+    hl.bind("minus", hl.dsp.exec_cmd(ipc .. " brightness decrease"), { repeating = true })
+    hl.bind("right", hl.dsp.exec_cmd(kbd .. " 10%+"), { repeating = true })
+    hl.bind("left",  hl.dsp.exec_cmd(kbd .. " 10%-"), { repeating = true })
+    hl.bind("escape",       hl.dsp.submap("reset"))
+    hl.bind("Return",       hl.dsp.submap("reset"))
+    hl.bind("b",            hl.dsp.submap("reset"))
+    hl.bind(mod .. " + b",  hl.dsp.submap("reset"))
+end)
+hl.bind(mod .. " + B", hl.dsp.submap("brightness"))
+hl.bind(mod .. " + K", hl.dsp.exec_cmd("~/.config/hypr/scripts/kbd-backlight-cycle.sh"))
 
 -- ====== Screenshots ======
 hl.bind(mod .. " + P",          hl.dsp.exec_cmd("grim " .. shot))
@@ -68,6 +91,8 @@ hl.bind("XF86AudioMute",         hl.dsp.exec_cmd(ipc .. " volume muteOutput"),  
 hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd(ipc .. " volume muteInput"),     { locked = true })
 hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd(ipc .. " brightness increase"),  { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. " brightness decrease"),  { locked = true, repeating = true })
+hl.bind("XF86KbdBrightnessUp",   hl.dsp.exec_cmd(kbd .. " 10%+"),                 { locked = true, repeating = true })
+hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd(kbd .. " 10%-"),                 { locked = true, repeating = true })
 hl.bind("XF86AudioNext",         hl.dsp.exec_cmd(ipc .. " media next"),           { locked = true })
 hl.bind("XF86AudioPause",        hl.dsp.exec_cmd(ipc .. " media playPause"),      { locked = true })
 hl.bind("XF86AudioPlay",         hl.dsp.exec_cmd(ipc .. " media playPause"),      { locked = true })
