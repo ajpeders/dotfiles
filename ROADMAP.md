@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, notifications, volume, clipboard, lock screen) all working via Noctalia IPC.
+Desktop shell is moving from the older Noctalia stack to Omarchy-managed Hyprland with personal dotfile overrides layered on top.
 
 ## Done
 
@@ -15,6 +15,7 @@ Desktop shell is functional with Noctalia on Hyprland. Core workflow (launcher, 
 
 ## Next
 
+- [ ] Integrate Omarchy and personal dotfiles more tightly: document ownership boundaries, reduce duplicated Hypr/desktop config, and make install/update behavior clearer across Omarchy, Noctalia, headless, and macOS machines
 - [ ] Test install.sh on a fresh system
 - [ ] Review wlsunset — Noctalia has built-in night light, may be redundant
 

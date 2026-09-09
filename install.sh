@@ -245,15 +245,29 @@ phase_preflight() {
     [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 }
 
+aur_helper=""
+
+detect_aur_helper() {
+    if command -v paru >/dev/null 2>&1 && paru --version >/dev/null 2>&1; then
+        aur_helper="paru"
+        return 0
+    fi
+    return 1
+}
+
 phase_paru() {
     print_phase "Phase 3: AUR Helper (paru)"
 
     print_info "Ensuring base-devel and git are installed..."
     sudo pacman -S --needed --noconfirm base-devel git
 
-    if command -v paru >/dev/null 2>&1; then
+    if detect_aur_helper; then
         print_status "paru already installed ($(paru --version | head -n 1))"
         return
+    fi
+
+    if command -v paru >/dev/null 2>&1; then
+        print_info "paru is installed but cannot start; rebuilding it against current pacman..."
     fi
 
     local tmp
@@ -265,6 +279,7 @@ phase_paru() {
     rm -rf "$tmp"
 
     print_status "paru installed"
+    aur_helper="paru"
 }
 
 read_packages() {
@@ -315,9 +330,14 @@ phase_packages() {
     fi
 
     local failed=()
-    print_info "Installing ${#pkgs[@]} packages via paru; already-installed packages are skipped..."
+    detect_aur_helper || {
+        print_error "No working paru found"
+        return 1
+    }
+
+    print_info "Installing ${#pkgs[@]} packages via $aur_helper; already-installed packages are skipped..."
     for pkg in "${pkgs[@]}"; do
-        paru -S --needed --noconfirm "$pkg" || {
+        "$aur_helper" -S --needed --noconfirm "$pkg" || {
             print_error "Failed to install: $pkg (skipping)"
             failed+=("$pkg")
         }
