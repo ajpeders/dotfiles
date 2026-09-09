@@ -13,6 +13,7 @@
 !scripts/
 !scripts/**
 !packages.txt
+!packages-asahi.txt
 !hypr/
 !theme/
 !kitty/
@@ -59,6 +60,10 @@ opencode/.gitignore
 !git/**
 !tmux/**
 !nvim/**
+
+# Ignore generated hypridle symlink (written by scripts/hypridle-power.sh;
+# points at hypridle-ac.conf or hypridle-battery.conf depending on power source)
+hypr/hypridle.conf
 
 # Ignore generated zsh runtime files
 zsh/.zcompdump*

@@ -126,6 +126,35 @@ fi
 alias ls='eza --icons'
 alias lc='eza -la --icons --group-directories-first'
 
+# --- VPN ---------------------------------------------------------------------
+# Two independent VPNs, neither enabled at boot; bring up whichever you need.
+#
+# 1. WireGuard -> home wg-easy server. Full-tunnel (0.0.0.0/0) and it pushes its
+#    own DNS into systemd-resolved, so it's disruptive to leave running.
+#    Configs are git-ignored in ~/.config/wireguard/; awg-quick takes the
+#    interface name from the filename, so keep those names <=15 chars.
+#      alex - original client (10.8.0.2), has the AmneziaWG obfuscation params
+#      isis - reissued 2026-08-20 (10.8.0.16), plain WireGuard, no obfuscation
+#    Pass a name to pick one (`vpn-up isis`), or set VPN_DEFAULT.
+VPN_DEFAULT=alex
+vpn-up()   { sudo awg-quick up   ~/.config/wireguard/"${1:-$VPN_DEFAULT}".conf }
+vpn-down() { sudo awg-quick down ~/.config/wireguard/"${1:-$VPN_DEFAULT}".conf }
+alias vpn-status='sudo awg show'
+alias vpn-list='print -l ~/.config/wireguard/*.conf(N:t:r)'
+
+# 2. Tailscale. --accept-dns=false keeps tailscaled out of systemd-resolved so
+#    it can't fight the DNS the AmneziaWG tunnel pushes; the tradeoff is that
+#    MagicDNS short names don't resolve (use tailnet IPs or full names).
+#    ts-up starts tailscaled in case it isn't running yet. Extra args
+#    pass through, e.g. `ts-up --exit-node=<host>`.
+ts-up() {
+  sudo systemctl start tailscaled && sudo tailscale up --accept-dns=false "$@"
+}
+ts-down() {
+  sudo tailscale down && sudo systemctl stop tailscaled
+}
+alias ts-status='tailscale status'
+
 # Default cliamp to the Plex provider on launch
 alias cliamp='cliamp --provider plex'
 

@@ -132,6 +132,17 @@ read_packages() {
         [ -n "$line" ] || continue
         pkgs+=("$line")
     done < "$REPO_DIR/packages.txt"
+
+    # Apple Silicon (Asahi) extras. Kept out of packages.txt so x86 never
+    # tries to build them from the AUR.
+    if [ "$(uname -m)" = "aarch64" ] && [ -f "$REPO_DIR/packages-asahi.txt" ]; then
+        while IFS= read -r line; do
+            line="${line%%#*}"
+            line="${line//[[:space:]]/}"
+            [ -n "$line" ] || continue
+            pkgs+=("$line")
+        done < "$REPO_DIR/packages-asahi.txt"
+    fi
 }
 
 phase_packages() {
