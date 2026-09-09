@@ -51,9 +51,9 @@ position           = "top"
 thickness          = 36
 background_opacity = 0.93
 radius             = 0
-margin_ends        = 0              # v5 default is 180 (floating pill); v4 bar was flush and full width
+margin_ends        = 6              # small gap at the bar ends; top stays flush (margin_edge = 0)
 margin_edge        = 0
-padding            = 8
+padding            = 10
 widget_spacing     = 6
 start  = ["launcher", "workspaces"]
 center = []
