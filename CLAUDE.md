@@ -8,7 +8,7 @@ Scripts pick one automatically by checking whether the `omarchy` pacman package 
 
 | | **Noctalia** (desktops) | **Omarchy** (M1 Air, Asahi) |
 |---|---|---|
-| Hyprland config | `hypr/hyprland.lua` → `hypr/config/*.lua` | same entry point → Omarchy bootstrap + overrides in `hypr/{monitors,input,bindings,looknfeel,autostart}.lua` |
+| Hyprland config | `hypr/hyprland.lua` → `hypr/config/*.lua` | same entry point → Omarchy bootstrap + overrides in `hypr/omarchy/*.lua` |
 | Shell / bar | `noctalia-shell` systemd user service | Omarchy shell (Quickshell) via `omarchy-launch-shell` |
 | Quickshell pkg | `noctalia-qs` (fork) | upstream `quickshell` |
 | Display manager | `ly` | sddm (an `omarchy` dependency) |
@@ -33,7 +33,7 @@ Scripts pick one automatically by checking whether the `omarchy` pacman package 
 ## Omarchy stack
 
 - **Never edit `/usr/share/omarchy/`** — package-owned, overwritten on update. Reading it is fine and is the best reference.
-- Keep only genuine deltas in the `hypr/*.lua` overrides. Rebinding a key Omarchy already binds requires `hl.unbind(...)` first. `omarchy menu keybindings --print` lists the defaults.
+- Keep only genuine deltas in the `hypr/omarchy/*.lua` overrides. Rebinding a key Omarchy already binds requires `hl.unbind(...)` first. `omarchy menu keybindings --print` lists the defaults.
 - Omarchy provides its own polkit agent and clipboard history, so `polkit-gnome` and `cliphist` are not needed there.
 - `scripts/install.sh --install-omarchy` (aarch64 only) bootstraps Omarchy via omarchy-mac `quattro` in `~/.local/share/omarchy`, *before* the dotfiles phase because its installer overwrites tracked configs.
 - The Air is the always-on "kitchen Alexis" host: never idle-suspend. Enforced by `/etc/systemd/logind.conf.d/10-kitchen-power.conf`.
