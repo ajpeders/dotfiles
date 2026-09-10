@@ -64,7 +64,7 @@ padding            = 10
 widget_spacing     = 6
 start  = ["workspaces"]
 center = []
-end    = ["group:tray", "clock", "media", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
+end    = ["group:tray", "clock", "media", "audio-vis", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
 
 # Tray collapses to a chevron; hovering it unfolds the icons to the LEFT
 # (accordion group, reveal direction "start"). Right-click an icon > Pin is
@@ -88,6 +88,13 @@ opacity             = 0.0           # no capsule background; reads as plain bar 
 [widget.media]
 max_length   = 360                  # default 220
 title_scroll = "always"             # marquee long titles
+
+[widget.audio-vis]
+type    = "audio_visualizer"        # hides itself when nothing is playing
+width   = 72
+bands   = 20
+color_1 = "primary"
+color_2 = "secondary"
 
 [widget.clock]
 format = "{:%a %b %-d}  {:%H:%M:%S}"
