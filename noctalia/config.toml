@@ -91,8 +91,8 @@ title_scroll = "always"             # marquee long titles
 
 [widget.audio-vis]
 type    = "audio_visualizer"        # hides itself when nothing is playing
-width   = 160
-bands   = 32
+width   = 240
+bands   = 40
 color_1 = "primary"
 color_2 = "secondary"
 
