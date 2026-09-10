@@ -11,6 +11,9 @@ clipboard_enabled = true            # replaces cliphist + wl-paste watchers
 [shell.panel]
 launcher_placement = "floating"
 launcher_position  = "center"       # SUPER+Space opens mid-screen
+control_center_placement = "floating"
+control_center_position  = "top_right"
+open_near_click_control_center = true  # bar click opens under the widget (far right)
 
 [theme]
 mode    = "dark"
@@ -62,6 +65,10 @@ widget_spacing     = 6
 start  = ["workspaces", "media"]
 center = []
 end    = ["tray", "clock", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
+
+[widget.tray]
+drawer         = true               # collapse tray icons behind one button; right-click an icon > Pin to keep it inline
+drawer_columns = 3
 
 [widget.clock]
 format = "{:%a %b %-d}  {:%H:%M:%S}"
