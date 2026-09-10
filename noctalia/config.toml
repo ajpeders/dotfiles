@@ -64,11 +64,26 @@ padding            = 10
 widget_spacing     = 6
 start  = ["workspaces", "media"]
 center = []
-end    = ["tray", "clock", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
+end    = ["group:tray", "clock", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
 
+# Tray collapses to a chevron; hovering it unfolds the icons to the LEFT
+# (accordion group, reveal direction "start"). Right-click an icon > Pin is
+# for the drawer mode only, which this replaces.
 [widget.tray]
-drawer         = true               # collapse tray icons behind one button; right-click an icon > Pin to keep it inline
-drawer_columns = 3
+drawer = false
+
+[widget.tray-handle]
+type    = "custom_button"
+glyph   = "chevron-left"
+tooltip = "Tray"
+
+[[bar.main.capsule_group]]
+id                  = "tray"
+members             = ["tray-handle", "tray"]
+accordion           = true
+accordion_direction = "start"
+padding             = 4
+opacity             = 0.0           # no capsule background; reads as plain bar widgets
 
 [widget.clock]
 format = "{:%a %b %-d}  {:%H:%M:%S}"
