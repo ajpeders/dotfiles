@@ -85,6 +85,10 @@ accordion_direction = "start"
 padding             = 4
 opacity             = 0.0           # no capsule background; reads as plain bar widgets
 
+[widget.media]
+max_length   = 360                  # default 220
+title_scroll = "always"             # marquee long titles
+
 [widget.clock]
 format = "{:%a %b %-d}  {:%H:%M:%S}"
 
