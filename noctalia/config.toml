@@ -62,9 +62,9 @@ margin_ends        = 6              # small gap at the bar ends; top stays flush
 margin_edge        = 0
 padding            = 10
 widget_spacing     = 6
-start  = ["workspaces"]
+start  = ["workspaces", "audio-vis"]
 center = ["clock"]
-end    = ["group:tray", "media", "audio-vis", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
+end    = ["group:tray", "media", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
 
 # Tray collapses to a chevron; hovering it unfolds the icons to the LEFT
 # (accordion group, reveal direction "start"). Right-click an icon > Pin is
