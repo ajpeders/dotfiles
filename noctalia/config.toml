@@ -63,8 +63,8 @@ margin_edge        = 0
 padding            = 10
 widget_spacing     = 6
 start  = ["workspaces"]
-center = []
-end    = ["group:tray", "clock", "media", "audio-vis", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
+center = ["clock"]
+end    = ["group:tray", "media", "audio-vis", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
 
 # Tray collapses to a chevron; hovering it unfolds the icons to the LEFT
 # (accordion group, reveal direction "start"). Right-click an icon > Pin is
