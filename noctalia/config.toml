@@ -8,6 +8,10 @@ time_format   = "{:%H:%M:%S}"
 polkit_agent  = false               # polkit-gnome is started from hypr/config/autostart.lua
 clipboard_enabled = true            # replaces cliphist + wl-paste watchers
 
+[shell.panel]
+launcher_placement = "floating"
+launcher_position  = "center"       # SUPER+Space opens mid-screen
+
 [theme]
 mode    = "dark"
 source  = "builtin"
@@ -61,3 +65,26 @@ end    = ["tray", "clock", "media", "volume", "sysmon", "brightness", "battery",
 
 [widget.clock]
 format = "{:%a %b %-d}  {:%H:%M:%S}"
+
+[control_center]
+sidebar = "full"
+sidebar_section = "full"
+hidden_tabs = []
+
+[[control_center.shortcuts]]
+type = "audio"
+
+[[control_center.shortcuts]]
+type = "mic_mute"
+
+[[control_center.shortcuts]]
+type = "bluetooth"
+
+[[control_center.shortcuts]]
+type = "network"
+
+[[control_center.shortcuts]]
+type = "system"
+
+[[control_center.shortcuts]]
+type = "session"
