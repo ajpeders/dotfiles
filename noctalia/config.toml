@@ -59,9 +59,9 @@ margin_ends        = 6              # small gap at the bar ends; top stays flush
 margin_edge        = 0
 padding            = 10
 widget_spacing     = 6
-start  = ["launcher", "workspaces"]
+start  = ["launcher", "workspaces", "media"]
 center = []
-end    = ["tray", "clock", "media", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
+end    = ["tray", "clock", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
 
 [widget.clock]
 format = "{:%a %b %-d}  {:%H:%M:%S}"
