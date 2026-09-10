@@ -11,8 +11,7 @@ clipboard_enabled = true            # replaces cliphist + wl-paste watchers
 [shell.panel]
 launcher_placement = "floating"
 launcher_position  = "center"       # SUPER+Space opens mid-screen
-control_center_placement = "floating"
-control_center_position  = "top_right"
+control_center_placement = "attached"   # near-click only works when attached
 open_near_click_control_center = true  # bar click opens under the widget (far right)
 
 [theme]
@@ -64,7 +63,7 @@ padding            = 10
 widget_spacing     = 6
 start  = ["workspaces", "audio-vis", "media"]
 center = ["clock"]
-end    = ["group:tray", "volume", "sysmon", "brightness", "battery", "notifications", "control-center"]
+end    = ["group:tray", "volume", "sysmon", "brightness", "battery", "dns", "notifications", "control-center"]
 
 # Tray collapses to a chevron; hovering it unfolds the icons to the LEFT
 # (accordion group, reveal direction "start"). Right-click an icon > Pin is
@@ -95,6 +94,12 @@ width   = 240
 bands   = 40
 color_1 = "primary"
 color_2 = "secondary"
+
+# Community port of the v4 DNS Switcher (enable with:
+#   noctalia msg plugins enable nightwatch75/dns-switcher).
+# Left-click: provider panel; right-click: back to ISP default; scroll: cycle.
+[widget.dns]
+type = "nightwatch75/dns-switcher:dns-switcher"
 
 [widget.clock]
 format = "{:%a %b %-d}  {:%-I:%M:%S %p}"
