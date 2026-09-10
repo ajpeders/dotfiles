@@ -18,7 +18,7 @@ hl.bind(mod .. " + F",         hl.dsp.window.fullscreen({ mode = "maximized" }))
 hl.bind(mod .. " + SHIFT + F", hl.dsp.window.float({ action = "toggle" }))
 
 -- ====== Noctalia ======
-hl.bind(mod .. " + N",     hl.dsp.exec_cmd(ipc .. " panel-toggle control-center history"))
+hl.bind(mod .. " + N",     hl.dsp.exec_cmd(ipc .. " panel-toggle control-center notifications"))
 hl.bind(mod .. " + comma", hl.dsp.exec_cmd(ipc .. " settings-toggle"))
 hl.bind(mod .. " + A",     hl.dsp.exec_cmd(ipc .. " panel-toggle control-center"))
 hl.bind(mod .. " + L",     hl.dsp.exec_cmd(ipc .. " session lock"))
