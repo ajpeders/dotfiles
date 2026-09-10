@@ -4,7 +4,7 @@
 
 [shell]
 font_family   = "Sans Serif"
-time_format   = "{:%H:%M:%S}"
+time_format   = "{:%-I:%M:%S %p}"  # 12-hour everywhere in the shell UI
 polkit_agent  = false               # polkit-gnome is started from hypr/config/autostart.lua
 clipboard_enabled = true            # replaces cliphist + wl-paste watchers
 
@@ -97,7 +97,7 @@ color_1 = "primary"
 color_2 = "secondary"
 
 [widget.clock]
-format = "{:%a %b %-d}  {:%H:%M:%S}"
+format = "{:%a %b %-d}  {:%-I:%M:%S %p}"
 
 [control_center]
 sidebar = "full"
