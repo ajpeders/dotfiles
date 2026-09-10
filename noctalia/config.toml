@@ -61,7 +61,7 @@ margin_ends        = 6              # small gap at the bar ends; top stays flush
 margin_edge        = 0
 padding            = 10
 widget_spacing     = 6
-start  = ["workspaces", "audio-vis", "media"]
+start  = ["workspaces", "media", "audio-vis"]
 center = ["clock"]
 end    = ["group:tray", "volume", "sysmon", "brightness", "battery", "dns", "notifications", "control-center"]
 
