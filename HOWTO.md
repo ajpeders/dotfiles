@@ -133,6 +133,64 @@ before committing to it.
   config uses. Test a candidate mode **under load**, not just by checking that
   the image appears.
 
+## Boot loader (Limine, desktop only)
+
+The desktop boots Limine, not GRUB. Nothing here is tracked in the repo —
+`/boot` lives outside `~/.config` and the config is machine-specific — so this
+is the reference for what exists on disk.
+
+| Path | What |
+|---|---|
+| `/boot/EFI/BOOT/BOOTX64.EFI` | Limine itself, at the *removable* path (inherited from GRUB, so no NVRAM entry was created) |
+| `/boot/limine.conf` | hand-written menu; nothing generates it |
+| `/boot/limine-bg.png` | menu wallpaper |
+| `/etc/pacman.d/hooks/95-limine-efi.hook` | re-copies the EFI binary on `limine` upgrades |
+
+Edit `/boot/limine.conf` directly; it is read fresh at every boot, so there is
+no install or regeneration step. `/boot` is mounted `umask=0077`, so you need
+`sudo` even to read it.
+
+```bash
+sudo nano /boot/limine.conf     # timeout, entries, wallpaper
+```
+
+Option reference ships with the package: `/usr/share/doc/limine/CONFIG.md`.
+
+### Adding a kernel entry
+
+Entries are literal — microcode must come *before* the initramfs, because the
+Linux boot protocol concatenates modules into one initrd stream and the kernel
+reads the early microcode blob off the front:
+
+```
+/Arch Linux (zen)
+    protocol: linux
+    path: boot():/vmlinuz-linux-zen
+    cmdline: root=UUID=<root-uuid> rw loglevel=3 quiet
+    module_path: boot():/amd-ucode.img
+    module_path: boot():/initramfs-linux-zen.img
+```
+
+`boot():/` means the volume Limine booted from — here the ESP, which *is*
+`/boot`. Other volumes are addressed by GPT partition GUID, e.g. the Windows
+chainload entry uses `guid(<esp-partition-guid>):/EFI/Microsoft/Boot/bootmgfw.efi`.
+
+### Gotchas
+
+- **There is no fallback.** GRUB is off the ESP and `/boot/grub` is deleted, so
+  a broken Limine means a USB stick. This is why both `linux-zen` and stock
+  `linux` stay installed — the second entry is the only in-place recovery.
+- The `grub` package is still installed, but only because `woeusb-ng` depends
+  on it. It cannot boot anything.
+- Limine has **`S Firmware Setup`** built into its menu; don't add an
+  `efi_boot_entry` stanza for it (`entry` takes an NVRAM entry *name*).
+- A missing wallpaper or font is skipped silently rather than failing the boot;
+  a missing kernel path panics.
+- Test config changes without rebooting by booting a copy of the ESP under
+  OVMF: `qemu-system-x86_64 -drive if=pflash,...OVMF_CODE.4m.fd ...`. Attach a
+  display backend (`-vnc`) — with `-display none` the framebuffer never
+  refreshes and `screendump` silently returns a black frame.
+
 ## VPN
 
 Two independent VPNs. AmneziaWG is never enabled at boot; `tailscaled.service` is enabled by the installer but the tailnet stays down until `ts-up`. Helpers live in `zsh/.zshrc`.

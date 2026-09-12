@@ -59,7 +59,7 @@ from git history if ever needed.
 
 ## Theming
 
-Border colors and kitty colors both come from Noctalia 5's theme templates (`hypr/noctalia.lua`, `kitty/themes/noctalia.conf`), so one palette (Ayu built-in) drives shell, compositor and terminal. Dynamic theming via wallust was removed (wallust is x86-only and the workflow added more friction than value).
+Border colors, kitty colors and the GTK palette all come from Noctalia 5's theme templates (`hypr/noctalia.lua`, `kitty/themes/noctalia.conf`, `gtk-{3,4}.0/noctalia.css`), so one palette (Ayu built-in) drives shell, compositor, terminal and GTK apps. The rendered files are gitignored — they are output that churns on every palette change; only the hand-written `@import` in each `gtk.css` is tracked. Dynamic theming via wallust was removed (wallust is x86-only and the workflow added more friction than value).
 
 ## Key Decisions
 
@@ -67,4 +67,5 @@ Border colors and kitty colors both come from Noctalia 5's theme templates (`hyp
 - **Noctalia over custom Quickshell** — Noctalia provides bar, launcher, notifications, clipboard, OSD, control center, and lock screen out of the box. Custom Quickshell was abandoned due to PipeWire binding issues and complexity.
 - **Noctalia 5 (2026-09-09)** — the native C++ rewrite. No Quickshell dependency, so it no longer conflicts with Omarchy's `quickshell`; config is TOML; clipboard history is built in (cliphist dropped).
 - **Noctalia wallpaper** — built-in wallpaper manager with Material You color generation, replaces awww
+- **Limine over GRUB (2026-09-12, desktop only)** — the desktop boots Limine 12.8.0 from the removable ESP path (`/boot/EFI/BOOT/BOOTX64.EFI`), which is where GRUB already lived, so the existing firmware entry was inherited unchanged. Config is a hand-written `/boot/limine.conf` rather than anything generated, and a pacman hook re-copies the EFI binary on `limine` upgrades. Deliberately **not** tracked here: `/boot` is outside `~/.config`, and the config is machine-specific (root UUID, Windows ESP GUID). Both `linux-zen` and stock `linux` stay installed — with GRUB gone, the second kernel is the only in-place recovery path.
 - **ly over SDDM/GDM** — minimal TUI display manager

@@ -19,6 +19,12 @@ Desktops run Noctalia 5 (native C++ rewrite, since 2026-09-09) on Hyprland; the 
 - [x] Established that the Samsung G53F's EDID under-reports (claims 60Hz max).
       Settled on 144Hz: 200Hz link-trains and looks fine idle but drops frames
       under load. Don't raise it without testing a fullscreen game.
+- [x] GTK apps follow the Noctalia palette (`gtk.css` imports the generated
+      `noctalia.css`; the generated files are gitignored)
+- [x] Games pinned to workspace 9 — both `steam_app_*` and `gamescope`, since
+      under gamescope the outer window's class is `gamescope`
+- [x] Desktop moved from GRUB to Limine (2026-09-12) — see ARCHITECTURE.md;
+      `/boot/limine.conf` is machine state, intentionally untracked
 
 ## Next
 
