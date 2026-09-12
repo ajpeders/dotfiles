@@ -183,6 +183,9 @@ fi
 # scripts/setup-llm.sh. Under ~/.local/state, not ~/.config: on Arch the repo
 # is ~/.config itself.
 [ -f "$HOME/.local/state/dotfiles/llm.env" ] && . "$HOME/.local/state/dotfiles/llm.env"
-# opencode.json resolves {env:LLM_MODEL}; unset would leave it a bare "ollama/",
-# which only fails at request time. Fall back to the catalog's coding default.
+# opencode.json resolves {env:LLM_SERVER_URL} and {env:LLM_MODEL}; unset would
+# leave a bare "ollama/" and an empty baseURL, which only fail at request time.
+# Default to the local ollama so a machine with no llm.env just works; running
+# setup-llm.sh is only needed to point at a different host.
+export LLM_SERVER_URL="${LLM_SERVER_URL:-http://localhost:11434/v1}"
 export LLM_MODEL="${LLM_MODEL:-qwen3-coder:30b}"

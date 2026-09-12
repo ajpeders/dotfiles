@@ -153,6 +153,11 @@ URL and the chosen model go to `~/.local/state/dotfiles/llm.env` as
 repo because both differ per machine, and because on Arch the repo *is*
 `~/.config`.
 
+Running this is **optional**: `zsh/.zshrc` defaults `LLM_SERVER_URL` to the
+local ollama (`http://localhost:11434/v1`) and `LLM_MODEL` to the catalog's
+coding default, so a machine with a local ollama needs no setup at all. Run the
+script only to point opencode at a different host.
+
 `opencode/opencode.json` stays machine-agnostic: it is a *catalog* declaring
 context/output limits per model, and `{env:LLM_MODEL}` selects the default. The
 script never rewrites it, so running setup on a second machine no longer dirties
