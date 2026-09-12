@@ -103,6 +103,12 @@ omarchy/hooks/**/*.hook
 # Editor/template backups left by the Omarchy config port.
 **/*.omarchy-template.bak
 
+# Session env defaults (LLM_SERVER_URL/LLM_MODEL for opencode).
+!environment.d/
+!environment.d/*.conf
+# ...but per-machine overrides stay out of the repo, same as llm.env.
+environment.d/90-llm-local.conf
+
 # Rendered by Noctalia v5 theme templates on every palette change
 hypr/noctalia.lua
 kitty/themes/noctalia.conf
