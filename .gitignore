@@ -28,6 +28,10 @@
 !noctalia/**
 !yazi/
 !opencode/
+# Vaultwarden CLI: server/email config + keyring-backed pinentry shim (no secrets)
+!rbw/
+!rbw/config.json
+!rbw/pinentry-rbw
 !opencode/**
 # ...but opencode writes its own runtime cruft into its config dir,
 # and that dir is a symlink to this repo. Keep it out of the tree.
