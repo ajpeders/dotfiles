@@ -106,3 +106,5 @@ omarchy/hooks/**/*.hook
 # Rendered by Noctalia v5 theme templates on every palette change
 hypr/noctalia.lua
 kitty/themes/noctalia.conf
+gtk-3.0/noctalia.css
+gtk-4.0/noctalia.css
