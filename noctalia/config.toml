@@ -57,11 +57,11 @@ position           = "top"
 thickness          = 36
 background_opacity = 0.93
 radius             = 0
-margin_ends        = 6              # small gap at the bar ends; top stays flush (margin_edge = 0)
+margin_ends        = 0              # flush to both screen edges; no end gaps
 margin_edge        = 0
 padding            = 10
 widget_spacing     = 6
-start  = ["workspaces", "media", "audio-vis"]
+start  = ["workspaces", "audio-vis", "media"]
 center = ["clock"]
 end    = ["group:tray", "volume", "sysmon", "brightness", "battery", "dns", "notifications", "control-center"]
 
