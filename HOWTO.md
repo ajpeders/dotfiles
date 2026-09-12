@@ -323,3 +323,70 @@ shim the app installs, pointing at the binary inside the bundle.
 - The standalone build has no `install-system-daemon` subcommand — that's the open
   source `tailscaled`, not this app. Tailscale here is per-login, not per-boot.
 
+
+## Vaultwarden from the CLI (`rbw`)
+
+`rbw` gives terminal access to the Vaultwarden server at `https://vault.thelunadog.com`.
+It unlocks silently — no master-password prompt — because the master password lives in
+the GNOME keyring and a shim hands it to `rbw` on demand.
+
+```bash
+rbw list                 # item names
+rbw get <item>           # password to stdout
+rbw get --full <item>    # username, password, notes
+rbw sync                 # refresh from the server
+rbw lock                 # drop the cached key
+```
+
+### How the unlock chain works
+
+Nothing here talks to the Secret Service API directly — `rbw` only knows how to shell
+out to a pinentry program, and that indirection is the whole hook:
+
+1. Your login password unlocks gnome-keyring (`pam_gnome_keyring.so` in `/etc/pam.d/ly`).
+2. `rbw` needs the master password and runs `rbw/pinentry-rbw`.
+3. The shim speaks the Assuan pinentry protocol and answers `GETPIN` with
+   `secret-tool lookup service vaultwarden account <email>`.
+4. `rbw-agent` derives the vault key and caches it for `lock_timeout` (8h).
+
+If the keyring is locked or the secret is missing, the shim `exec`s `pinentry-gnome3`
+instead, so a broken lookup degrades to a normal prompt rather than a hard failure.
+
+Files: `rbw/config.json` (email, `base_url`, pinentry path, `lock_timeout`) and
+`rbw/pinentry-rbw`. Both are tracked. The vault database is **not** — it lives at
+`~/.local/share/rbw/`, outside this repo.
+
+### Setting it up on a new machine
+
+```bash
+# 1. Point rbw at the server, but use the REAL pinentry for now (see Gotchas).
+rbw config set email <email>
+rbw config set base_url https://vault.thelunadog.com
+rbw config set pinentry pinentry-gnome3
+rbw config set lock_timeout 28800
+
+# 2. Log in. Prompts for the master password, and 2FA if enabled.
+rbw login
+
+# 3. Seed the keyring (prompts once, nothing in plaintext on disk).
+secret-tool store --label='Vaultwarden master (rbw)' service vaultwarden account <email>
+
+# 4. Switch to the shim.
+rbw config set pinentry ~/.config/rbw/pinentry-rbw
+rbw stop-agent && rbw get <some-item>   # should not prompt
+```
+
+### Gotchas
+
+- **`rbw login` must not use the shim.** `rbw` asks for the 2FA code through pinentry
+  too, and the shim answers every `GETPIN` with the master password — so login fails in
+  a confusing way. Swap to `pinentry-gnome3` for the login, swap back after.
+- **`.gitignore` is deny-by-default here.** `rbw/config.json` and `rbw/pinentry-rbw` are
+  allowlisted by exact filename, not as `rbw/**`, so anything else `rbw` drops in that
+  directory stays untracked. Add new files deliberately.
+- **This trades vault security for login security.** Anyone who can log into the desktop
+  has silent access to the whole vault. That's the point of the setup, but it means the
+  login password is now the only thing guarding it — don't do this on a shared machine.
+- `rbw` is the unofficial Rust client (`extra/rbw`), not Bitwarden's `bw`. It keeps a
+  local encrypted copy and a background agent, so it's fast enough for scripts; `bw` is
+  Node and needs a `BW_SESSION` env var juggled by hand.
