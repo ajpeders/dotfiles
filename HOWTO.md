@@ -133,6 +133,21 @@ before committing to it.
   config uses. Test a candidate mode **under load**, not just by checking that
   the image appears.
 
+## Point opencode at a different LLM server
+
+Defaults live in `environment.d/50-llm.conf` (session-wide) and `zsh/.zshrc`
+(shells), both pointing at the local ollama. To use another host, either run
+`bash scripts/setup-llm.sh <base-url>` (writes `~/.local/state/dotfiles/llm.env`,
+picked up by shells) or drop a gitignored `environment.d/90-llm-local.conf` —
+systemd reads `*.conf` in name order, so the higher number wins session-wide.
+
+Changes to `environment.d` apply at next login; to test immediately:
+
+```bash
+systemctl --user set-environment LLM_SERVER_URL=http://host:11434/v1
+opencode debug config      # check the resolved baseURL
+```
+
 ## Boot loader (Limine, desktop only)
 
 The desktop boots Limine, not GRUB. Nothing here is tracked in the repo —
