@@ -15,6 +15,7 @@ hl.window_rule({ match = { class = "^(blueman-manager)$" }, float = true, size =
 hl.window_rule({ match = { title = "^(Save File|Open File)$" }, float = true })
 hl.window_rule({ match = { class = "^(xdg-desktop-portal-(gtk|kde|hyprland).*)$" }, float = true })
 hl.window_rule({ match = { class = "^(polkit-gnome-authentication-agent-1)$" }, float = true })
+hl.window_rule({ match = { class = "^(LunaChat)$" }, float = false })
 
 -- ====== Picture-in-Picture ======
 hl.window_rule({
@@ -32,6 +33,14 @@ hl.window_rule({
 -- ====== Gaming (keep fullscreen when unfocused) ======
 hl.window_rule({ match = { class = "^(steam_app_.*)$" }, suppress_event = "activateother" })
 hl.window_rule({ match = { class = "^(gamescope)$" },    suppress_event = "activateother" })
+
+-- ====== Gaming (pin to workspace 9 "game") ======
+-- Games always land on one workspace instead of wherever focus happened to
+-- be, so alt-tabbing out and back is a workspace switch rather than a hunt.
+-- Under gamescope the outer window's class is "gamescope", not steam_app_N,
+-- so both need the rule. Append " silent" to open there without following.
+hl.window_rule({ match = { class = "^(steam_app_.*)$" }, workspace = "9" })
+hl.window_rule({ match = { class = "^(gamescope)$" },    workspace = "9" })
 
 -- ====== Gaming (immediate tearing for lowest latency) ======
 hl.window_rule({ match = { class = "^(cs2)$" },           immediate = true })
