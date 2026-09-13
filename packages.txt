@@ -51,9 +51,6 @@ tmux
 # Terminal
 kitty
 
-# Browser
-librewolf-bin
-
 # Clipboard
 wl-clipboard
 
@@ -93,18 +90,15 @@ ddcutil
 evolution-data-server
 
 # Fonts and icons
-ttf-jetbrains-mono-nerd
 noto-fonts
 noto-fonts-emoji
 papirus-icon-theme
 
 # VPN — AmneziaWG (obfuscated WireGuard; home server runs wg-easy/AmneziaWG).
-# Userspace impl (amneziawg-go) instead of a DKMS kernel module — the Asahi
-# kernel makes out-of-tree modules fragile. Client config: ~/.config/wireguard/
-# (NOT in this repo). Bring up with the `vpn-up` helper in zsh/.zshrc, or
-# directly: awg-quick up ~/.config/wireguard/alex.conf. See HOWTO.md.
+# Client config: ~/.config/wireguard/ (NOT in this repo). Bring up with the
+# `vpn-up` helper in zsh/.zshrc, or directly:
+# awg-quick up ~/.config/wireguard/alex.conf. See HOWTO.md.
 amneziawg-tools
-amneziawg-go
 # resolvconf shim so awg-quick can push the VPN DNS into systemd-resolved
 systemd-resolvconf
 
@@ -127,6 +121,14 @@ cliamp
 # Core Hyprland packages
 hyprland
 xdg-desktop-portal-hyprland
+
+# Full JetBrains Mono Nerd package. Omarchy depends on
+# ttf-jetbrains-mono-nerd-basic, which provides the same font name and
+# conflicts with this package.
+ttf-jetbrains-mono-nerd
+
+# Browser
+librewolf-bin
 
 # Desktop shell
 noctalia-shell

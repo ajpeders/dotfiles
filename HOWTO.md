@@ -85,7 +85,13 @@ Two independent VPNs. **Neither is enabled at boot** — start whichever you nee
 
 ### WireGuard / AmneziaWG
 
-We use the userspace `amneziawg-go` rather than a DKMS kernel module, because out-of-tree modules are fragile on the Asahi kernel. `awg-quick` handles both obfuscated and plain WireGuard configs — with no `Jc`/`S1`/`S2`/`H1..H4` keys present it falls back to standard WireGuard framing — so `wireguard-tools` is not installed and `wg`/`wg-quick` are unavailable. Use `awg`/`awg-quick`.
+We use AmneziaWG through `amneziawg-tools`. On aarch64/Asahi, the userspace
+`amneziawg-go` backend may need to stay manually pinned: the current AUR
+PKGBUILD rejects `aarch64`, so it is intentionally not synced from
+`packages.txt`. `awg-quick` handles both obfuscated and plain WireGuard configs
+— with no `Jc`/`S1`/`S2`/`H1..H4` keys present it falls back to standard
+WireGuard framing — so `wireguard-tools` is not installed and `wg`/`wg-quick`
+are unavailable. Use `awg`/`awg-quick`.
 
 Client configs are **not in this repo** (they hold private keys). They live in `~/.config/wireguard/`, mode `600`, covered by the catch-all ignore in `.gitignore`. `vpn-list` shows what's available:
 
