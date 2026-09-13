@@ -632,6 +632,11 @@ phase_browser_policies() {
         return
     fi
 
+    if ! pacman -Qq librewolf-bin librewolf >/dev/null 2>&1; then
+        print_info "Librewolf is not installed — skipping policies"
+        return
+    fi
+
     if [ -f "$dst" ] && cmp -s "$src" "$dst"; then
         print_status "Librewolf policies already up to date"
         return
