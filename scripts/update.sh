@@ -167,10 +167,8 @@ phase_dotfiles() {
     print_phase "Phase 3: Dotfile Sync"
 
     local config_dirs
-    local config_files
     if [ "$HEADLESS" -eq 1 ]; then
         config_dirs=(zsh yazi git tmux nvim opencode)
-        config_files=()
     else
         config_dirs=(hypr kitty wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim opencode)
         if [ "$OMARCHY" -eq 1 ]; then
@@ -178,7 +176,6 @@ phase_dotfiles() {
         else
             config_dirs+=(noctalia)
         fi
-        config_files=(pavucontrol.ini QtProject.conf)
     fi
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -218,11 +215,6 @@ phase_dotfiles() {
     local dir
     for dir in "${config_dirs[@]}"; do
         [ -d "$REPO_DIR/$dir" ] && backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
-    done
-
-    local file
-    for file in "${config_files[@]}"; do
-        [ -f "$REPO_DIR/$file" ] && backup_and_link "$REPO_DIR/$file" "$HOME/.config/$file"
     done
 
     # Ensure ~/.zshenv is configured
