@@ -28,6 +28,8 @@ Desktops run Noctalia 5 (native C++ rewrite, since 2026-09-09) on Hyprland; the 
 - [x] Repo audit (2026-09-12): dropped the Noctalia 4 config (`settings.json`,
       QML plugins, colorschemes), the wallust CSS/`theme/` palette, `nwg-displays`,
       and the untracked-file links in the scripts; `.gitignore` deduplicated
+- [x] Dropped wlsunset: nothing launched it, Noctalia's `[nightlight]` does the job
+      (Omarchy keeps hyprsunset via its own package)
 
 ## Next
 
