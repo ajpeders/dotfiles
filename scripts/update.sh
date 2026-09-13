@@ -172,7 +172,7 @@ phase_dotfiles() {
         config_dirs=(zsh yazi git tmux nvim opencode)
         config_files=()
     else
-        config_dirs=(hypr kitty theme wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim opencode)
+        config_dirs=(hypr kitty wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim opencode)
         if [ "$OMARCHY" -eq 1 ]; then
             config_dirs+=(omarchy)
         else
