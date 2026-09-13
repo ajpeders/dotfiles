@@ -137,9 +137,6 @@ blueman
 # Idle management (Omarchy uses idle.screensaver / idle.lock in shell.json)
 hypridle
 
-# Night light (Omarchy uses hyprsunset)
-wlsunset
-
 # Display manager (Omarchy uses sddm, which its package depends on)
 ly
 
