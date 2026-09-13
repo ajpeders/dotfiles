@@ -4,14 +4,28 @@
 <dict>
     <key>Label</key>
     <string>com.alex.mount.share</string>
+
+    <!-- Run through sh so $HOME expands: launchd itself does not expand ~,
+         and hardcoding /Users/<name> would not survive a different machine. -->
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/bin/osascript</string>
-        <string>-e</string>
-        <string>mount volume "smb://ween@share.thelunadog.com/share"</string>
+        <string>/bin/sh</string>
+        <string>-c</string>
+        <string>exec "$HOME/dotfiles/macos/mount-share.sh"</string>
     </array>
+
     <key>RunAtLoad</key>
     <true/>
+
+    <!-- Re-run every 5 minutes, rather than relaunching only on failure.
+         KeepAlive/SuccessfulExit=false retried until the first success and then
+         stopped, so a share dropped mid-session — sleep, a tunnel blip, the
+         server rebooting — stayed gone until the next login. A plain interval
+         covers that as well as a machine booted off-network, and costs nothing:
+         the script exits 0 in milliseconds when the share is already mounted. -->
+    <key>StartInterval</key>
+    <integer>300</integer>
+
     <key>StandardErrorPath</key>
     <string>/tmp/com.alex.mount.share.err</string>
     <key>StandardOutPath</key>

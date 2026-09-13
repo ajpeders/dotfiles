@@ -10,12 +10,12 @@ Linux comes in two flavours; the scripts detect which one a machine runs (see
 | Role | Arch Linux | macOS |
 |------|-----------|-------|
 | Window manager | Hyprland | AeroSpace |
-| Desktop shell | Omarchy shell, or Noctalia on pre-Omarchy boxes | macOS Finder |
+| Desktop shell | Noctalia 5 (desktops) or Omarchy shell (M1 Air) | macOS Finder |
 | Terminal | Kitty | Kitty |
 | Shell | Zsh + Oh My Zsh + Powerlevel10k | Zsh + Oh My Zsh + Powerlevel10k |
 | File manager | Yazi (TUI) / Thunar (GUI) | Yazi (TUI) / Finder |
 | Display manager | sddm (Omarchy) / ly (Noctalia) | macOS login |
-| VPN | AmneziaWG (`vpn-up`) + Tailscale (`ts-up`) — see [HOWTO](HOWTO.md#vpn) | WireGuard (App Store) |
+| VPN | AmneziaWG (`vpn-up`) + Tailscale (`tailscaled.service`, `ts-up`) — see [HOWTO](HOWTO.md#vpn) | WireGuard (App Store) + Tailscale (LaunchAgent `com.alex.tailscale`) |
 | SMB share | autofs / systemd | LaunchAgent (`com.alex.mount.share`) |
 
 ## Desktop stacks
@@ -25,24 +25,24 @@ Where it is installed it owns the desktop, and this repo only carries the
 personal overrides on top. Older Linux machines keep the original
 Noctalia + `ly` desktop.
 
-`install.sh` and `update.sh` choose by checking for the `omarchy` package:
+`scripts/install.sh` and `scripts/update.sh` choose by checking for the `omarchy` package:
 
 ```bash
-bash install.sh                # auto-detect
-bash install.sh --no-omarchy   # force the Noctalia stack
-bash install.sh --omarchy      # force the Omarchy stack
+bash scripts/install.sh                # auto-detect
+bash scripts/install.sh --no-omarchy   # force the Noctalia stack
+bash scripts/install.sh --omarchy      # force the Omarchy stack
 ```
 
 The result is recorded in `~/.local/state/dotfiles-desktop`. `packages.txt` is
-split by the same markers, so an Omarchy box never installs `noctalia-shell`,
-`ly` or `hypridle`, and a Noctalia box never installs upstream `quickshell`.
+split by the same markers, so an Omarchy box never installs `noctalia`,
+`ly` or `hypridle`, and a Noctalia box never installs `quickshell`.
 
 ### Installing Omarchy from here
 
 On a machine that does not have Omarchy yet:
 
 ```bash
-bash install.sh --install-omarchy     # implies --omarchy; aarch64 only
+bash scripts/install.sh --install-omarchy     # implies --omarchy; aarch64 only
 ```
 
 This runs *before* the dotfiles phase, because Omarchy's installer ends in
@@ -72,8 +72,9 @@ cost a working desktop.
 > Omarchy's dependency as already satisfied and the Omarchy shell dies at
 > startup with a Qt symbol lookup error — no bar, no notifications, no OSD.
 
-On the Omarchy stack, personal Hyprland overrides live in `hypr/*.lua` and load
-*after* Omarchy's defaults. Check bindings with `omarchy menu keybindings
+Both stacks share `hypr/hyprland.lua`: it detects Omarchy at runtime and either
+bootstraps Omarchy and loads the personal overrides in `hypr/omarchy/*.lua`, or loads the
+Noctalia config from `hypr/config/*.lua`. Omarchy overrides load *after* its defaults. Check bindings with `omarchy menu keybindings
 --print`, and validate any change with `hyprctl reload && hyprctl configerrors`.
 
 ## Fresh Install
@@ -83,7 +84,7 @@ On the Omarchy stack, personal Hyprland overrides live in `hypr/*.lua` and load
 ```bash
 git clone git@git.thelunadog.com:alex/dotfiles.git ~/.config
 cd ~/.config
-bash install.sh
+bash scripts/install.sh
 ```
 
 The Arch script installs `paru`, packages from `packages.txt`, symlinks configs into `~/.config`, sets up zsh, and enables `NetworkManager`/`bluetooth`/`pipewire`/`wireplumber`. On a Noctalia machine it also installs and enables the `ly` display manager; on an Omarchy machine it leaves the display manager alone, since Omarchy depends on sddm and enabling `ly` would disable it.
@@ -101,10 +102,22 @@ machine sddm starts the session directly; confirm the bar came up with
 For servers / boxes you only SSH into:
 
 ```bash
-bash install.sh --headless
+bash scripts/install.sh --headless
 ```
 
-Installs only the CLI base from `packages.txt` (zsh, neovim, git, mosh, openssh, tmux, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`, `opencode`), enables `sshd`, and switches the system to `multi-user.target` (no display manager). `update.sh` reads the mode from `~/.local/state/dotfiles-mode` and stays in headless mode on resync; pass `--full` to override.
+Installs only the CLI base from `packages.txt` (zsh, neovim, git, mosh, openssh, tmux, opencode, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), enables `sshd`, and switches the system to `multi-user.target` (no display manager). `scripts/update.sh` reads the mode from `~/.local/state/dotfiles-mode` and stays in headless mode on resync; pass `--full` to override.
+
+### Debian — headless
+
+For Debian/Raspberry Pi boxes (the GUI stack is Arch-only, so there is no full mode):
+
+```bash
+git clone git@git.thelunadog.com:alex/dotfiles.git ~/.config
+cd ~/.config
+bash scripts/install-debian.sh
+```
+
+The Debian counterpart to `scripts/install.sh --headless`: `apt`-installs the CLI base (Debian-named — `fd-find`, `openssh-server`, etc.), links the CLI dotfiles (`zsh`, `nvim`, `tmux`, `yazi`, `git`), sets up zsh + oh-my-zsh + powerlevel10k, enables `ssh`, and installs `opencode` via upstream's installer (Debian has no package; Arch gets it from `packages.txt`, macOS from the `Brewfile`). Per-host `$HOME` files live under `hosts/<name>/`; `hosts/livingroom-pi/install.sh --full` links those and then runs this script.
 
 ### macOS
 
@@ -114,25 +127,51 @@ cd ~/dotfiles
 bash macos/install.sh
 ```
 
-The macOS script installs Homebrew, AeroSpace, kitty, `mas` + WireGuard (App Store), symlinks configs into `~/.config` and `~/Library/LaunchAgents`, and interactively seeds the SMB Keychain entry. See `HOWTO.md` for the manual follow-ups (Full Disk Access for kitty, etc.).
+The macOS script installs Homebrew, AeroSpace, kitty, Tailscale, `mas` + WireGuard (App Store), symlinks configs into `~/.config` and `~/Library/LaunchAgents`, and interactively seeds the SMB Keychain entry. See `HOWTO.md` for the manual follow-ups (Full Disk Access for kitty, etc.).
 
 ## Keep in Sync
 
 ```bash
 # Arch only — pull + reinstall packages + relink + hyprctl reload
-bash update.sh
+bash scripts/update.sh
 ```
 
 ```bash
 # Both — sync private files (wallpapers, SSH hosts, librewolf profile) from a remote host
-bash sync-private.sh user@host
+bash scripts/sync-private.sh user@host
 ```
+
+```bash
+# Both — point opencode at a local Ollama / llama.cpp / OpenAI-compatible server
+bash scripts/setup-llm.sh [base-url]
+```
+
+Prompts for the server's base URL (or takes it as an argument), confirms it
+responds on `/v1/models`, and lets you pick from the models it serves. Both the
+URL and the chosen model go to `~/.local/state/dotfiles/llm.env` as
+`LLM_SERVER_URL` and `LLM_MODEL`, which `zsh/.zshrc` sources — kept out of the
+repo because both differ per machine, and because on Arch the repo *is*
+`~/.config`.
+
+Running this is **optional**: the defaults point at a local ollama
+(`http://localhost:11434/v1`), so a machine running one needs no setup at all.
+They are set in two places on purpose — `environment.d/50-llm.conf` covers the
+whole session (systemd units, app launchers, Hyprland keybinds) and
+`zsh/.zshrc` covers shells. A shell rc alone is not enough: opencode launched
+from a keybind would get an empty `baseURL`, which fails at request time rather
+than at startup. Run the script only to point opencode at a different host.
+
+`opencode/opencode.json` stays machine-agnostic: it is a *catalog* declaring
+context/output limits per model, and `{env:LLM_MODEL}` selects the default. The
+script never rewrites it, so running setup on a second machine no longer dirties
+the working tree. Add a `models` entry when you want explicit limits for a model
+the catalog does not list yet.
 
 ## Key Bindings
 
 **On the Omarchy stack this table does not apply** — Omarchy ships ~238 of its
 own bindings and they are the source of truth. List them with `omarchy menu
-keybindings --print`. `hypr/bindings.lua` documents how each binding below maps
+keybindings --print`. `hypr/omarchy/bindings.lua` documents how each binding below maps
 onto its Omarchy equivalent, with ready-to-uncomment overrides if the defaults
 fight muscle memory.
 
@@ -162,21 +201,25 @@ Hyprland-only (no mac equivalent): Noctalia bindings (`N`, `,`, `A`, `L`, `O`), 
 ```
 dotfiles/
 ├── hypr/                  # Hyprland config (Linux)
-│   ├── *.lua              #   Omarchy stack: overrides loaded after its defaults
-│   └── hyprland.conf, config/  #   Noctalia stack: standalone config
+│   ├── hyprland.lua       #   Entry point for both stacks (branches on /usr/share/omarchy)
+│   ├── config/*.lua       #   Noctalia stack: standalone config
+│   └── omarchy/*.lua      #   Omarchy stack: overrides loaded after its defaults
 ├── omarchy/               # Omarchy shell/bar, menu extensions, hooks (Linux)
 ├── kitty/                 # Terminal (shared)
-├── noctalia/              # Noctalia shell (Linux, pre-Omarchy machines)
+├── noctalia/              # Noctalia 5 config.toml (Linux desktops)
 ├── yazi/                  # File manager (shared)
 ├── zsh/                   # Zsh / p10k config (shared via ZDOTDIR)
 ├── opencode/              # OpenCode config for the local remote model
 ├── wallpapers/            # Default wallpaper
-├── gtk-3.0/, gtk-4.0/     # GTK theme (Linux)
-├── theme/                 # Static colors
+├── keychron/              # Keychron Q1 HE keymap export
+├── gtk-3.0/, gtk-4.0/     # GTK theme (Linux); noctalia.css is generated + gitignored
 ├── macos/                 # macOS-only: aerospace, LaunchAgents, install.sh
-├── install.sh             # Arch bootstrap
-├── update.sh              # Arch resync
-├── sync-private.sh        # Cross-platform private file sync
+├── scripts/               # Bootstrap + maintenance entry points
+│   ├── install.sh         # Arch bootstrap
+│   ├── install-debian.sh  # Debian headless bootstrap (apt)
+│   ├── update.sh          # Arch resync
+│   ├── sync-private.sh    # Cross-platform private file sync
+│   └── setup-llm.sh       # Point opencode at a local LLM server
 ├── packages.txt           # Pacman + AUR package list
 └── HOWTO.md, ARCHITECTURE.md, ROADMAP.md
 ```

@@ -1,87 +1,117 @@
-# Ignore everything by default
+# ~/.config *is* the repo, so ignore everything and allow-list what belongs.
 *
 */
 
-# Keep configuration directories
+# Repo metadata + docs
 !.gitignore
 !CLAUDE.md
 !README.md
 !ARCHITECTURE.md
 !ROADMAP.md
 !HOWTO.md
-!update.sh
-!install.sh
-!sync-private.sh
-!omarchy-shell.sh
+
+# Bootstrap + maintenance entry points
+!scripts/
+!scripts/**
 !packages.txt
-!.hermes/
+!packages-asahi.txt
+
+# Per-host $HOME dotfiles (see hosts/<name>/README.md)
+!hosts/
+!hosts/**
+
+# Shared config dirs (whole tree tracked)
 !hypr/
-!theme/
+!hypr/**
 !kitty/
+!kitty/**
 !wallpapers/
+!wallpapers/**
 !gtk-3.0/
+!gtk-3.0/**
 !gtk-4.0/
+!gtk-4.0/**
 !zsh/
+!zsh/**
 !noctalia/
 !noctalia/**
 !yazi/
+!yazi/**
 !macos/
+!macos/**
 !git/
+!git/**
 !tmux/
+!tmux/**
 !nvim/
+!nvim/**
+# Keychron Q1 HE keymap export (restore via VIA/Launcher)
+!keychron/
+!keychron/**
+
+# opencode: config tracked, but it writes runtime cruft into the same dir
 !opencode/
+!opencode/**
+opencode/node_modules/
+opencode/package.json
+opencode/package-lock.json
+opencode/bun.lock
+opencode/.gitignore
+
+# Vaultwarden CLI: server/email config + keyring-backed pinentry shim (no secrets)
+!rbw/
+!rbw/config.json
+!rbw/pinentry-rbw
+
+# Single files inside otherwise-ignored dirs
 !systemd/
 !systemd/user/
 !systemd/user/noctalia-shell.service
 !librewolf/
 !librewolf/policies.json
 
+# Session env defaults (LLM_SERVER_URL/LLM_MODEL for opencode);
+# per-machine overrides stay out, same as llm.env.
+!environment.d/
+!environment.d/*.conf
+environment.d/90-llm-local.conf
+
 # Omarchy (4.x) user-owned config. Omarchy itself lives in /usr/share/omarchy
 # and is package-managed; only these user override files belong in the repo.
 !omarchy/
 !omarchy/shell.json
 !omarchy/extensions/
-!omarchy/branding/
-!omarchy/themes/
-!omarchy/hooks/
-
-# Keep config files in tracked directories
-!.hermes/**
-!hypr/**
-!theme/**
-!kitty/**
-!wallpapers/**
-!gtk-3.0/**
-!gtk-4.0/**
-!zsh/**
-!noctalia/**
-!yazi/**
-!macos/**
-!git/**
-!tmux/**
-!nvim/**
-!opencode/opencode.json
 !omarchy/extensions/**
+!omarchy/branding/
 !omarchy/branding/**
+!omarchy/themes/
 !omarchy/themes/**
+!omarchy/hooks/
 !omarchy/hooks/**
-
-# Ignore generated hypridle symlink (written by scripts/hypridle-power.sh;
-# points at hypridle-ac.conf or hypridle-battery.conf depending on power source)
-hypr/hypridle.conf
-
-# Ignore generated zsh runtime files
-zsh/.zcompdump*
-zsh/.zsh_history
-zsh/.zsh_sessions/
-
-# Ignore editor/backup files anywhere in the tree
-**/*.bak
-
 # Omarchy ships these as stock samples / installs them on update; they are not
 # user configuration and would churn on every `omarchy update`.
 omarchy/hooks/**/*.sample
 omarchy/hooks/**/*.hook
 
-# Editor/template backups left by the Omarchy config port.
+# Generated hypridle symlink (written by hypr/scripts/hypridle-power.sh;
+# points at hypridle-ac.conf or hypridle-battery.conf depending on power source)
+hypr/hypridle.conf
+
+# Rendered by Noctalia v5 theme templates on every palette change
+hypr/noctalia.lua
+kitty/themes/noctalia.conf
+gtk-3.0/noctalia.css
+gtk-4.0/noctalia.css
+
+# Zsh runtime files
+zsh/.zcompdump*
+zsh/.zsh_history
+zsh/.zsh_sessions/
+
+# Editor / installer backups anywhere in the tree. The -* variant catches
+# timestamped backups (aerospace.toml.bak-20260901-004455), which *.bak
+# does not; install.sh writes <file>.pre-dotfiles before symlinking.
+**/*.bak
+**/*.bak-*
+**/*.pre-dotfiles
 **/*.omarchy-template.bak

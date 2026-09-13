@@ -1,0 +1,128 @@
+# Noctalia v5 config. Hand-written layer; GUI overrides land in
+# ~/.local/state/noctalia/settings.toml and win over this file.
+# Reference: https://docs.noctalia.dev/noctalia/  (defaults: example.toml in the repo)
+
+[shell]
+font_family   = "Sans Serif"
+time_format   = "{:%-I:%M:%S %p}"  # 12-hour everywhere in the shell UI
+polkit_agent  = false               # polkit-gnome is started from hypr/config/autostart.lua
+clipboard_enabled = true            # replaces cliphist + wl-paste watchers
+
+[shell.panel]
+launcher_placement = "floating"
+launcher_position  = "center"       # SUPER+Space opens mid-screen
+control_center_placement = "attached"   # near-click only works when attached
+open_near_click_control_center = true  # bar click opens under the widget (far right)
+
+[theme]
+mode    = "dark"
+source  = "builtin"
+builtin = "Ayu"
+
+[theme.templates]
+enable_builtin_templates = true
+# hyprland -> ~/.config/hypr/noctalia.lua (border colours), required from hyprland.lua
+# kitty    -> ~/.config/kitty/themes/noctalia.conf, included from kitty.conf
+builtin_ids = ["hyprland", "kitty"]
+
+[wallpaper]
+enabled             = true
+fill_mode           = "crop"
+directory           = "~/Pictures/Wallpapers"
+transition          = ["fade", "disc", "stripes", "wipe", "zoom", "honeycomb"]
+transition_duration = 1500
+
+[weather]
+enabled = true
+unit    = "celsius"
+
+[location]
+address = "Denver"
+
+[nightlight]
+enabled = false
+
+[lockscreen]
+enabled = true
+
+# Idle is owned by hypridle (hypr/hypridle-{ac,battery}.conf); it calls
+# `noctalia msg session lock`, so Noctalia's own idle timers stay off.
+[idle.behavior.lock]
+enabled = false
+[idle.behavior.screen-off]
+enabled = false
+
+[bar.main]
+position           = "top"
+thickness          = 36
+background_opacity = 0.93
+radius             = 0
+margin_ends        = 0              # flush to both screen edges; no end gaps
+margin_edge        = 0
+padding            = 10
+widget_spacing     = 6
+start  = ["workspaces", "audio-vis", "media"]
+center = ["clock"]
+end    = ["group:tray", "volume", "sysmon", "brightness", "battery", "dns", "notifications", "control-center"]
+
+# Tray collapses to a chevron; hovering it unfolds the icons to the LEFT
+# (accordion group, reveal direction "start"). Right-click an icon > Pin is
+# for the drawer mode only, which this replaces.
+[widget.tray]
+drawer = false
+
+[widget.tray-handle]
+type    = "custom_button"
+glyph   = "chevron-left"
+tooltip = "Tray"
+
+[[bar.main.capsule_group]]
+id                  = "tray"
+members             = ["tray-handle", "tray"]
+accordion           = true
+accordion_direction = "start"
+padding             = 4
+opacity             = 0.0           # no capsule background; reads as plain bar widgets
+
+[widget.media]
+max_length   = 360                  # default 220
+title_scroll = "always"             # marquee long titles
+
+[widget.audio-vis]
+type    = "audio_visualizer"
+width   = 240
+bands   = 40
+color_1 = "primary"
+color_2 = "secondary"
+
+# Community port of the v4 DNS Switcher (enable with:
+#   noctalia msg plugins enable nightwatch75/dns-switcher).
+# Left-click: provider panel; right-click: back to ISP default; scroll: cycle.
+[widget.dns]
+type = "nightwatch75/dns-switcher:dns-switcher"
+
+[widget.clock]
+format = "{:%a %b %-d}  {:%-I:%M:%S %p}"
+
+[control_center]
+sidebar = "full"
+sidebar_section = "full"
+hidden_tabs = []
+
+[[control_center.shortcuts]]
+type = "audio"
+
+[[control_center.shortcuts]]
+type = "mic_mute"
+
+[[control_center.shortcuts]]
+type = "bluetooth"
+
+[[control_center.shortcuts]]
+type = "network"
+
+[[control_center.shortcuts]]
+type = "system"
+
+[[control_center.shortcuts]]
+type = "session"

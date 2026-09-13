@@ -145,7 +145,7 @@ alias vpn-list='print -l ~/.config/wireguard/*.conf(N:t:r)'
 # 2. Tailscale. --accept-dns=false keeps tailscaled out of systemd-resolved so
 #    it can't fight the DNS the AmneziaWG tunnel pushes; the tradeoff is that
 #    MagicDNS short names don't resolve (use tailnet IPs or full names).
-#    ts-up starts tailscaled first since it isn't enabled at boot. Extra args
+#    ts-up starts tailscaled in case it isn't running yet. Extra args
 #    pass through, e.g. `ts-up --exit-node=<host>`.
 ts-up() {
   sudo systemctl start tailscaled && sudo tailscale up --accept-dns=false "$@"
@@ -174,3 +174,18 @@ if (( ${+functions[_zsh_autosuggest_fetch]} )); then
 fi
 
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+
+# opencode — packaged on Arch (pacman) and macOS (brew), so this only
+# matters where upstream's installer put it in ~/.opencode/bin (Debian).
+[ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"
+
+# LLM_SERVER_URL + LLM_MODEL for opencode, written per-machine by
+# scripts/setup-llm.sh. Under ~/.local/state, not ~/.config: on Arch the repo
+# is ~/.config itself.
+[ -f "$HOME/.local/state/dotfiles/llm.env" ] && . "$HOME/.local/state/dotfiles/llm.env"
+# opencode.json resolves {env:LLM_SERVER_URL} and {env:LLM_MODEL}; unset would
+# leave a bare "ollama/" and an empty baseURL, which only fail at request time.
+# Default to the local ollama so a machine with no llm.env just works; running
+# setup-llm.sh is only needed to point at a different host.
+export LLM_SERVER_URL="${LLM_SERVER_URL:-http://localhost:11434/v1}"
+export LLM_MODEL="${LLM_MODEL:-qwen3-coder:30b}"

@@ -1,0 +1,99 @@
+local d = require("config.defaults")
+
+local mod  = d.mainMod
+local ipc  = "noctalia msg"
+local shot = "~/Pictures/Screenshots/$(date +'%Y-%m-%d-%H%M%S_screenshot.png')"
+
+-- ====== Apps ======
+hl.bind(mod .. " + Return",    hl.dsp.exec_cmd(d.terminal))
+hl.bind(mod .. " + Q",         hl.dsp.window.close())
+hl.bind(mod .. " + SHIFT + Q", hl.dsp.exit())
+hl.bind(mod .. " + E",         hl.dsp.exec_cmd(d.browser))
+hl.bind(mod .. " + SHIFT + B", hl.dsp.exec_cmd(d.terminal .. " btop"))
+hl.bind(mod .. " + Space",     hl.dsp.exec_cmd(ipc .. " panel-toggle launcher"))
+hl.bind(mod .. " + V",         hl.dsp.exec_cmd(ipc .. " panel-toggle clipboard"))
+hl.bind(mod .. " + J",         hl.dsp.layout("togglesplit"))
+hl.bind(mod .. " + M",         hl.dsp.window.fullscreen({ mode = "fullscreen" }))
+hl.bind(mod .. " + F",         hl.dsp.window.fullscreen({ mode = "maximized" }))
+hl.bind(mod .. " + SHIFT + F", hl.dsp.window.float({ action = "toggle" }))
+
+-- ====== Noctalia ======
+hl.bind(mod .. " + N",     hl.dsp.exec_cmd(ipc .. " panel-toggle control-center notifications"))
+hl.bind(mod .. " + comma", hl.dsp.exec_cmd(ipc .. " settings-toggle"))
+hl.bind(mod .. " + A",     hl.dsp.exec_cmd(ipc .. " panel-toggle control-center"))
+hl.bind(mod .. " + L",     hl.dsp.exec_cmd(ipc .. " session lock"))
+hl.bind(mod .. " + O",     hl.dsp.exec_cmd(ipc .. " panel-toggle session"))
+-- Restart the shell (recovery after a crash, e.g. Bluetooth disconnect segfault)
+hl.bind(mod .. " + SHIFT + R", hl.dsp.exec_cmd("systemctl --user restart noctalia-shell.service"))
+-- Keep-awake / caffeine: toggle the idle inhibitor (blocks hypridle dim/lock/suspend).
+-- SHIFT+A toggles; CTRL+A forces it on (v5 has no timed variant).
+hl.bind(mod .. " + SHIFT + A", hl.dsp.exec_cmd(ipc .. " caffeine-toggle"))
+hl.bind(mod .. " + CTRL + A",  hl.dsp.exec_cmd(ipc .. " caffeine-enable"))
+
+-- ====== Brightness (laptop) ======
+-- SUPER+B opens a submap: Up/Down or +/- = screen, Left/Right = keyboard
+-- backlight, Esc/Enter/B exits. SUPER+K cycles the keyboard backlight 0->100->0.
+local kbd = "brightnessctl --device=kbd_backlight set"
+hl.define_submap("brightness", function()
+    hl.bind("up",    hl.dsp.exec_cmd(ipc .. " brightness-up"), { repeating = true })
+    hl.bind("down",  hl.dsp.exec_cmd(ipc .. " brightness-down"), { repeating = true })
+    hl.bind("equal", hl.dsp.exec_cmd(ipc .. " brightness-up"), { repeating = true })
+    hl.bind("minus", hl.dsp.exec_cmd(ipc .. " brightness-down"), { repeating = true })
+    hl.bind("right", hl.dsp.exec_cmd(kbd .. " 10%+"), { repeating = true })
+    hl.bind("left",  hl.dsp.exec_cmd(kbd .. " 10%-"), { repeating = true })
+    hl.bind("escape",       hl.dsp.submap("reset"))
+    hl.bind("Return",       hl.dsp.submap("reset"))
+    hl.bind("b",            hl.dsp.submap("reset"))
+    hl.bind(mod .. " + b",  hl.dsp.submap("reset"))
+end)
+hl.bind(mod .. " + B", hl.dsp.submap("brightness"))
+hl.bind(mod .. " + K", hl.dsp.exec_cmd("~/.config/hypr/scripts/kbd-backlight-cycle.sh"))
+
+-- ====== Screenshots ======
+hl.bind(mod .. " + P",          hl.dsp.exec_cmd("grim " .. shot))
+hl.bind(mod .. " + SHIFT + P",  hl.dsp.exec_cmd('grim -g "$(slurp)" ' .. shot))
+hl.bind(mod .. " + CTRL + P",   hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'))
+
+-- ====== Monitor Focus (for gaming) ======
+hl.bind(mod .. " + Tab", hl.dsp.focus({ monitor = "+1" }))
+
+-- ====== Focus / Move / Resize ======
+local dirs = { left = "left", right = "right", up = "up", down = "down" }
+for key, dir in pairs(dirs) do
+    hl.bind(mod .. " + " .. key,             hl.dsp.focus({ direction = dir }))
+    hl.bind(mod .. " + SHIFT + " .. key,     hl.dsp.window.move({ direction = dir }))
+end
+hl.bind(mod .. " + CTRL + left",  hl.dsp.window.resize({ x = -50, y = 0,   relative = true }))
+hl.bind(mod .. " + CTRL + right", hl.dsp.window.resize({ x = 50,  y = 0,   relative = true }))
+hl.bind(mod .. " + CTRL + up",    hl.dsp.window.resize({ x = 0,   y = -50, relative = true }))
+hl.bind(mod .. " + CTRL + down",  hl.dsp.window.resize({ x = 0,   y = 50,  relative = true }))
+
+-- ====== Workspaces ======
+for i = 1, 10 do
+    local key = i % 10 -- 10 maps to key 0
+    hl.bind(mod .. " + " .. key,         hl.dsp.focus({ workspace = i, on_current_monitor = true }))
+    hl.bind(mod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+end
+
+hl.bind(mod .. " + equal", hl.dsp.workspace.toggle_special("magic"))
+hl.bind(mod .. " + minus", hl.dsp.window.move({ workspace = "special:magic" }))
+
+hl.bind(mod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
+
+hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
+hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+-- ====== Media Keys ======
+hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd(ipc .. " volume-up"),      { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd(ipc .. " volume-down"),      { locked = true, repeating = true })
+hl.bind("XF86AudioMute",         hl.dsp.exec_cmd(ipc .. " volume-mute"),    { locked = true })
+hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd(ipc .. " mic-mute"),     { locked = true })
+hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd(ipc .. " brightness-up"),  { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. " brightness-down"),  { locked = true, repeating = true })
+hl.bind("XF86KbdBrightnessUp",   hl.dsp.exec_cmd(kbd .. " 10%+"),                 { locked = true, repeating = true })
+hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd(kbd .. " 10%-"),                 { locked = true, repeating = true })
+hl.bind("XF86AudioNext",         hl.dsp.exec_cmd(ipc .. " media next"),           { locked = true })
+hl.bind("XF86AudioPause",        hl.dsp.exec_cmd(ipc .. " media toggle"),      { locked = true })
+hl.bind("XF86AudioPlay",         hl.dsp.exec_cmd(ipc .. " media toggle"),      { locked = true })
+hl.bind("XF86AudioPrev",         hl.dsp.exec_cmd(ipc .. " media previous"),       { locked = true })
