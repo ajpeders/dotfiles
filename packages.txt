@@ -50,6 +50,9 @@ opencode
 # Core Hyprland packages
 hyprland
 xdg-desktop-portal-hyprland
+# Wayland QPA plugin for Qt6 apps (Dolphin, PrismLauncher, the portal picker).
+# Only ever pulled in transitively before; without it Qt6 apps fall back to X11.
+qt6-wayland
 
 # Terminal
 kitty
