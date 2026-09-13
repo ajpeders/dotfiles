@@ -210,6 +210,7 @@ dotfiles/
 ├── yazi/                  # File manager (shared)
 ├── zsh/                   # Zsh / p10k config (shared via ZDOTDIR)
 ├── wallpapers/            # Default wallpaper
+├── keychron/              # Keychron Q1 HE keymap export
 ├── gtk-3.0/, gtk-4.0/     # GTK theme (Linux); noctalia.css is generated + gitignored
 ├── macos/                 # macOS-only: aerospace, LaunchAgents, install.sh
 ├── scripts/               # Bootstrap + maintenance entry points
