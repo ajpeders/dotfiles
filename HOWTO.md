@@ -33,9 +33,20 @@ settings GUI is written to `~/.local/state/noctalia/settings.toml`, which wins
 over the file. If a value in `config.toml` seems ignored, look there.
 `noctalia config validate` checks the file.
 
-Theme colours reach Hyprland and kitty through Noctalia's built-in templates
-(`builtin_ids` in `config.toml`): they render `hypr/noctalia.lua` and
-`kitty/themes/noctalia.conf`, both gitignored, on every palette change.
+Theme colours reach Hyprland, kitty, GTK and btop through Noctalia's built-in
+templates (`builtin_ids`; the GUI list in `settings.toml` wins): they render
+`hypr/noctalia.lua`, `kitty/themes/noctalia.conf`, `gtk-{3,4}.0/noctalia.css`
+and `btop/themes/noctalia.theme`, all gitignored, on every palette change.
+
+- **Template output directories must already exist.** Noctalia will not create
+  them and logs nothing when a write fails — `kitty/themes/` was missing, so
+  kitty never got a theme. `kitty/themes/.gitkeep` is tracked for that reason.
+- Re-selecting the same scheme does not re-render. Force it with
+  `noctalia msg templates-apply`.
+- `hyprland.lua` loads the colours inside a `pcall`, so a failure there shows
+  up as default borders, not as `hyprctl configerrors`. Check with
+  `hyprctl getoption general:col.active_border` and
+  `hyprctl eval 'return tostring(pcall(require,"noctalia"))'`.
 
 ## Restart Noctalia
 
