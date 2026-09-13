@@ -1,29 +1,89 @@
--- Learn how to configure Hyprland: https://wiki.hypr.land/Configuring/Start/
-
--- Omarchy's bootstrap keeps path setup out of this user config.
-dofile((os.getenv("OMARCHY_PATH") or "/usr/share/omarchy") .. "/default/hypr/bootstrap.lua")
-
--- Disable all Omarchy default bindings. Add your own in hypr/bindings.lua.
--- omarchy_default_bindings = false
+-- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+-- ┃                   Hyprland Configuration (Lua)              ┃
+-- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+-- One entry point for two desktop stacks. Hyprland always loads this
+-- file, so the stack is chosen here at load time rather than by
+-- swapping files per machine:
 --
--- Or disable only bindings for Omarchy's preinstalled apps/web apps while
--- keeping core window-manager bindings:
--- omarchy_preinstalled_bindings = false
+--   Omarchy present  -> Omarchy's bootstrap + defaults, then the personal
+--                       overrides in hypr/omarchy/*.lua (M1 Air, Asahi).
+--   Omarchy absent   -> the Noctalia desktop from hypr/config/*.lua.
+--
+-- Same check scripts/install.sh uses (the `omarchy` package), expressed
+-- as the path that package owns.
 
--- Load Omarchy defaults.
-require("default.hypr.omarchy")
+local omarchy_path = os.getenv("OMARCHY_PATH") or "/usr/share/omarchy"
+local function omarchy_installed()
+    local f = io.open(omarchy_path .. "/default/hypr/bootstrap.lua", "r")
+    if f then f:close() return true end
+    return false
+end
 
--- Put your personal overrides in these files. They're loaded after Omarchy's
--- defaults so package updates can improve the defaults without rewriting your
--- ~/.config/hypr files.
-require("hypr.monitors")
-require("hypr.input")
-require("hypr.bindings")
-require("hypr.looknfeel")
-require("hypr.autostart")
+if omarchy_installed() then
+    -- ================= Omarchy stack =================
+    -- Omarchy's bootstrap keeps path setup out of this user config.
+    dofile(omarchy_path .. "/default/hypr/bootstrap.lua")
 
--- Toggle config flags dynamically.
-require("default.hypr.toggles")
+    -- Disable all Omarchy default bindings. Add your own in hypr/omarchy/bindings.lua.
+    -- omarchy_default_bindings = false
+    -- Or disable only bindings for Omarchy's preinstalled apps/web apps:
+    -- omarchy_preinstalled_bindings = false
 
--- Add any other personal Hyprland configuration below.
--- o.window("qemu", { workspace = "5" })
+    require("default.hypr.omarchy")
+
+    -- Personal overrides load after Omarchy's defaults so package updates
+    -- can improve the defaults without rewriting these files.
+    require("hypr.omarchy.monitors")
+    require("hypr.omarchy.input")
+    require("hypr.omarchy.bindings")
+    require("hypr.omarchy.looknfeel")
+    require("hypr.omarchy.autostart")
+
+    -- Toggle config flags dynamically.
+    require("default.hypr.toggles")
+    return
+end
+
+-- ================= Noctalia stack =================
+-- Migrated from hyprland.conf (hyprlang). Border colours come from
+-- hypr/noctalia.lua, rendered by Noctalia 5's theme template (see the end).
+--
+-- Monitors are hand-written in config/monitors.lua, keyed by EDID
+-- description rather than connector name so one file serves every
+-- setup. monitors.conf (nwg-displays) is dead — see HOWTO.md.
+
+require("config.environment")
+require("config.variables")
+require("config.decorations")
+require("config.animations")
+require("config.input")
+require("config.autostart")
+require("config.keybinds")
+require("config.monitors")
+require("config.windowrules")
+
+-- ====== Primary monitor ======
+-- Hyprland has no "primary" flag; the closest thing is which monitor
+-- owns workspace 1 by default, since that's where the session lands on
+-- login and where unassigned windows go. Keyed by desc: like the
+-- monitor rules — on a machine without this panel the rule never
+-- matches and workspace 1 falls back to the normal monitor order.
+hl.workspace_rule({
+    workspace = "1",
+    monitor   = "desc:Samsung Electric Company LS27FG53x",
+    default   = true,
+})
+
+-- ====== Workspace Names ======
+hl.workspace_rule({ workspace = "6",  default_name = "dev" })
+hl.workspace_rule({ workspace = "7",  default_name = "server" })
+hl.workspace_rule({ workspace = "8",  default_name = "work" })
+hl.workspace_rule({ workspace = "9",  default_name = "game" })
+hl.workspace_rule({ workspace = "10", default_name = "config" })
+
+-- For Noctalia Color templates
+-- Noctalia's built-in "hyprland" template renders hypr/noctalia.lua (gitignored)
+-- from the active palette. Loaded last so the border colours win. Guarded so a
+-- fresh machine boots before Noctalia has rendered it once.
+local ok, noctalia = pcall(function() return require("noctalia") end)
+if ok and noctalia then noctalia.apply_theme() end

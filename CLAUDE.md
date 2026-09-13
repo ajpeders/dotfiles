@@ -1,50 +1,46 @@
 # Dotfiles — ~/.config
 
-Cross-platform dotfiles. The git repo *is* `~/.config`, so `install.sh`'s
-symlink phase is a no-op on a machine that was bootstrapped by cloning here.
+Cross-platform dotfiles. On Arch the git repo *is* `~/.config`, so `scripts/install.sh`'s symlink phase is a no-op on a machine bootstrapped by cloning here. macOS lives under `macos/`.
 
-## Two desktop stacks
+## Two Linux desktop stacks
 
-This repo supports two Linux desktops. Scripts pick one automatically by
-checking whether the `omarchy` pacman package is installed; override with
-`--omarchy` / `--no-omarchy`. The choice is recorded in
-`~/.local/state/dotfiles-desktop`.
+Scripts pick one automatically by checking whether the `omarchy` pacman package is installed; override with `--omarchy` / `--no-omarchy`. The choice is recorded in `~/.local/state/dotfiles-desktop`.
 
-| | **Omarchy** (this machine, `alarm` branch) | **Noctalia** (other Linux boxes) |
+| | **Noctalia** (desktops) | **Omarchy** (M1 Air, Asahi) |
 |---|---|---|
-| Hyprland config | `hypr/*.lua` (Omarchy loads `hyprland.lua`) | `hypr/hyprland.conf` + `hypr/config/*.conf` |
-| Shell / bar | Omarchy shell (Quickshell) via `omarchy-launch-shell` | `noctalia-shell` systemd user service |
-| Quickshell pkg | upstream `quickshell` | `noctalia-qs` (fork) |
-| Display manager | sddm (an `omarchy` dependency) | `ly` |
-| Idle / lock | `omarchy/shell.json` -> `idle.screensaver`, `idle.lock` | `hypr/hypridle-{ac,battery}.conf` + `scripts/hypridle-power.sh` |
-| Theming | `omarchy theme set <name>` | static palette in `hypr/config/colors.conf` |
-| Config dir linked | `omarchy/` | `noctalia/` |
+| Hyprland config | `hypr/hyprland.lua` → `hypr/config/*.lua` | same entry point → Omarchy bootstrap + overrides in `hypr/omarchy/*.lua` |
+| Shell / bar | Noctalia 5 (native C++) as `noctalia-shell.service` | Omarchy shell (Quickshell) via `omarchy-launch-shell` |
+| Quickshell pkg | none (v5 has no Qt) | upstream `quickshell` |
+| Display manager | `ly` | sddm (an `omarchy` dependency) |
+| Idle / lock | `hypr/hypridle-{ac,battery}.conf` + `hypr/scripts/hypridle-power.sh` | `omarchy/shell.json` → `idle.screensaver`, `idle.lock` |
+| Theming | Noctalia templates render `hypr/noctalia.lua` + `kitty/themes/noctalia.conf` | `omarchy theme set <name>` |
+| Config dir linked | `noctalia/` | `omarchy/` |
 
-**`noctalia-qs` and `quickshell` are mutually exclusive.** `noctalia-qs`
-declares `Provides: quickshell` *and* `Conflicts: quickshell`, so installing it
-first makes pacman consider Omarchy's `quickshell` dependency satisfied. The
-Omarchy shell then crashes at startup with a Qt `symbol lookup error` and there
-is no bar, no notifications and no OSD. `packages.txt` puts each package in its
-own gated section so a resync can never reintroduce this.
+`hypr/hyprland.lua` branches at runtime on `/usr/share/omarchy` being present, so one file serves both. `packages.txt` has `NOCTALIA` / `OMARCHY` sections gated by the same detection; `packages-asahi.txt` is added on aarch64 only.
 
-## Installing Omarchy
+**Never install the legacy `noctalia-qs`** (Noctalia 4's Quickshell fork) on an Omarchy machine: it Provides+Conflicts `quickshell` and the Omarchy shell dies with a Qt symbol lookup error. Noctalia 5 has no Quickshell dependency, so this only bites if v4 is reinstalled. `verify_omarchy_shell_stack` in install.sh checks for it.
 
-`install.sh --install-omarchy` (aarch64 only, implies `--omarchy`) bootstraps
-Omarchy via [omarchy-mac](https://github.com/omacom/omarchy-mac) `quattro`,
-checked out to `~/.local/share/omarchy`. It runs as `phase_omarchy`, second,
-deliberately **before `phase_dotfiles`** — the fork's installer ends in
-`seed_user_defaults`, which overwrites tracked configs (it replaced
-`kitty.conf` and `tmux.conf` here), so dotfiles must be applied after it.
+## Noctalia stack
 
-Omarchy's `bootstrap.sh` is not used: it runs as root on a bare system and
-creates the user, which is upstream of this repo entirely.
+- **WM:** Hyprland — native Lua config (0.56+); sub-configs in `hypr/config/*.lua`
+- **Shell:** Noctalia 5 (bar, launcher, notifications, OSD, control center, lock screen, clipboard); hand-written config `noctalia/config.toml`, GUI overrides in `~/.local/state/noctalia/settings.toml` (they win)
+- **IPC:** `noctalia msg <command>` for keybinds; `noctalia msg --help` lists them
+- **Wallpaper / theming:** Noctalia built-in; wallust was removed
+- Monitors live in `hypr/config/monitors.lua`, hand-written, matched by `desc:` (EDID make/model). Known panels get absolute coordinates, unknown ones fall through to an `auto` catch-all. Don't use nwg-displays; `monitors.conf` is gone.
+- Named workspaces: dev(6), server(7), work(8), game(9), config(10), magic(scratchpad)
+- waybar/rofi/swaync configs are legacy (kept on the `quickshell` branch)
 
-`verify_omarchy_shell_stack` runs whenever Omarchy is present and fails loudly
-on the `noctalia-qs` / `quickshell` conflict described above.
+## Omarchy stack
+
+- **Never edit `/usr/share/omarchy/`** — package-owned, overwritten on update. Reading it is fine and is the best reference.
+- Keep only genuine deltas in the `hypr/omarchy/*.lua` overrides. Rebinding a key Omarchy already binds requires `hl.unbind(...)` first. `omarchy menu keybindings --print` lists the defaults.
+- Omarchy provides its own polkit agent and clipboard history, so `polkit-gnome` and `cliphist` are not needed there.
+- `scripts/install.sh --install-omarchy` (aarch64 only) bootstraps Omarchy via omarchy-mac `quattro` in `~/.local/share/omarchy`, *before* the dotfiles phase because its installer overwrites tracked configs.
+- The Air is the always-on "kitchen Alexis" host: never idle-suspend. Enforced by `/etc/systemd/logind.conf.d/10-kitchen-power.conf`.
 
 ## Omarchy's shell without Omarchy
 
-`omarchy-shell.sh` puts the Omarchy shell (bar, notifications, OSD, menu, lock)
+`scripts/omarchy-shell.sh` puts the Omarchy shell (bar, notifications, OSD, menu, lock)
 on a Hyprland box that is *not* running Omarchy — the Noctalia machines. It
 unpacks the upstream packages under `~/.local/share/omarchy-shell` and points
 `OMARCHY_PATH` there, so there is no pacman repo, no keyring, no `/etc`
@@ -75,33 +71,8 @@ stages themed configs over `kitty.conf`, `foot.ini` and `alacritty.toml`, all
 of which this repo tracks. The shell falls back to a built-in palette when no
 theme is set.
 
-## Omarchy specifics
+## Shared
 
-- **Never edit `/usr/share/omarchy/`** — package-owned, overwritten on update.
-  Reading it is fine and is the best reference.
-- User Hyprland overrides load *after* Omarchy's defaults; keep only genuine
-  deltas in `hypr/{input,looknfeel,bindings,monitors,autostart}.lua`.
-- Rebinding a key that Omarchy already binds requires `hl.unbind(...)` first.
-- Validate every Hyprland change with `hyprctl reload && hyprctl configerrors`.
-  A reload succeeds even when the config has errors, so always check both.
-- `omarchy menu keybindings --print` lists all 238 default binds.
-- Omarchy provides its own polkit agent and clipboard history, so `polkit-gnome`
-  and `cliphist` are not needed on this stack.
-
-## Machine notes (`alarm` branch — M1 Air, Asahi)
-
-- Single internal display `eDP-1` @ 2560x1600. `hypr/monitors.conf` in this repo
-  describes the *desktop* (three DP outputs) and is not used on this machine.
-- Always-on "kitchen Alexis" host: never idle-suspend. Enforced by
-  `/etc/systemd/logind.conf.d/10-kitchen-power.conf` (`HandleLidSwitch=ignore`,
-  `IdleAction=ignore`). Omarchy's idle only dims and locks, so it does not
-  conflict.
-- Apple Silicon speakers need `asahi-audio` + `speakersafetyd`.
-
-## Shell
-
-Zsh via `ZDOTDIR=~/.config/zsh` (set in `~/.zshenv`), Oh My Zsh +
-Powerlevel10k. There is deliberately **no `~/.zshrc`** — it would be dead
-weight next to `ZDOTDIR`, and a stock Oh-My-Zsh copy there caused confusion
-after the Omarchy install. Omarchy ships a `starship.toml`, but nothing sources
-it and no Omarchy theme drives it, so p10k stays.
+- **Terminal:** Kitty. `kitty/kitty.conf` includes both stacks' theme files; whichever exists wins.
+- **Shell:** Zsh (Oh My Zsh + Powerlevel10k) at `zsh/` via `ZDOTDIR`. Deliberately no `~/.zshrc`.
+- Validate every Hyprland change with `hyprctl reload && hyprctl configerrors` — a reload succeeds even when the config has errors.

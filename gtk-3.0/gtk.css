@@ -1,23 +1,25 @@
-@import url("wallust-colors.css");
+/* Palette is rendered by Noctalia 5's GTK template (gitignored). Only the
+ * rules below are hand-written; they use the libadwaita colour names. */
+@import url("noctalia.css");
 
 * {
-    color: @theme_fg_color;
-    caret-color: @theme_fg_color;
+    color: @window_fg_color;
+    caret-color: @window_fg_color;
 }
 
 window,
 dialog,
 popover,
 .background {
-    background-color: @theme_bg_color;
-    color: @theme_fg_color;
+    background-color: @window_bg_color;
+    color: @window_fg_color;
 }
 
 headerbar,
 .titlebar {
-    background: alpha(@color0, 0.72);
-    border-bottom: 1px solid @borders;
-    color: @theme_fg_color;
+    background: alpha(@headerbar_bg_color, 0.72);
+    border-bottom: 1px solid alpha(@window_fg_color, 0.12);
+    color: @window_fg_color;
 }
 
 entry,
@@ -26,9 +28,9 @@ combobox,
 button,
 menu,
 menuitem {
-    background-color: alpha(@color0, 0.45);
-    border: 1px solid @borders;
-    color: @theme_fg_color;
+    background-color: alpha(@card_bg_color, 0.45);
+    border: 1px solid alpha(@window_fg_color, 0.12);
+    color: @window_fg_color;
 }
 
 button:hover,
@@ -39,7 +41,7 @@ menuitem:hover {
 scale trough,
 progressbar trough,
 levelbar trough {
-    background-color: alpha(@color0, 0.50);
+    background-color: alpha(@card_bg_color, 0.50);
     border-radius: 999px;
 }
 

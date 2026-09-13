@@ -4,13 +4,33 @@
 # Start on login
 start-at-login = true
 
-# Normalizations
-enable-normalization-flatten-containers = true
+# macOS restores every app's windows at login in a burst, racing AeroSpace's
+# startup, which is why things look shuffled after a reboot. This re-tiles the
+# workspace once AeroSpace is up. Pair it with disabling macOS window restore:
+#   defaults write com.apple.loginwindow TALLogoutSavesState -bool false
+after-startup-command = ['layout tiles --root']
+
+# Normalizations.
+# flatten-containers is OFF on purpose. With it on, every window in a workspace
+# becomes an equal sibling, so five windows means five narrow columns. Hyprland's
+# dwindle instead splits only the focused window, giving a binary spiral where
+# tiles stay far wider. Off + opposite-orientation below is the closest AeroSpace
+# gets to dwindle.
+enable-normalization-flatten-containers = false
 enable-normalization-opposite-orientation-for-nested-containers = true
 
-# Mouse follows focus
+# Closest thing AeroSpace has to Hyprland's dwindle. 'auto' picks the split
+# orientation from the monitor's aspect ratio (horizontal on wide, vertical on
+# tall) instead of always splitting the same way, which is what makes new
+# windows land somewhere sensible. Pinning the layout to 'tiles' also stops a
+# workspace coming up in accordion, where windows stack instead of tiling.
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# Mouse follows focus.
+# Monitor-level warping only. Per-window warping (on-focus-changed) is disabled
+# deliberately: it fights macOS focus tracking and causes focus ping-pong/stutter.
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
-on-focus-changed = ['move-mouse window-lazy-center']
 
 # Gaps (similar to Hyprland gaps)
 [gaps]
@@ -26,8 +46,19 @@ outer.bottom = 8
 if.app-id = 'org.mozilla.librewolf'
 run = ['layout tiling']
 
+# System Settings is a Mac Catalyst app: non-standard Accessibility tree (its
+# window reports an empty title) and a rigid minimum size it will not resize
+# below. Forcing it into the tiling tree just reserves a tile it refuses to
+# fill, which reads as a broken/overlapping window. Float it instead.
 [[on-window-detected]]
 if.app-id = 'com.apple.systempreferences'
+run = ['layout floating']
+
+# Tailscale ships with LSUIElement=1, so AeroSpace floats it by default. But it
+# switches activation policy to regular at runtime and its main window is a real
+# AXStandardWindow, so force it into the tiling tree.
+[[on-window-detected]]
+if.app-id = 'io.tailscale.ipn.macsys'
 run = ['layout tiling']
 
 # ====== Apps ======
@@ -35,8 +66,10 @@ run = ['layout tiling']
 
 [mode.main.binding]
 # Terminal
-alt-enter = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no'
-alt-t = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no'
+# -d ~ is required: AeroSpace is launched by launchd, whose working directory is
+# /, and exec-and-forget inherits it. Without this, every new terminal opens in /.
+alt-enter = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no -d ~'
+alt-t = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no -d ~'
 
 # Browser
 # MOZ_DISABLE_SAFE_MODE_KEY=1 stops LibreWolf from interpreting the held Option
@@ -55,8 +88,13 @@ alt-f = 'fullscreen'
 # Float / tiling toggle
 alt-shift-f = 'layout floating tiling'
 
-# Toggle split direction
+# Toggle split direction (Hyprland's SUPER+J togglesplit)
 alt-j = 'layout tiles horizontal vertical'
+
+# Force the whole workspace back to tiles. Recovery for a workspace that ends up
+# in accordion, where windows stack on top of each other and nothing looks
+# tiled — alt-j only retargets the focused node, so it cannot undo that.
+alt-shift-j = 'layout tiles --root'
 
 # ====== Focus ======
 alt-left = 'focus left'
@@ -86,6 +124,7 @@ alt-6 = 'workspace 6'
 alt-7 = 'workspace 7'
 alt-8 = 'workspace 8'
 alt-9 = 'workspace 9'
+alt-0 = 'workspace 10'
 
 # Move window to workspace
 alt-shift-1 = 'move-node-to-workspace 1'
@@ -97,6 +136,7 @@ alt-shift-6 = 'move-node-to-workspace 6'
 alt-shift-7 = 'move-node-to-workspace 7'
 alt-shift-8 = 'move-node-to-workspace 8'
 alt-shift-9 = 'move-node-to-workspace 9'
+alt-shift-0 = 'move-node-to-workspace 10'
 
 # Monitor focus (like Super+Tab)
 alt-tab = 'focus-monitor next'

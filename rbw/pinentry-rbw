@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Minimal pinentry shim: answers GETPIN from the GNOME keyring so rbw can
+# unlock the Vaultwarden vault without prompting.
+# Falls back to pinentry-gnome3 if the secret is missing or the keyring is locked.
+set -u
+
+SERVICE="vaultwarden"
+ACCOUNT="${RBW_KEYRING_ACCOUNT:-alexjpeders@gmail.com}"
+
+if [ -n "$ACCOUNT" ]; then
+    PASS=$(secret-tool lookup service "$SERVICE" account "$ACCOUNT" 2>/dev/null)
+else
+    PASS=$(secret-tool lookup service "$SERVICE" 2>/dev/null)
+fi
+
+# No secret available -> hand the whole session to the real pinentry.
+[ -n "$PASS" ] || exec pinentry-gnome3 "$@"
+
+# Assuan percent-escaping: % must go first, then CR/LF.
+PASS=${PASS//%/%25}
+PASS=${PASS//$'\r'/%0D}
+PASS=${PASS//$'\n'/%0A}
+
+printf 'OK Pleased to meet you\n'
+while IFS= read -r line; do
+    case "$line" in
+        GETPIN*) printf 'D %s\nOK\n' "$PASS" ;;
+        BYE*)    printf 'OK closing connection\n'; exit 0 ;;
+        *)       printf 'OK\n' ;;
+    esac
+done

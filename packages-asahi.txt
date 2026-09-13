@@ -1,0 +1,8 @@
+# Apple Silicon (Asahi) only — read by scripts/install.sh when uname -m is
+# aarch64, on top of packages.txt. Kept separate so an x86 machine never tries
+# to build these from the AUR.
+
+# Speaker stack (REQUIRED for built-in speakers on M-series Macs;
+# speakersafetyd protects the drivers, asahi-audio provides the DSP config).
+asahi-audio
+speakersafetyd

@@ -32,21 +32,27 @@ zoxide
 # Remote access
 mosh
 openssh
-
-# VPN — Tailscale (mesh/tailnet; official repo, so it's headless-safe here).
-# tailscaled is deliberately NOT enabled at boot — start it on demand via the
-# `ts-up` helper in zsh/.zshrc. See HOWTO.md for first-time login.
 tailscale
 
 # Terminal multiplexer
 tmux
 
+# AI coding agent
+opencode
+
 # ================================================================
 # === GUI (skipped in headless mode) ===
 # Everything below is only installed when running install.sh
 # without --headless. The marker line above is parsed by
-# install.sh / update.sh — do not rename it.
+# scripts/install.sh and scripts/update.sh — do not rename it.
 # ================================================================
+
+# Core Hyprland packages
+hyprland
+xdg-desktop-portal-hyprland
+# Wayland QPA plugin for Qt6 apps (Dolphin, PrismLauncher, the portal picker).
+# Only ever pulled in transitively before; without it Qt6 apps fall back to X11.
+qt6-wayland
 
 # Terminal
 kitty
@@ -58,12 +64,6 @@ wl-clipboard
 pipewire
 pipewire-pulse
 wireplumber
-
-# Asahi / Apple Silicon speaker stack (REQUIRED for built-in speakers on M-series
-# Macs; speakersafetyd protects the drivers, asahi-audio provides the DSP config).
-# Asahi-ARM only — do NOT merge to main / x86 machines.
-asahi-audio
-speakersafetyd
 
 # Bluetooth (bluez daemon + bluetoothctl; AirPods etc. via PipeWire A2DP)
 bluez
@@ -118,9 +118,8 @@ cliamp
 # Parsed by install.sh / update.sh — do not rename the marker line above.
 # ================================================================
 
-# Core Hyprland packages
-hyprland
-xdg-desktop-portal-hyprland
+# Desktop shell (v5, native C++; the v4 noctalia-shell/noctalia-qs pair is legacy)
+noctalia
 
 # Full JetBrains Mono Nerd package. Omarchy depends on
 # ttf-jetbrains-mono-nerd-basic, which provides the same font name and
@@ -130,14 +129,8 @@ ttf-jetbrains-mono-nerd
 # Browser
 librewolf-bin
 
-# Desktop shell
-noctalia-shell
-
 # Authentication agent (Omarchy's shell ships its own polkit agent)
 polkit-gnome
-
-# Clipboard history (Omarchy's shell keeps its own history)
-cliphist
 
 # System tray applets (Omarchy's bar has network/bluetooth widgets)
 network-manager-applet
@@ -145,12 +138,6 @@ blueman
 
 # Idle management (Omarchy uses idle.screensaver / idle.lock in shell.json)
 hypridle
-
-# Display configuration (Omarchy: SUPER + CTRL + D)
-nwg-displays
-
-# Night light (Omarchy uses hyprsunset)
-wlsunset
 
 # Display manager (Omarchy uses sddm, which its package depends on)
 ly
@@ -163,8 +150,7 @@ ly
 # ================================================================
 
 # Upstream Quickshell, which the Omarchy shell (bar, notifications, OSD,
-# lock screen) runs on. This must be the real `quickshell` package: the
-# Noctalia fork `noctalia-qs` also Provides+Conflicts `quickshell`, so if it
-# is installed first, pacman treats Omarchy's dependency as satisfied and
-# omarchy-shell dies at startup with a Qt symbol lookup error.
+# lock screen) runs on. Must be the real `quickshell`: Noctalia 4's fork
+# `noctalia-qs` Provides+Conflicts it and breaks omarchy-shell. Noctalia 5
+# no longer uses Quickshell, so this only matters if v4 is ever reinstalled.
 quickshell
