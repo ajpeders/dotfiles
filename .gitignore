@@ -15,7 +15,6 @@
 !packages.txt
 !packages-asahi.txt
 !hypr/
-!theme/
 !kitty/
 !wallpapers/
 # Per-host $HOME dotfiles (see hosts/<name>/README.md)
@@ -61,7 +60,6 @@ opencode/.gitignore
 
 # Keep config files in tracked directories
 !hypr/**
-!theme/**
 !kitty/**
 !wallpapers/**
 !gtk-3.0/**
