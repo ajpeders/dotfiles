@@ -25,6 +25,9 @@ Desktops run Noctalia 5 (native C++ rewrite, since 2026-09-09) on Hyprland; the 
       under gamescope the outer window's class is `gamescope`
 - [x] Desktop moved from GRUB to Limine (2026-09-12) — see ARCHITECTURE.md;
       `/boot/limine.conf` is machine state, intentionally untracked
+- [x] Repo audit (2026-09-12): dropped the Noctalia 4 config (`settings.json`,
+      QML plugins, colorschemes), the wallust CSS/`theme/` palette, `nwg-displays`,
+      and the untracked-file links in the scripts; `.gitignore` deduplicated
 
 ## Next
 

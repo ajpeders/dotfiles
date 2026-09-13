@@ -59,7 +59,7 @@ from git history if ever needed.
 
 ## Theming
 
-Border colors, kitty colors and the GTK palette all come from Noctalia 5's theme templates (`hypr/noctalia.lua`, `kitty/themes/noctalia.conf`, `gtk-{3,4}.0/noctalia.css`), so one palette (Ayu built-in) drives shell, compositor, terminal and GTK apps. The rendered files are gitignored — they are output that churns on every palette change; only the hand-written `@import` in each `gtk.css` is tracked. Dynamic theming via wallust was removed (wallust is x86-only and the workflow added more friction than value).
+Border colors, kitty colors and the GTK palette all come from Noctalia 5's theme templates (`hypr/noctalia.lua`, `kitty/themes/noctalia.conf`, `gtk-{3,4}.0/noctalia.css`), so one palette (Ayu built-in) drives shell, compositor, terminal and GTK apps. The rendered files are gitignored — they are output that churns on every palette change; only the hand-written rules in each `gtk.css` are tracked, and they use the libadwaita colour names (`@window_bg_color`, `@accent_color`, …) that the template defines. Dynamic theming via wallust was removed (wallust is x86-only and the workflow added more friction than value).
 
 ## Key Decisions
 
