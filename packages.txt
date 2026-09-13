@@ -134,9 +134,6 @@ blueman
 # Idle management (Omarchy uses idle.screensaver / idle.lock in shell.json)
 hypridle
 
-# Display configuration (Omarchy: SUPER + CTRL + D)
-nwg-displays
-
 # Night light (Omarchy uses hyprsunset)
 wlsunset
 

@@ -201,8 +201,9 @@ Hyprland-only (no mac equivalent): Noctalia bindings (`N`, `,`, `A`, `L`, `O`), 
 ```
 dotfiles/
 ├── hypr/                  # Hyprland config (Linux)
-│   ├── *.lua              #   Omarchy stack: overrides loaded after its defaults
-│   └── hyprland.conf, config/  #   Noctalia stack: standalone config
+│   ├── hyprland.lua       #   Entry point for both stacks (branches on /usr/share/omarchy)
+│   ├── config/*.lua       #   Noctalia stack: standalone config
+│   └── omarchy/*.lua      #   Omarchy stack: overrides loaded after its defaults
 ├── omarchy/               # Omarchy shell/bar, menu extensions, hooks (Linux)
 ├── kitty/                 # Terminal (shared)
 ├── noctalia/              # Noctalia 5 config.toml (Linux desktops)

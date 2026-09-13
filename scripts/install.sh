@@ -379,13 +379,10 @@ phase_dotfiles() {
     print_phase "Phase 6: Dotfiles"
 
     local config_dirs
-    local config_files
     if [ "$HEADLESS" -eq 1 ]; then
         config_dirs=(zsh yazi git tmux nvim opencode)
-        config_files=()
     else
         config_dirs=(hypr kitty wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim opencode)
-        config_files=(pavucontrol.ini QtProject.conf)
         # Each desktop keeps its own config dir; linking the other one just
         # leaves a dead directory behind.
         if [ "$OMARCHY" -eq 1 ]; then
@@ -434,13 +431,6 @@ phase_dotfiles() {
     for dir in "${config_dirs[@]}"; do
         if [ -d "$REPO_DIR/$dir" ]; then
             backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
-        fi
-    done
-
-    local file
-    for file in "${config_files[@]}"; do
-        if [ -f "$REPO_DIR/$file" ]; then
-            backup_and_link "$REPO_DIR/$file" "$HOME/.config/$file"
         fi
     done
 
