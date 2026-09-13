@@ -96,16 +96,26 @@ phase_pull() {
 
     cd "$SCRIPT_DIR"
 
+    local stashed=false
     if ! git diff --quiet || ! git diff --cached --quiet; then
         print_info "Uncommitted changes detected:"
         git status --short
         read -rp "Continue anyway? [y/N] " confirm
         [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
+        print_info "Temporarily stashing local changes before pull..."
+        git stash push --include-untracked -m "dotfiles update autostash $(date +%Y%m%d_%H%M%S)" >/dev/null
+        stashed=true
     fi
 
     local before
     before="$(git rev-parse HEAD)"
-    git pull --ff-only
+    if ! git -c pull.rebase=false pull --ff-only; then
+        if [ "$stashed" = true ]; then
+            print_info "Restoring stashed local changes..."
+            git stash pop || print_error "Stash pop had conflicts; resolve them manually"
+        fi
+        return 1
+    fi
     local after
     after="$(git rev-parse HEAD)"
 
@@ -114,6 +124,16 @@ phase_pull() {
     else
         print_status "Updated $(git log --oneline "$before..$after" | wc -l) commit(s):"
         git log --oneline "$before..$after" | sed 's/^/  /'
+    fi
+
+    if [ "$stashed" = true ]; then
+        print_info "Restoring stashed local changes..."
+        if git stash pop; then
+            print_status "Local changes restored"
+        else
+            print_error "Stash pop had conflicts; resolve them before continuing"
+            return 1
+        fi
     fi
 }
 
@@ -266,6 +286,11 @@ phase_browser_policies() {
 
     if [ ! -f "$src" ]; then
         print_info "No librewolf/policies.json in repo — skipping"
+        return
+    fi
+
+    if ! pacman -Qq librewolf-bin librewolf >/dev/null 2>&1; then
+        print_info "Librewolf is not installed — skipping policies"
         return
     fi
 
