@@ -73,6 +73,10 @@ theme is set.
 
 ## Shared
 
-- **Terminal:** Kitty. `kitty/kitty.conf` includes both stacks' theme files; whichever exists wins.
+- **Terminal:** Kitty everywhere except Omarchy. `kitty/kitty.conf` includes both stacks' theme
+  files; whichever exists wins. Omarchy's `SUPER+RETURN` runs `xdg-terminal-exec`, whose only
+  preference is `foot.desktop`, so an Omarchy box gets `foot/foot.ini` — kept in step with
+  kitty.conf by hand, deltas marked in the file. foot aborts on a missing `include=` (kitty
+  skips one), so its Omarchy theme include has to go if Omarchy ever comes off a machine.
 - **Shell:** Zsh (Oh My Zsh + Powerlevel10k) at `zsh/` via `ZDOTDIR`. Deliberately no `~/.zshrc`.
 - Validate every Hyprland change with `hyprctl reload && hyprctl configerrors` — a reload succeeds even when the config has errors.
