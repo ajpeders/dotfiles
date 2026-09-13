@@ -37,6 +37,15 @@ Scripts pick one automatically by checking whether the `omarchy` pacman package 
 - Omarchy provides its own polkit agent and clipboard history, so `polkit-gnome` and `cliphist` are not needed there.
 - `scripts/install.sh --install-omarchy` (aarch64 only) bootstraps Omarchy via omarchy-mac `quattro` in `~/.local/share/omarchy`, *before* the dotfiles phase because its installer overwrites tracked configs.
 - The Air is the always-on "kitchen Alexis" host: never idle-suspend. Enforced by `/etc/systemd/logind.conf.d/10-kitchen-power.conf`.
+- **`omarchy update` edits tracked terminal configs in place.** Its migrations
+  `sed -i`/append straight into `~/.config/kitty/kitty.conf`,
+  `~/.config/foot/foot.ini` and `~/.config/alacritty/alacritty.toml` — that is
+  where kitty.conf's `listen_on` line and both files' `~/.local/state/omarchy/current`
+  include paths came from. Each one is guarded (it skips when the setting is
+  already present) and recorded in `~/.local/state/omarchy/migrations/`, so they
+  do not re-run, but expect an `omarchy update` to show up as a dirty tree.
+  `omarchy-font-set` and `omarchy-display-text-size` rewrite the font size the
+  same way. Theming does *not* — see the section below.
 
 ## Omarchy's shell without Omarchy
 
@@ -66,10 +75,13 @@ Three things about the packaging that the script exists to handle:
 one, and no machine can run both shells. The script refuses to proceed without
 `--replace-noctalia`.
 
-Do not run `omarchy theme set` on such a box without reading it first: it
-stages themed configs over `kitty.conf`, `foot.ini` and `alacritty.toml`, all
-of which this repo tracks. The shell falls back to a built-in palette when no
-theme is set.
+`omarchy theme set` is safe to run here, contrary to what this file used to
+say. Verified against Omarchy on foot 1.28: nothing in the `omarchy-theme-set*`
+family writes under `~/.config` for a terminal. Themes land in
+`~/.local/state/omarchy/current/theme/`, `omarchy-theme-set-templates` renders
+into `.../current/next-theme/`, and the tracked `kitty.conf` / `foot.ini` pick
+the result up through their `include` lines. The shell falls back to a built-in
+palette when no theme is set.
 
 ## Shared
 
