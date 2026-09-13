@@ -45,6 +45,9 @@
 !tmux/**
 !nvim/
 !nvim/**
+# Keychron Q1 HE keymap export (restore via VIA/Launcher)
+!keychron/
+!keychron/**
 
 # opencode: config tracked, but it writes runtime cruft into the same dir
 !opencode/
