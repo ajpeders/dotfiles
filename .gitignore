@@ -9,6 +9,8 @@
 !ARCHITECTURE.md
 !ROADMAP.md
 !HOWTO.md
+!docs/
+!docs/**
 
 # Bootstrap + maintenance entry points
 !scripts/
