@@ -84,7 +84,7 @@ element; elements per token = 2 x layers x kv_heads x head_dim.
 | `qwen3-coder:30b` | 48 x 4 x 128 | 52.1 KB | 6.8 GB | 18 GB | ~24.8 GB + graph buffers |
 | `qwen3.6:27b` | 16 full-attn of 65 x 4 x 256 | 34.7 KB | 4.6 GB | 17 GB | ~21.6 GB, a floor (linear-attention state excluded) |
 | `qwen3:8b` | 36 x 8 x 128 | 78.1 KB | 10.2 GB | 5.2 GB | ~15.4 GB |
-| `glm-4.7-flash` | to measure after pull | tbd | tbd | 19 GB | tbd |
+| `glm-4.7-flash` | MLA, 47 x 576 latent | ~24 KB (measured) | ~3 GB | 19 GB | **22 GB measured at 131k, 100% GPU** |
 
 `qwen3-coder:30b` at 131k fits the ~28 GB headroom, but not with room to spare.
 
