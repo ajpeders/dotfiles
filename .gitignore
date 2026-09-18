@@ -11,6 +11,8 @@
 !HOWTO.md
 !docs/
 !docs/**
+!etc/
+!etc/**
 
 # Bootstrap + maintenance entry points
 !scripts/
