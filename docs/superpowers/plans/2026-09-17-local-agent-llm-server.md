@@ -96,7 +96,9 @@ ollama create qwen3:8b-32k -f ~/.config/etc/qwen3-8b-32k.Modelfile
 
 - [ ] **Step 3: Verify the cap actually beats the server default**
 
-Do this check *after* Task 3 is applied, and treat it as the gate on the whole approach:
+**Settled 2026-09-18 on the live system: Modelfile `num_ctx` WINS.** After Task 3 made
+131072 global, `glm-4.7-flash` loaded at 131072 while `qwen3:8b-32k` loaded at 32768.
+Re-confirm after any Ollama upgrade:
 
 ```bash
 curl -s --max-time 120 localhost:11434/api/chat \
@@ -203,12 +205,21 @@ table inet ollama_gate {
     tcp dport 11434 ip saddr 192.168.0.0/24 accept comment "LAN"
     tcp dport 11434 ip saddr 100.64.0.0/10 accept comment "tailnet"
     tcp dport 11434 ip saddr 172.16.0.0/12 accept comment "docker bridges: open-webui, myproject-myagent"
-    tcp dport 11434 counter drop comment "everything else"
+    tcp dport 11434 ip6 saddr fd7a:115c:a1e0::/48 accept comment "tailnet v6"
+    tcp dport 11434 ip6 saddr fdc1:8b43:26ea:4be9::/64 accept comment "LAN ULA"
+    tcp dport 11434 ip6 saddr fe80::/10 accept comment "link-local"
+    tcp dport 11434 counter drop comment "everything else, v4 and v6"
   }
 }
 ```
 
 Everything not matching `tcp dport 11434` falls off the chain end to `policy accept`.
+
+**IPv6 matters here.** Verified 2026-09-18: the socket is dual-stack (`LISTEN *:11434`)
+and `curl http://[<ULA>]:11434/api/version` returns 200. An `ip saddr` match never
+matches IPv6, so a v4-only ruleset would leave the port open on a routable global
+address. The dynamic `2601:...` GUA is deliberately NOT allow-listed — LAN peers reach
+the box by IPv4 or ULA.
 
 - [ ] **Step 2: Dry-run the syntax without loading**
 
@@ -236,7 +247,14 @@ docker run --rm --network open-webui_default curlimages/curl:latest \
   -s -m 5 -o /dev/null -w '%{http_code}\n' http://172.23.0.1:11434/api/version  # expect 200 (allowed)
 ping -c1 -W2 192.168.0.176 && ping -c1 -W2 2606:4700:4700::1111      # IPv4 + IPv6 still work
 tailscale status | head -3                                            # still direct, not relayed
+# NEGATIVE test: the GUA must now be refused, and the drop counter must move
+GUA=$(ip -6 addr show enp16s0 scope global | awk '/inet6 2/{print $2}' | cut -d/ -f1 | head -1)
+curl -s -m 5 "http://[$GUA]:11434/api/version" && echo "FAIL: still reachable" || echo "refused, as intended"
+sudo nft list table inet ollama_gate | grep counter
 ```
+
+A gate that only ever accepts proves nothing; the drop counter incrementing is the
+evidence it works.
 
 Instant undo if anything misbehaves: `sudo nft destroy table inet ollama_gate`.
 
@@ -247,8 +265,9 @@ Instant undo if anything misbehaves: `sudo nft destroy table inet ollama_gate`.
 ```ini
 [Unit]
 Description=Restrict Ollama (11434) to LAN, tailnet and docker bridges
-After=network-pre.target
-Before=network.target
+Wants=network-pre.target
+Before=network-pre.target
+Before=ollama.service docker.service
 
 [Service]
 Type=oneshot
@@ -320,12 +339,13 @@ ln -sfn ~/.config/scripts/claude-local ~/.local/bin/claude-local
 A reply alone proves nothing — the existing Anthropic login would answer too. Watch the server:
 
 ```bash
-journalctl -u ollama -f &   # leave running
 claude-local -p "reply with only: ok" 2>&1 | tail -3
-# expect a POST /v1/messages line in the journal, then:
-kill %1
+journalctl -u ollama --since "-2 min" --no-pager | grep -c '/v1/messages'
 ```
-Expected: `/v1/messages` appears in the Ollama journal during the call.
+Expected: a non-zero count. (Ollama 0.34 logs a GIN access line per request at the
+default level. Grep the exact path: isis polls `GET /api/tags` every 30s, so a bare
+"POST" grep would be noisy. Do not use `journalctl -f &` plus `kill %1` — that needs
+interactive job control and fails in non-interactive execution.)
 
 - [ ] **Step 4: Confirm the model served it**
 
@@ -377,9 +397,8 @@ Expected: no "unrecognized field" error. `--profile` is typed `CONFIG_PROFILE_V2
 - [ ] **Step 4: Prove the run reaches Ollama and the default is unchanged**
 
 ```bash
-journalctl -u ollama -f &
 codex -p local exec "reply with only: ok" 2>&1 | tail -5
-kill %1
+journalctl -u ollama --since "-2 min" --no-pager | grep -c '/v1/responses'
 codex doctor 2>&1 | grep -iE 'default model|model provider'
 ```
 Expected: a `/v1/responses` line in the Ollama journal (Codex can silently fall back to the default provider, so the journal is the proof), and the doctor output still naming `gpt-6-astra · openai`.
@@ -477,7 +496,9 @@ Expected: env shows `100.84.247.20`; health shows `arch` non-zero and no `arch-v
 ssh isis-alex 'docker exec llm-router wget -qO- -T 60 --header="content-type: application/json" \
   --post-data="{\"model\":\"glm-4.7-flash\",\"messages\":[{\"role\":\"user\",\"content\":\"say ok\"}],\"max_tokens\":50}" \
   http://127.0.0.1:8080/v1/chat/completions' | head -c 200
-curl -s -m 10 https://llm.thelunadog.com/health   # spec criterion 3; Traefik local-only@file
+ssh isis-alex 'curl -s -m 10 https://llm.thelunadog.com/health'   # spec criterion 3
+# Run it from isis: Traefik's local-only@file middleware may reject the desktop and
+# produce a false failure.
 ```
 
 - [ ] **Step 5: Confirm nothing needs committing on isis**
@@ -503,7 +524,8 @@ OLLAMA_API_KEY=
 
 ```bash
 sudo install -d -m 755 /etc/ollama
-read -rs KEY                      # paste; not echoed, not in history
+sudo -v                           # get the sudo prompt out of the way first
+read -rsp 'OLLAMA_API_KEY: ' KEY; echo   # paste; not echoed, not in history
 printf 'OLLAMA_API_KEY=%s\n' "$KEY" | sudo install -m 600 /dev/stdin /etc/ollama/cloud.env
 unset KEY
 sudo systemctl restart ollama
@@ -560,9 +582,18 @@ Confirm `git status` never shows the real key file (it lives outside the repo).
 - Modify: `~/.config/environment.d/50-llm.conf`, `~/.config/zsh/.zshrc`
 - Modify: `~/.config/README.md`, `ARCHITECTURE.md`, `ROADMAP.md`, `HOWTO.md`
 
-- [ ] **Step 1: Update `LLM_MODEL` to the bake-off winner**
+- [ ] **Step 1: Update the model name in ALL FIVE places**
 
-Both `environment.d/50-llm.conf` and the `zsh/.zshrc:191` fallback default to `qwen3-coder:30b`. If Task 10 Step 5 removed that model, every non-shell launcher would point at a deleted model. Update both to the winner.
+The bake-off loser gets deleted, so every hardcoded reference must move to the winner
+first. Task 10 Step 5 must not delete anything until this is done:
+
+1. `environment.d/50-llm.conf` (`LLM_MODEL`)
+2. `zsh/.zshrc:191` (the `LLM_MODEL` fallback)
+3. `scripts/claude-local` (the `LLM_MODEL` default)
+4. `codex/config-local.toml` (`[profiles.local] model`) — and re-merge into `~/.codex/config.toml`
+5. `opencode/opencode.json` (`small_model`, and the per-model `limit` entries)
+
+Verify with `grep -rn 'glm-4.7-flash\|qwen3-coder:30b' ~/.config --include='*' | grep -v docs/`
 
 - [ ] **Step 2: README** — add the local agent server and the one-liner for pointing *another* machine at it (`scripts/setup-llm.sh <url>`).
 
