@@ -156,8 +156,8 @@ coder models, not for `qwen2.5:7b-instruct` (real ceiling 32k). Change
 `small_model` off `qwen3:8b` to the coder model, for the same eviction reason as
 Claude Code.
 
-**Claude Code.** New `scripts/claude-local` (installed to `~/bin`, which exists
-and holds other scripts), setting `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`,
+**Claude Code.** New `scripts/claude-local`, symlinked into `~/.local/bin`
+(`~/bin` exists but is NOT on PATH), setting `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`,
 `ANTHROPIC_MODEL` and the background/small-model variable to the same model.
 The exact name of that last variable (`ANTHROPIC_SMALL_FAST_MODEL` versus
 `ANTHROPIC_DEFAULT_HAIKU_MODEL`) must be confirmed against the installed
@@ -196,8 +196,12 @@ it timing out every 30s refresh. Then recreate the container.
 5. `systemctl show ollama -p Environment` contains the new variables and
    `systemctl is-enabled ollama` is `enabled`. After the next reboot,
    `tailscale debug prefs` still shows `RouteAll: false`.
-6. From a Docker bridge address on the desktop, `curl 172.17.0.1:11434` is
-   refused, while LAN and tailnet clients still succeed.
+6. The gate is live and correct: `nft list table inet ollama_gate` shows the
+   rules, LAN/tailnet/loopback and the docker bridges reach 11434, and IPv6,
+   Tailscale direct UDP and SSH are unaffected. Docker bridges are allowed by
+   decision (2026-09-18): `open-webui` and `myproject-myagent` reach Ollama via
+   `host.docker.internal`, and repointing them was rejected as more invasive
+   than trusting local containers.
 7. A cloud model answers through the local server:
    `ollama run glm-5.3-flash:cloud` returns text, and the same model works from
    isis via the tailnet endpoint.
