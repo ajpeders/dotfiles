@@ -205,6 +205,7 @@ table inet ollama_gate {
     tcp dport 11434 ip saddr 192.168.0.0/24 accept comment "LAN"
     tcp dport 11434 ip saddr 100.64.0.0/10 accept comment "tailnet"
     tcp dport 11434 ip saddr 172.16.0.0/12 accept comment "docker bridges: open-webui, myproject-myagent"
+    tcp dport 11434 ip saddr 10.8.0.0/24 accept comment "wg-isis (Alex, 2026-09-18)"
     tcp dport 11434 ip6 saddr fd7a:115c:a1e0::/48 accept comment "tailnet v6"
     tcp dport 11434 ip6 saddr fdc1:8b43:26ea:4be9::/64 accept comment "LAN ULA"
     tcp dport 11434 ip6 saddr fe80::/10 accept comment "link-local"
