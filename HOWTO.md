@@ -148,9 +148,11 @@ before committing to it.
 
 Defaults live in `environment.d/50-llm.conf` (session-wide) and `zsh/.zshrc`
 (shells), both pointing at the local ollama. To use another host, either run
-`bash scripts/setup-llm.sh <base-url>` (writes `~/.local/state/dotfiles/llm.env`,
-picked up by shells) or drop a gitignored `environment.d/90-llm-local.conf` —
-systemd reads `*.conf` in name order, so the higher number wins session-wide.
+`bash scripts/setup-llm.sh <base-url>` or set the files manually. The script
+writes `~/.local/state/dotfiles/llm.env` for shells and the gitignored
+`environment.d/90-llm-local.conf` for app launchers, then updates the current
+systemd user environment. Files under `environment.d` are read in name order,
+so the higher-numbered machine override wins session-wide.
 
 Changes to `environment.d` apply at next login; to test immediately:
 

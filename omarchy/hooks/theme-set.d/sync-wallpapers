@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -euo pipefail
+
+theme_name="${1:-}"
+if [ -z "$theme_name" ]; then
+  theme_name="$(cat "$HOME/.local/state/omarchy/current/theme.name" 2>/dev/null || true)"
+fi
+
+source_dir="$HOME/Pictures/Wallpapers"
+if [ -z "$theme_name" ] || [ ! -d "$source_dir" ]; then
+  exit 0
+fi
+
+destination="$HOME/.config/omarchy/backgrounds/$theme_name"
+mkdir -p "$destination"
+
+# Refresh only links managed by this hook; preserve theme-specific backgrounds.
+for link in "$destination"/dotfiles-*; do
+  [ -L "$link" ] && rm -- "$link"
+done
+
+shopt -s nullglob nocaseglob
+for image in "$source_dir"/*.{jpg,jpeg,png,gif,bmp,webp}; do
+  ln -sfn "$image" "$destination/dotfiles-$(basename "$image")"
+done
+
+color_sync="$HOME/.config/scripts/sync-omarchy-colors.sh"
+[ -x "$color_sync" ] && "$color_sync" --force

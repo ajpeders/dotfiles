@@ -454,6 +454,14 @@ phase_dotfiles() {
         fi
     done
 
+    if [ "$HEADLESS" -ne 1 ] && [ "$OMARCHY" -eq 1 ]; then
+        mkdir -p "$HOME/.config/systemd/user"
+        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.service" \
+            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.service"
+        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.path" \
+            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.path"
+    fi
+
     if [ ! -f "$HOME/.zshenv" ]; then
         printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
         print_status "Created ~/.zshenv with ZDOTDIR"
@@ -554,6 +562,10 @@ phase_services() {
         enable_user_service pipewire
         enable_user_service pipewire-pulse
         enable_user_service wireplumber
+        if [ "$OMARCHY" -eq 1 ]; then
+            systemctl --user daemon-reload
+            enable_user_service omarchy-wallpaper-colors.path
+        fi
     fi
 }
 
