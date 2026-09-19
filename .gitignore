@@ -70,6 +70,8 @@ opencode/.gitignore
 !systemd/
 !systemd/user/
 !systemd/user/noctalia-shell.service
+!systemd/user/omarchy-wallpaper-colors.path
+!systemd/user/omarchy-wallpaper-colors.service
 !librewolf/
 !librewolf/policies.json
 
@@ -87,10 +89,16 @@ environment.d/90-llm-local.conf
 !omarchy/extensions/**
 !omarchy/branding/
 !omarchy/branding/**
+!omarchy/defaults/
+!omarchy/defaults/agent
 !omarchy/themes/
 !omarchy/themes/**
+# Rendered per-theme by scripts/sync-omarchy-colors.sh.
+omarchy/themes/*/colors.toml
 !omarchy/hooks/
 !omarchy/hooks/**
+!omarchy/matugen/
+!omarchy/matugen/**
 # Omarchy ships these as stock samples / installs them on update; they are not
 # user configuration and would churn on every `omarchy update`.
 omarchy/hooks/**/*.sample

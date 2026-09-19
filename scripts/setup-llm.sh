@@ -21,6 +21,8 @@ REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 ENV_DIR="$HOME/.local/state/dotfiles"
 ENV_FILE="$ENV_DIR/llm.env"
+SYSTEMD_ENV_DIR="$HOME/.config/environment.d"
+SYSTEMD_ENV_FILE="$SYSTEMD_ENV_DIR/90-llm-local.conf"
 OPENCODE_CONFIG="$REPO_DIR/opencode/opencode.json"
 PROVIDER="ollama"
 
@@ -149,7 +151,7 @@ fi
 
 # ---------- 4. Write the env file ----------
 
-mkdir -p "$ENV_DIR"
+mkdir -p "$ENV_DIR" "$SYSTEMD_ENV_DIR"
 cat > "$ENV_FILE" <<EOF
 # Written by scripts/setup-llm.sh — per-machine, intentionally outside the repo.
 # opencode reads both of these via {env:...} in opencode/opencode.json. The URL
@@ -158,6 +160,22 @@ export LLM_SERVER_URL="$BASE_URL"
 export LLM_MODEL="$MODEL_ID"
 EOF
 print_status "Wrote $ENV_FILE"
+
+cat > "$SYSTEMD_ENV_FILE" <<EOF
+# Written by scripts/setup-llm.sh — per-machine and intentionally gitignored.
+LLM_SERVER_URL=$BASE_URL
+LLM_MODEL=$MODEL_ID
+EOF
+print_status "Wrote $SYSTEMD_ENV_FILE"
+
+# Make menu/keybinding launches use the new endpoint immediately. environment.d
+# remains the durable source for the next login.
+if systemctl --user show-environment >/dev/null 2>&1; then
+    systemctl --user set-environment \
+        "LLM_SERVER_URL=$BASE_URL" \
+        "LLM_MODEL=$MODEL_ID"
+    print_status "Updated the current systemd user environment"
+fi
 
 # ---------- 5. Check the model has a catalog entry ----------
 
@@ -188,5 +206,10 @@ echo -e "${BOLD}Model: ${NC} $MODEL_ID"
 echo ""
 if [ "${LLM_SERVER_URL:-}" != "$BASE_URL" ] || [ "${LLM_MODEL:-}" != "$MODEL_ID" ]; then
     echo "Start a new shell (or 'source $ENV_FILE') to pick up the new values."
+    echo ""
+fi
+
+if pgrep -x opencode >/dev/null 2>&1; then
+    echo "Quit and restart OpenCode so it inherits the updated server environment."
     echo ""
 fi

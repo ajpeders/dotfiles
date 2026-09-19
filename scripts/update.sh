@@ -251,6 +251,14 @@ phase_dotfiles() {
         [ -d "$REPO_DIR/$dir" ] && backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
     done
 
+    if [ "$HEADLESS" -ne 1 ] && [ "$OMARCHY" -eq 1 ]; then
+        mkdir -p "$HOME/.config/systemd/user"
+        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.service" \
+            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.service"
+        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.path" \
+            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.path"
+    fi
+
     # Ensure ~/.zshenv is configured
     if [ ! -f "$HOME/.zshenv" ]; then
         printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
@@ -310,6 +318,11 @@ phase_reload() {
         print_info "Not inside a Hyprland session — skipping live reload"
         print_info "Changes will take effect after next login"
         return
+    fi
+
+    if [ "$OMARCHY" -eq 1 ]; then
+        systemctl --user daemon-reload
+        systemctl --user enable --now omarchy-wallpaper-colors.path
     fi
 
     # Hyprland
