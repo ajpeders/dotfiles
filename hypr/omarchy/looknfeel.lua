@@ -14,6 +14,19 @@ hl.config({
     dim_inactive = true,
     dim_strength = 0.15,
   },
+
+  dwindle = {
+    -- Omarchy defaults to force_split = 2, which makes new terminals split
+    -- from the focused terminal. Restore Hyprland's automatic placement.
+    force_split = 0,
+  },
+})
+
+-- OpenCode runs inside the terminal and sets this title while active. Give it
+-- the same stronger translucency used for terminals on the Noctalia desktop.
+hl.window_rule({
+  match = { title = "^(OpenCode)$" },
+  opacity = "0.94 0.88",
 })
 
 -- The old desktop config ran blur (size 10, passes 3) and shadows. Omarchy

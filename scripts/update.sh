@@ -13,18 +13,17 @@
 
 set -euo pipefail
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BOLD='\033[1m'
-NC='\033[0m'
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib-dotfiles.sh
+source "$SCRIPT_DIR/lib-dotfiles.sh"
+trap dotfiles_release_lock EXIT
+dotfiles_acquire_lock
 
 print_status() { echo -e "${GREEN}[✓]${NC} $1"; }
 print_error()  { echo -e "${RED}[✗]${NC} $1"; }
 print_info()   { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase()  { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # The repo root is one level up: this script lives in <repo>/scripts/.
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
@@ -62,17 +61,10 @@ if [ -z "$HEADLESS" ]; then
     fi
 fi
 
-# The installed omarchy package is the source of truth; the state file only
-# matters when the package database is unavailable.
-if [ "$OMARCHY" -eq -1 ]; then
-    if pacman -Qq omarchy >/dev/null 2>&1; then
-        OMARCHY=1
-    elif [ -r "$DESKTOP_STATE_FILE" ] && [ "$(cat "$DESKTOP_STATE_FILE")" = "omarchy" ]; then
-        OMARCHY=1
-    else
-        OMARCHY=0
-    fi
-fi
+# Single source of truth for desktop detection lives in lib-dotfiles.sh.
+# dotfiles_detect_desktop honors explicit --omarchy/--no-omarchy overrides
+# first, then the omarchy pacman package, then dotfiles-desktop state file.
+OMARCHY=-1 dotfiles_detect_desktop >/dev/null
 
 desktop_label() {
     if [ "$OMARCHY" -eq 1 ]; then echo "Omarchy"; else echo "Noctalia"; fi
@@ -84,21 +76,59 @@ else
     print_info "Mode: FULL DESKTOP / $(desktop_label)"
 fi
 
+aur_helper=""
+detect_aur_helper() {
+    if command -v paru >/dev/null 2>&1 && paru --version >/dev/null 2>&1; then
+        aur_helper="paru"
+        return 0
+    fi
+    return 1
+}
+
+# Re-create ~/.local/state/dotfiles-desktop if a prior install.sh run was
+# interrupted before phase_state could write it. Idempotent: the marker file
+# marks completion, so this only runs once per machine.
+phase_migrations() {
+    print_phase "Phase 0: Migrations"
+
+    # Re-create ~/.local/state/dotfiles-desktop if a prior install.sh run was
+    # interrupted before phase_state could write it. Idempotent: the marker
+    # file marks completion, so this only runs once per machine.
+    if [ ! -r "$HOME/.local/state/dotfiles-desktop" ]; then
+        local detected="noctalia"
+        if command -v pacman >/dev/null 2>&1 && pacman -Qq omarchy >/dev/null 2>&1; then
+            detected="omarchy"
+        fi
+        dotfiles_run_migration ensure-dotfiles-desktop \
+            bash -c "echo '$detected' > '$HOME/.local/state/dotfiles-desktop'"
+    fi
+}
+
 phase_pull() {
     print_phase "Phase 1: Pull Latest Changes"
 
     cd "$REPO_DIR"
 
+    local stashed=false
     if ! git diff --quiet || ! git diff --cached --quiet; then
         print_info "Uncommitted changes detected:"
         git status --short
         read -rp "Continue anyway? [y/N] " confirm
         [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
+        print_info "Temporarily stashing local changes before pull..."
+        git stash push --include-untracked -m "dotfiles update autostash $(date +%Y%m%d_%H%M%S)" >/dev/null
+        stashed=true
     fi
 
     local before
     before="$(git rev-parse HEAD)"
-    git pull --ff-only
+    if ! git -c pull.rebase=false pull --ff-only; then
+        if [ "$stashed" = true ]; then
+            print_info "Restoring stashed local changes..."
+            git stash pop || print_error "Stash pop had conflicts; resolve them manually"
+        fi
+        return 1
+    fi
     local after
     after="$(git rev-parse HEAD)"
 
@@ -107,6 +137,16 @@ phase_pull() {
     else
         print_status "Updated $(git log --oneline "$before..$after" | wc -l) commit(s):"
         git log --oneline "$before..$after" | sed 's/^/  /'
+    fi
+
+    if [ "$stashed" = true ]; then
+        print_info "Restoring stashed local changes..."
+        if git stash pop; then
+            print_status "Local changes restored"
+        else
+            print_error "Stash pop had conflicts; resolve them before continuing"
+            return 1
+        fi
     fi
 }
 
@@ -149,13 +189,29 @@ phase_packages() {
         pkgs+=("$line")
     done < "$REPO_DIR/packages.txt"
 
+    # Apple Silicon (Asahi) extras, kept out of packages.txt so x86 never
+    # tries to build them from the AUR. Mirrors install.sh.
+    if [ "$(uname -m)" = "aarch64" ] && [ -f "$REPO_DIR/packages-asahi.txt" ]; then
+        while IFS= read -r line; do
+            line="${line%%#*}"
+            line="${line//[[:space:]]/}"
+            [ -n "$line" ] || continue
+            pkgs+=("$line")
+        done < "$REPO_DIR/packages-asahi.txt"
+    fi
+
     if [ "${#pkgs[@]}" -eq 0 ]; then
         print_info "No packages in packages.txt"
         return
     fi
 
-    print_info "Syncing ${#pkgs[@]} packages (new packages will be installed)..."
-    if paru -S --needed --noconfirm "${pkgs[@]}"; then
+    detect_aur_helper || {
+        print_error "No working paru found. Run install.sh once to rebuild paru, then rerun update.sh."
+        return 1
+    }
+
+    print_info "Syncing ${#pkgs[@]} packages with $aur_helper (new packages will be installed)..."
+    if "$aur_helper" -S --needed --noconfirm "${pkgs[@]}"; then
         print_status "Packages up to date"
     else
         print_error "Package sync failed"
@@ -217,6 +273,14 @@ phase_dotfiles() {
         [ -d "$REPO_DIR/$dir" ] && backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
     done
 
+    if [ "$HEADLESS" -ne 1 ] && [ "$OMARCHY" -eq 1 ]; then
+        mkdir -p "$HOME/.config/systemd/user"
+        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.service" \
+            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.service"
+        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.path" \
+            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.path"
+    fi
+
     # Ensure ~/.zshenv is configured
     if [ ! -f "$HOME/.zshenv" ]; then
         printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
@@ -249,6 +313,11 @@ phase_browser_policies() {
         return
     fi
 
+    if ! pacman -Qq librewolf-bin librewolf >/dev/null 2>&1; then
+        print_info "Librewolf is not installed — skipping policies"
+        return
+    fi
+
     if [ -f "$dst" ] && cmp -s "$src" "$dst"; then
         print_status "Librewolf policies already up to date"
         return
@@ -271,6 +340,11 @@ phase_reload() {
         print_info "Not inside a Hyprland session — skipping live reload"
         print_info "Changes will take effect after next login"
         return
+    fi
+
+    if [ "$OMARCHY" -eq 1 ]; then
+        systemctl --user daemon-reload
+        systemctl --user enable --now omarchy-wallpaper-colors.path
     fi
 
     # Hyprland
@@ -302,6 +376,7 @@ phase_reload() {
     print_status "Live reload complete"
 }
 
+phase_migrations
 phase_pull
 phase_packages
 phase_dotfiles

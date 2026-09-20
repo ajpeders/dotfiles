@@ -23,18 +23,17 @@
 
 set -euo pipefail
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BOLD='\033[1m'
-NC='\033[0m'
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib-dotfiles.sh
+source "$SCRIPT_DIR/lib-dotfiles.sh"
+trap dotfiles_release_lock EXIT
+dotfiles_acquire_lock
 
 print_status() { echo -e "${GREEN}[✓]${NC} $1"; }
 print_error() { echo -e "${RED}[✗]${NC} $1"; }
 print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase() { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # The repo root is one level up: this script lives in <repo>/scripts/.
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
@@ -77,16 +76,10 @@ for arg in "$@"; do
 done
 
 # Omarchy installs itself as a pacman package and owns Hyprland, the shell and
-# the display manager. Its presence is what decides which desktop phases run.
+# the display manager. The shared detector in lib-dotfiles.sh is the single
+# source of truth; this shim keeps the old name working.
 detect_desktop() {
-    if [ "$OMARCHY" -ne -1 ]; then
-        return
-    fi
-    if pacman -Qq omarchy >/dev/null 2>&1; then
-        OMARCHY=1
-    else
-        OMARCHY=0
-    fi
+    OMARCHY=-1 dotfiles_detect_desktop >/dev/null
 }
 
 desktop_label() {
@@ -229,7 +222,7 @@ phase_preflight() {
     echo "  - Install paru if needed"
     if [ "$HEADLESS" -eq 1 ]; then
         echo "  - Install headless packages from packages.txt (GUI packages skipped)"
-        echo "  - Link CLI dotfiles into ~/.config (shell, editor, tmux, yazi, git)"
+        echo "  - Link CLI dotfiles into ~/.config (shell, editor, tmux, yazi, git, opencode)"
         echo "  - Configure zsh, oh-my-zsh, plugins, and powerlevel10k"
         echo "  - Enable NetworkManager, avahi-daemon, and sshd"
         echo "  - Set the system default target to multi-user.target (no graphical login)"
@@ -247,15 +240,29 @@ phase_preflight() {
     [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 }
 
+aur_helper=""
+
+detect_aur_helper() {
+    if command -v paru >/dev/null 2>&1 && paru --version >/dev/null 2>&1; then
+        aur_helper="paru"
+        return 0
+    fi
+    return 1
+}
+
 phase_paru() {
     print_phase "Phase 3: AUR Helper (paru)"
 
     print_info "Ensuring base-devel and git are installed..."
     sudo pacman -S --needed --noconfirm base-devel git
 
-    if command -v paru >/dev/null 2>&1; then
+    if detect_aur_helper; then
         print_status "paru already installed ($(paru --version | head -n 1))"
         return
+    fi
+
+    if command -v paru >/dev/null 2>&1; then
+        print_info "paru is installed but cannot start; rebuilding it against current pacman..."
     fi
 
     local tmp
@@ -267,6 +274,7 @@ phase_paru() {
     rm -rf "$tmp"
 
     print_status "paru installed"
+    aur_helper="paru"
 }
 
 read_packages() {
@@ -328,9 +336,14 @@ phase_packages() {
     fi
 
     local failed=()
-    print_info "Installing ${#pkgs[@]} packages via paru; already-installed packages are skipped..."
+    detect_aur_helper || {
+        print_error "No working paru found"
+        return 1
+    }
+
+    print_info "Installing ${#pkgs[@]} packages via $aur_helper; already-installed packages are skipped..."
     for pkg in "${pkgs[@]}"; do
-        paru -S --needed --noconfirm "$pkg" || {
+        "$aur_helper" -S --needed --noconfirm "$pkg" || {
             print_error "Failed to install: $pkg (skipping)"
             failed+=("$pkg")
         }
@@ -434,6 +447,25 @@ phase_dotfiles() {
         fi
     done
 
+    if [ "$HEADLESS" -ne 1 ] && [ "$OMARCHY" -eq 1 ]; then
+        mkdir -p "$HOME/.config/systemd/user"
+        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.service" \
+            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.service"
+        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.path" \
+            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.path"
+
+        # kitty.conf has a conditional Noctalia include that points nowhere
+        # on a host that has never run Noctalia. Comment it out so future
+        # kitty reloads stop warning about a missing include.
+        if ! pacman -Qq noctalia >/dev/null 2>&1; then
+            local kitty_conf="$HOME/.config/kitty/kitty.conf"
+            if [ -r "$kitty_conf" ] && grep -qE '^include[[:space:]]+themes/noctalia\.conf[[:space:]]*$' "$kitty_conf"; then
+                sed -i 's|^include[[:space:]]\+themes/noctalia\.conf[[:space:]]*$|# include themes/noctalia.conf -- not on a Noctalia host|' "$kitty_conf"
+                print_status "Disabled Noctalia include in kitty.conf"
+            fi
+        fi
+    fi
+
     if [ ! -f "$HOME/.zshenv" ]; then
         printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
         print_status "Created ~/.zshenv with ZDOTDIR"
@@ -534,6 +566,10 @@ phase_services() {
         enable_user_service pipewire
         enable_user_service pipewire-pulse
         enable_user_service wireplumber
+        if [ "$OMARCHY" -eq 1 ]; then
+            systemctl --user daemon-reload
+            enable_user_service omarchy-wallpaper-colors.path
+        fi
     fi
 }
 
@@ -562,9 +598,22 @@ phase_session() {
 
     if [ "$OMARCHY" -eq 1 ]; then
         print_phase "Phase 9: Display Manager (managed by Omarchy)"
-        print_info "Omarchy depends on sddm and enables it itself; leaving the"
-        print_info "display manager alone. Do NOT enable ly here -- it would"
-        print_info "disable sddm and leave the machine without a login screen."
+
+        local dm
+        for dm in gdm.service lightdm.service ly.service ly@tty1.service; do
+            if systemctl is-enabled --quiet "$dm" 2>/dev/null; then
+                print_info "Disabling conflicting display manager: $dm"
+                # Do not use --now: this session may have been launched by it.
+                sudo systemctl disable "$dm"
+            fi
+        done
+
+        if systemctl is-enabled --quiet sddm.service 2>/dev/null; then
+            print_status "sddm.service already enabled"
+        else
+            sudo systemctl enable sddm.service
+            print_status "Enabled: sddm.service"
+        fi
         return
     fi
 
@@ -618,6 +667,11 @@ phase_browser_policies() {
         return
     fi
 
+    if ! pacman -Qq librewolf-bin librewolf >/dev/null 2>&1; then
+        print_info "Librewolf is not installed — skipping policies"
+        return
+    fi
+
     if [ -f "$dst" ] && cmp -s "$src" "$dst"; then
         print_status "Librewolf policies already up to date"
         return
@@ -662,9 +716,8 @@ phase_reminders() {
     echo ""
 }
 
-detect_desktop
-
 phase_preflight
+detect_desktop
 phase_omarchy
 phase_paru
 phase_packages
