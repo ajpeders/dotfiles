@@ -1,0 +1,7 @@
+{
+  "agents": [
+    { "providerId": "deepseek", "id": "deepseek", "name": "DeepSeek" },
+    { "providerId": "ollama", "id": "ollama", "name": "Ollama" },
+    { "providerId": "minimax-coding-plan", "id": "minimax", "name": "MiniMax" }
+  ]
+}
