@@ -1,12 +1,112 @@
 {
   "$schema": "https://opencode.ai/config.json",
 
-  "model": "ollama/{env:LLM_MODEL}",
+  "model": "deepseek/deepseek-v4-pro",
   "small_model": "ollama/glm-4.7-flash:latest",
 
   "plugin": [
     "@whisperopencode/push"
   ],
+
+  "agent": {
+    "build": {
+      "model": "deepseek/deepseek-v4-pro",
+      "prompt": "{file:./prompts/build.txt}",
+      "color": "primary",
+      "steps": 50,
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "*": "allow",
+          "git push*": "ask",
+          "git push --force*": "deny",
+          "rm -rf*": "ask",
+          "rm -rf /*": "deny",
+          "mkfs*": "deny",
+          "dd if=*": "deny",
+          ":(){ :|:& };:*": "deny"
+        },
+        "webfetch": "allow"
+      }
+    },
+    "plan": {
+      "model": "minimax-coding-plan/MiniMax-M3",
+      "prompt": "{file:./prompts/plan.txt}",
+      "color": "secondary"
+    },
+    "general": {
+      "model": "ollama/glm-4.7-flash:latest",
+      "color": "accent"
+    },
+    "explore": {
+      "model": "ollama/qwen3:8b-32k",
+      "color": "info"
+    },
+    "scout": {
+      "model": "ollama/qwen3:8b-32k",
+      "color": "info"
+    },
+    "review": {
+      "description": "Reviews code for security, performance, and maintainability without making changes",
+      "mode": "subagent",
+      "model": "ollama/qwen3-coder:30b",
+      "prompt": "You are a code reviewer. Focus on security, performance, and maintainability. Provide constructive feedback without making direct changes.",
+      "color": "warning",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "debug": {
+      "description": "Investigates bugs, crashes, and runtime issues using logs, traces, and network diagnostics. Read-only — never modifies project files.",
+      "mode": "subagent",
+      "model": "ollama/qwen3.6:27b",
+      "prompt": "{file:./prompts/debug.txt}",
+      "color": "error",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "ask",
+          "journalctl *": "allow",
+          "dmesg *": "allow",
+          "cat /var/log/*": "allow",
+          "tail *": "allow",
+          "less *": "allow",
+          "head *": "allow",
+          "grep *": "allow",
+          "rg *": "allow",
+          "find *": "allow",
+          "ls *": "allow",
+          "ps *": "allow",
+          "top *": "allow",
+          "htop *": "allow",
+          "lsof *": "allow",
+          "strace *": "allow",
+          "ltrace *": "allow",
+          "gdb *": "allow",
+          "coredumpctl *": "allow",
+          "ip *": "allow",
+          "ss *": "allow",
+          "netstat *": "allow",
+          "ping *": "allow",
+          "traceroute *": "allow",
+          "curl *": "allow",
+          "wget *": "allow",
+          "dig *": "allow",
+          "nslookup *": "allow",
+          "systemctl status *": "allow",
+          "systemctl show *": "allow",
+          "git log *": "allow",
+          "git diff *": "allow",
+          "git show *": "allow",
+          "rm -rf*": "deny",
+          "mkfs*": "deny",
+          "dd if=*": "deny",
+          ":(){ :|:& };:*": "deny"
+        }
+      }
+    }
+  },
 
   "provider": {
     "ollama": {
@@ -56,17 +156,7 @@
       }
     },
     "xai": {
-      "models": {
-        "grok-4.6": {
-          "name": "Grok 4.6"
-        },
-        "grok-4.5": {
-          "name": "Grok 4.5"
-        },
-        "grok-4.3": {
-          "name": "Grok 4.3"
-        }
-      }
+      "disable": true
     }
   }
 }
