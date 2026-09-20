@@ -38,10 +38,10 @@ Scripts pick one automatically by checking whether the `omarchy` pacman package 
 - `scripts/install.sh --install-omarchy` (aarch64 only) bootstraps Omarchy via omarchy-mac `quattro` in `~/.local/share/omarchy`, *before* the dotfiles phase because its installer overwrites tracked configs.
 - The Air is the always-on "kitchen Alexis" host: never idle-suspend. Enforced by `/etc/systemd/logind.conf.d/10-kitchen-power.conf`.
 - **`omarchy update` edits tracked terminal configs in place.** Its migrations
-  `sed -i`/append straight into `~/.config/kitty/kitty.conf`,
-  `~/.config/foot/foot.ini` and `~/.config/alacritty/alacritty.toml` — that is
-  where kitty.conf's `listen_on` line and both files' `~/.local/state/omarchy/current`
-  include paths came from. Each one is guarded (it skips when the setting is
+  `sed -i`/append straight into `~/.config/kitty/kitty.conf` and
+  `~/.config/alacritty/alacritty.toml` — that is where kitty.conf's
+  `listen_on` line and both files' `~/.local/state/omarchy/current` include
+  paths came from. Each one is guarded (it skips when the setting is
   already present) and recorded in `~/.local/state/omarchy/migrations/`, so they
   do not re-run, but expect an `omarchy update` to show up as a dirty tree.
   `omarchy-font-set` and `omarchy-display-text-size` rewrite the font size the
@@ -85,10 +85,9 @@ palette when no theme is set.
 
 ## Shared
 
-- **Terminal:** Kitty everywhere except Omarchy. `kitty/kitty.conf` includes both stacks' theme
-  files; whichever exists wins. Omarchy's `SUPER+RETURN` runs `xdg-terminal-exec`, whose only
-  preference is `foot.desktop`, so an Omarchy box gets `foot/foot.ini` — kept in step with
-  kitty.conf by hand, deltas marked in the file. foot aborts on a missing `include=` (kitty
-  skips one), so its Omarchy theme include has to go if Omarchy ever comes off a machine.
+- **Terminal:** Kitty on every desktop stack. `kitty/kitty.conf` includes both stacks' theme
+  files; whichever exists wins. Omarchy's `SUPER+RETURN` is overridden in `hypr/omarchy/bindings.lua`
+  to launch `kitty` directly, so `xdg-terminal-exec` is only relevant for the un-overridden
+  `SUPER+SHIFT+RETURN` (`Terminal (current)`).
 - **Shell:** Zsh (Oh My Zsh + Powerlevel10k) at `zsh/` via `ZDOTDIR`. Deliberately no `~/.zshrc`.
 - Validate every Hyprland change with `hyprctl reload && hyprctl configerrors` — a reload succeeds even when the config has errors.

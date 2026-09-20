@@ -64,6 +64,14 @@ sync_dir() {
 # Wallpapers
 sync_dir "Pictures/Wallpapers/" "$HOME/Pictures/Wallpapers"
 
+# Omarchy only searches the active theme's background directory. Its tracked
+# theme hook links this shared collection whenever wallpapers or themes change.
+OMARCHY_WALLPAPER_HOOK="$HOME/.config/omarchy/hooks/theme-set.d/sync-wallpapers"
+if [ -x "$OMARCHY_WALLPAPER_HOOK" ]; then
+    "$OMARCHY_WALLPAPER_HOOK"
+    print_status "Made shared wallpapers available to the current Omarchy theme"
+fi
+
 # SSH hosts
 sync_dir ".ssh/config.d/" "$HOME/.ssh/config.d"
 
