@@ -28,7 +28,7 @@ Scripts pick one automatically by checking whether the `omarchy` pacman package 
 - **Wallpaper / theming:** Noctalia built-in; wallust was removed
 - Monitors live in `hypr/config/monitors.lua`, hand-written, matched by `desc:` (EDID make/model). Known panels get absolute coordinates, unknown ones fall through to an `auto` catch-all. Don't use nwg-displays; `monitors.conf` is gone.
 - Named workspaces: dev(6), server(7), work(8), game(9), config(10), magic(scratchpad)
-- waybar/rofi/swaync configs are legacy (kept on the `quickshell` branch)
+- waybar/rofi/swaync configs are legacy — recoverable from commit `9db8483` (`git show 9db8483:rofi/config.rasi`), which was the old `quickshell` branch tip
 
 ## Omarchy stack
 
