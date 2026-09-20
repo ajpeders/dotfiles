@@ -54,6 +54,22 @@ and `btop/themes/noctalia.theme`, all gitignored, on every palette change.
 systemctl --user restart noctalia-shell.service   # or SUPER+SHIFT+R
 ```
 
+## Stop the screen locking mid-game or mid-video
+
+Idle is owned by hypridle (`hypr/hypridle-{ac,battery}.conf`), which locks
+after 5 min without keyboard/mouse input. Gamepad input never reaches the
+Wayland seat and XWayland games don't speak the idle-inhibit protocol, so
+`hypr/config/windowrules.lua` has `idle_inhibit = "fullscreen"` on every
+window: anything fullscreen blocks the lock. Check it with:
+
+```bash
+hyprctl clients -j | jq '.[] | select(.fullscreen > 0) | .inhibitingIdle'
+```
+
+For a windowed app, toggle caffeine instead (`SUPER+SHIFT+A`, or
+`noctalia msg caffeine-toggle`); it takes a logind idle inhibitor that
+hypridle honours. `systemd-inhibit --list` shows it as `Caffeine`.
+
 ## Add a Hyprland keybind
 
 Edit `~/.config/hypr/config/keybinds.lua`. The file already defines `mod` (from
