@@ -25,9 +25,6 @@
 !hypr/**
 !kitty/
 !kitty/**
-# foot: what Omarchy's SUPER+RETURN actually launches (see foot/foot.ini)
-!foot/
-!foot/**
 !wallpapers/
 !wallpapers/**
 !gtk-3.0/

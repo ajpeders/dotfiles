@@ -22,8 +22,8 @@ hl.config({
   },
 })
 
--- OpenCode runs inside foot and sets this title while active. Give it the same
--- stronger translucency used for terminals on the Noctalia desktop.
+-- OpenCode runs inside the terminal and sets this title while active. Give it
+-- the same stronger translucency used for terminals on the Noctalia desktop.
 hl.window_rule({
   match = { title = "^(OpenCode)$" },
   opacity = "0.94 0.88",
