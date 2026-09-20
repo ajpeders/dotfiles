@@ -119,9 +119,110 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 # Route ssh through the kitty kitten only when we're actually inside a kitty
 # window. Outside kitty (TTY, other terminals, scripts) the kitten errors out
 # with "The SSH kitten is meant to run inside a kitty window".
-if [[ -n "${KITTY_WINDOW_ID:-}" ]]; then
-    alias ssh='kitten ssh'
-fi
+#
+# Also wrap ssh so a dropped connection leaves the local terminal usable and
+# reconnects once automatically. A remote tmux/herdr/editor arms terminal
+# modes (mouse tracking, focus reporting, alternate screen) that only it can
+# disarm; if the connection dies, those modes stay armed locally and every
+# mouse move floods the prompt with escape junk.
+#
+# The wrapper dispatches to kitten ssh inside kitty, plain command ssh
+# elsewhere, so the alias and the function stay in sync without aliases
+# calling each other.
+_ssh_run() {
+    if [[ -n "${KITTY_WINDOW_ID:-}" ]]; then
+        kitten ssh "$@"
+    else
+        command ssh "$@"
+    fi
+}
+
+_ssh_disarm() {
+    printf '\e[?1000l\e[?1002l\e[?1003l\e[?1006l\e[?1004l\e[?1049l\e[?25h'
+}
+
+# True for an interactive session: a destination and no remote command. The
+# letters are the ssh(1) options that consume a value, so their arguments
+# are not mistaken for the destination.
+_ssh_interactive() {
+    local value_opts="BbcDEeFIiJLlmOoPpQRSWw"
+    local arg letters i dest="" opts_done=""
+    local -a argv=("$@")
+
+    while (($#)); do
+        arg="$1"
+        shift
+
+        if [[ -z $opts_done && $arg == "--" ]]; then
+            opts_done=1
+        elif [[ -z $opts_done && $arg == -?* ]]; then
+            letters="${arg#-}"
+            for ((i = 1; i <= ${#letters}; i++)); do
+                ch="${letters[$i]}"
+                if [[ $value_opts == *"$ch"* ]]; then
+                    # The value is glued to the letter (-p2222) unless the
+                    # letter ends the argument, in which case it consumes
+                    # the next one (-p 2222).
+                    (( i == ${#letters} )) && shift
+                    break
+                fi
+            done
+        elif [[ -z $dest ]]; then
+            dest="$arg"
+        else
+            return 1
+        fi
+    done
+
+    [[ -n $dest ]] || return 1
+
+    # A RemoteCommand from ssh_config or -o replays on reconnect just like
+    # a positional command; ssh -G resolves the effective configuration for
+    # this exact invocation without connecting. Fail closed when it cannot
+    # resolve, since an undetected RemoteCommand must not replay. The
+    # explicit "none" cancels a configured command, and some versions emit
+    # it when unset.
+    local resolved
+    resolved=$(command ssh -G "${argv[@]}" 2>/dev/null) || return 1
+    ! print -r -- "$resolved" | grep -i '^remotecommand ' | grep -qvi '^remotecommand none$'
+}
+
+ssh() {
+    local rc started
+    started=$SECONDS
+
+    _ssh_run "$@"
+    rc=$?
+
+    [[ -t 1 ]] || return $rc
+    _ssh_disarm
+
+    # Reconnect only when an interactive session drops: ssh exits 255 for
+    # transport failures, but a fast 255 with no established session is a
+    # connect/auth failure, a remote command's own 255 passes through
+    # indistinguishably and must not replay its side effects, and redirected
+    # stdin would feed the remaining piped input to a fresh remote shell.
+    if (( rc != 255 )) || [[ ! -t 0 ]] || ! _ssh_interactive "$@" ||
+        (( SECONDS - started < 30 )); then
+        return $rc
+    fi
+
+    # Retry in a subshell: Ctrl-C reaches the whole foreground process group,
+    # so it cancels both the in-flight attempt and the loop itself. Keep
+    # retrying fast failures, since a rebooting server refuses connections too.
+    (
+        while true; do
+            echo "Connection lost. Reconnecting (Ctrl-C to stop)..."
+            sleep 2
+            _ssh_run "$@"
+            rc=$?
+            _ssh_disarm
+            (( rc != 255 )) && exit $rc
+        done
+    )
+}
+
+unset -f _ssh_drop_kitten_alias 2>/dev/null
 
 alias ls='eza --icons'
 alias lc='eza -la --icons --group-directories-first'
@@ -189,3 +290,29 @@ fi
 # setup-llm.sh is only needed to point at a different host.
 export LLM_SERVER_URL="${LLM_SERVER_URL:-http://localhost:11434/v1}"
 export LLM_MODEL="${LLM_MODEL:-qwen3-coder:30b}"
+
+# ---------------------------------------------------------------------------
+# fzf -- Ctrl-T inserts files, Ctrl-R searches history, Alt-C cd's.
+# Arch ships /usr/share/fzf/{key-bindings,completion}.zsh; source them once.
+# Skip on TTY-only shells where loading is wasted and key bindings clash with
+# nothing useful.
+# ---------------------------------------------------------------------------
+if [ -r /usr/share/fzf/key-bindings.zsh ] && [ -r /usr/share/fzf/completion.zsh ]; then
+    source /usr/share/fzf/key-bindings.zsh
+    source /usr/share/fzf/completion.zsh
+
+    # Ctrl-G: fuzzy-pick a commit and insert "hash  subject" at the cursor.
+    # Useful for `git show <hash>` or `git checkout <hash>` without leaving
+    # the command line.
+    fzf-git-hash-widget() {
+        local selection
+        selection=$(
+            git log --pretty=format:'%h %s' -n 200 -- . 2>/dev/null |
+            fzf --no-sort --height 40% --reverse --tiebreak=index --no-multi
+        ) || return 0
+        LBUFFER+="${selection%% *}"
+        zle reset-prompt
+    }
+    zle -N fzf-git-hash-widget
+    bindkey '^G' fzf-git-hash-widget
+fi

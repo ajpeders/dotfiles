@@ -13,18 +13,17 @@
 
 set -euo pipefail
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BOLD='\033[1m'
-NC='\033[0m'
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib-dotfiles.sh
+source "$SCRIPT_DIR/lib-dotfiles.sh"
+trap dotfiles_release_lock EXIT
+dotfiles_acquire_lock
 
 print_status() { echo -e "${GREEN}[✓]${NC} $1"; }
 print_error()  { echo -e "${RED}[✗]${NC} $1"; }
 print_info()   { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase()  { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # The repo root is one level up: this script lives in <repo>/scripts/.
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
@@ -62,17 +61,10 @@ if [ -z "$HEADLESS" ]; then
     fi
 fi
 
-# The installed omarchy package is the source of truth; the state file only
-# matters when the package database is unavailable.
-if [ "$OMARCHY" -eq -1 ]; then
-    if pacman -Qq omarchy >/dev/null 2>&1; then
-        OMARCHY=1
-    elif [ -r "$DESKTOP_STATE_FILE" ] && [ "$(cat "$DESKTOP_STATE_FILE")" = "omarchy" ]; then
-        OMARCHY=1
-    else
-        OMARCHY=0
-    fi
-fi
+# Single source of truth for desktop detection lives in lib-dotfiles.sh.
+# dotfiles_detect_desktop honors explicit --omarchy/--no-omarchy overrides
+# first, then the omarchy pacman package, then dotfiles-desktop state file.
+OMARCHY=-1 dotfiles_detect_desktop >/dev/null
 
 desktop_label() {
     if [ "$OMARCHY" -eq 1 ]; then echo "Omarchy"; else echo "Noctalia"; fi
@@ -91,6 +83,25 @@ detect_aur_helper() {
         return 0
     fi
     return 1
+}
+
+# Re-create ~/.local/state/dotfiles-desktop if a prior install.sh run was
+# interrupted before phase_state could write it. Idempotent: the marker file
+# marks completion, so this only runs once per machine.
+phase_migrations() {
+    print_phase "Phase 0: Migrations"
+
+    # Re-create ~/.local/state/dotfiles-desktop if a prior install.sh run was
+    # interrupted before phase_state could write it. Idempotent: the marker
+    # file marks completion, so this only runs once per machine.
+    if [ ! -r "$HOME/.local/state/dotfiles-desktop" ]; then
+        local detected="noctalia"
+        if command -v pacman >/dev/null 2>&1 && pacman -Qq omarchy >/dev/null 2>&1; then
+            detected="omarchy"
+        fi
+        dotfiles_run_migration ensure-dotfiles-desktop \
+            bash -c "echo '$detected' > '$HOME/.local/state/dotfiles-desktop'"
+    fi
 }
 
 phase_pull() {
@@ -177,6 +188,17 @@ phase_packages() {
         [ -n "$line" ] || continue
         pkgs+=("$line")
     done < "$REPO_DIR/packages.txt"
+
+    # Apple Silicon (Asahi) extras, kept out of packages.txt so x86 never
+    # tries to build them from the AUR. Mirrors install.sh.
+    if [ "$(uname -m)" = "aarch64" ] && [ -f "$REPO_DIR/packages-asahi.txt" ]; then
+        while IFS= read -r line; do
+            line="${line%%#*}"
+            line="${line//[[:space:]]/}"
+            [ -n "$line" ] || continue
+            pkgs+=("$line")
+        done < "$REPO_DIR/packages-asahi.txt"
+    fi
 
     if [ "${#pkgs[@]}" -eq 0 ]; then
         print_info "No packages in packages.txt"
@@ -354,6 +376,7 @@ phase_reload() {
     print_status "Live reload complete"
 }
 
+phase_migrations
 phase_pull
 phase_packages
 phase_dotfiles
