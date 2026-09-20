@@ -34,6 +34,13 @@ hl.window_rule({
 hl.window_rule({ match = { class = "^(steam_app_.*)$" }, suppress_event = "activateother" })
 hl.window_rule({ match = { class = "^(gamescope)$" },    suppress_event = "activateother" })
 
+-- ====== Idle inhibit (any fullscreen window) ======
+-- hypridle only sees keyboard/mouse input and the Wayland idle-inhibit
+-- protocol. XWayland games never speak that protocol, and gamepad input never
+-- reaches the seat, so a controller session locks the screen after 5 min.
+-- Block idle while any window is fullscreen: covers games and fullscreen video.
+hl.window_rule({ match = { class = ".*" }, idle_inhibit = "fullscreen" })
+
 -- ====== Gaming (pin to workspace 9 "game") ======
 -- Games always land on one workspace instead of wherever focus happened to
 -- be, so alt-tabbing out and back is a workspace switch rather than a hunt.
