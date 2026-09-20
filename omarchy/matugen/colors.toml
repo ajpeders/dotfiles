@@ -1,0 +1,32 @@
+# Generated from the active wallpaper by matugen. Do not edit the rendered copy.
+mode = "dark"
+
+accent = "{{ colors.source_color.default.hex }}"
+selection = "{{ colors.secondary_container.default.hex }}"
+muted = "{{ colors.outline_variant.default.hex }}"
+
+background = "{{ colors.background.default.hex }}"
+dark_background = "{{ colors.surface_container_lowest.default.hex }}"
+darker_background = "{{ colors.scrim.default.hex }}"
+lighter_background = "{{ colors.surface_container.default.hex }}"
+
+foreground = "{{ colors.on_background.default.hex }}"
+dark_foreground = "{{ colors.outline.default.hex }}"
+light_foreground = "{{ colors.on_surface_variant.default.hex }}"
+bright_foreground = "{{ colors.primary_fixed.default.hex }}"
+
+red = "{{ colors.red.default.hex }}"
+yellow = "{{ colors.yellow.default.hex }}"
+orange = "{{ colors.orange.default.hex }}"
+green = "{{ colors.green.default.hex }}"
+cyan = "{{ colors.cyan.default.hex }}"
+blue = "{{ colors.blue.default.hex }}"
+magenta = "{{ colors.magenta.default.hex }}"
+brown = "{{ colors.brown.default.hex }}"
+
+bright_red = "{{ colors.red.default.hex | lighten: 10.0 }}"
+bright_yellow = "{{ colors.yellow.default.hex | lighten: 10.0 }}"
+bright_green = "{{ colors.green.default.hex | lighten: 10.0 }}"
+bright_cyan = "{{ colors.cyan.default.hex | lighten: 10.0 }}"
+bright_blue = "{{ colors.blue.default.hex | lighten: 10.0 }}"
+bright_magenta = "{{ colors.magenta.default.hex | lighten: 10.0 }}"

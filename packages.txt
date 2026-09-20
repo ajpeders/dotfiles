@@ -154,3 +154,6 @@ ly
 # `noctalia-qs` Provides+Conflicts it and breaks omarchy-shell. Noctalia 5
 # no longer uses Quickshell, so this only matters if v4 is ever reinstalled.
 quickshell
+
+# Generate Omarchy's palette from the active wallpaper (Wallust-style).
+matugen

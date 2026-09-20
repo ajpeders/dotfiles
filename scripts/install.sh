@@ -23,18 +23,17 @@
 
 set -euo pipefail
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BOLD='\033[1m'
-NC='\033[0m'
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib-dotfiles.sh
+source "$SCRIPT_DIR/lib-dotfiles.sh"
+trap dotfiles_release_lock EXIT
+dotfiles_acquire_lock
 
 print_status() { echo -e "${GREEN}[✓]${NC} $1"; }
 print_error() { echo -e "${RED}[✗]${NC} $1"; }
 print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase() { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # The repo root is one level up: this script lives in <repo>/scripts/.
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
@@ -77,16 +76,10 @@ for arg in "$@"; do
 done
 
 # Omarchy installs itself as a pacman package and owns Hyprland, the shell and
-# the display manager. Its presence is what decides which desktop phases run.
+# the display manager. The shared detector in lib-dotfiles.sh is the single
+# source of truth; this shim keeps the old name working.
 detect_desktop() {
-    if [ "$OMARCHY" -ne -1 ]; then
-        return
-    fi
-    if pacman -Qq omarchy >/dev/null 2>&1; then
-        OMARCHY=1
-    else
-        OMARCHY=0
-    fi
+    OMARCHY=-1 dotfiles_detect_desktop >/dev/null
 }
 
 desktop_label() {
@@ -454,6 +447,25 @@ phase_dotfiles() {
         fi
     done
 
+    if [ "$HEADLESS" -ne 1 ] && [ "$OMARCHY" -eq 1 ]; then
+        mkdir -p "$HOME/.config/systemd/user"
+        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.service" \
+            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.service"
+        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.path" \
+            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.path"
+
+        # kitty.conf has a conditional Noctalia include that points nowhere
+        # on a host that has never run Noctalia. Comment it out so future
+        # kitty reloads stop warning about a missing include.
+        if ! pacman -Qq noctalia >/dev/null 2>&1; then
+            local kitty_conf="$HOME/.config/kitty/kitty.conf"
+            if [ -r "$kitty_conf" ] && grep -qE '^include[[:space:]]+themes/noctalia\.conf[[:space:]]*$' "$kitty_conf"; then
+                sed -i 's|^include[[:space:]]\+themes/noctalia\.conf[[:space:]]*$|# include themes/noctalia.conf -- not on a Noctalia host|' "$kitty_conf"
+                print_status "Disabled Noctalia include in kitty.conf"
+            fi
+        fi
+    fi
+
     if [ ! -f "$HOME/.zshenv" ]; then
         printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
         print_status "Created ~/.zshenv with ZDOTDIR"
@@ -554,6 +566,10 @@ phase_services() {
         enable_user_service pipewire
         enable_user_service pipewire-pulse
         enable_user_service wireplumber
+        if [ "$OMARCHY" -eq 1 ]; then
+            systemctl --user daemon-reload
+            enable_user_service omarchy-wallpaper-colors.path
+        fi
     fi
 }
 
@@ -582,9 +598,22 @@ phase_session() {
 
     if [ "$OMARCHY" -eq 1 ]; then
         print_phase "Phase 9: Display Manager (managed by Omarchy)"
-        print_info "Omarchy depends on sddm and enables it itself; leaving the"
-        print_info "display manager alone. Do NOT enable ly here -- it would"
-        print_info "disable sddm and leave the machine without a login screen."
+
+        local dm
+        for dm in gdm.service lightdm.service ly.service ly@tty1.service; do
+            if systemctl is-enabled --quiet "$dm" 2>/dev/null; then
+                print_info "Disabling conflicting display manager: $dm"
+                # Do not use --now: this session may have been launched by it.
+                sudo systemctl disable "$dm"
+            fi
+        done
+
+        if systemctl is-enabled --quiet sddm.service 2>/dev/null; then
+            print_status "sddm.service already enabled"
+        else
+            sudo systemctl enable sddm.service
+            print_status "Enabled: sddm.service"
+        fi
         return
     fi
 
@@ -687,9 +716,8 @@ phase_reminders() {
     echo ""
 }
 
-detect_desktop
-
 phase_preflight
+detect_desktop
 phase_omarchy
 phase_paru
 phase_packages
