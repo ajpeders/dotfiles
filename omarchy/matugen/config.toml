@@ -1,0 +1,18 @@
+[config]
+version_check = false
+caching = true
+prefer = "saturation"
+
+[templates.omarchy]
+input_path = "./colors.toml"
+output_path = "~/.cache/omarchy/wallpaper-colors.toml"
+
+[config.custom_colors]
+red = "#f38ba8"
+yellow = "#f9e2af"
+orange = "#fab387"
+green = "#a6e3a1"
+cyan = "#94e2d5"
+blue = "#89b4fa"
+magenta = "#cba6f7"
+brown = "#a66a4e"

@@ -141,6 +141,17 @@ bash scripts/update.sh
 bash scripts/sync-private.sh user@host
 ```
 
+On Omarchy, synced wallpapers are linked into the active theme's user
+background directory. The tracked `theme-set` hook repeats that step whenever
+the theme changes, so the same collection remains available in the background
+switcher without duplicating image files.
+
+Omarchy also watches its current-background link and uses `matugen` to derive a
+dark semantic palette from each wallpaper. The generated `colors.toml` overlays
+the active stock theme, then Omarchy's normal refresh path propagates it to the
+shell, terminals, Hyprland, lock screen, editors, and supported applications.
+User-authored themes and hand-written color overrides are left unchanged.
+
 ```bash
 # Both — point opencode at a local Ollama / llama.cpp / OpenAI-compatible server
 bash scripts/setup-llm.sh [base-url]
@@ -149,9 +160,10 @@ bash scripts/setup-llm.sh [base-url]
 Prompts for the server's base URL (or takes it as an argument), confirms it
 responds on `/v1/models`, and lets you pick from the models it serves. Both the
 URL and the chosen model go to `~/.local/state/dotfiles/llm.env` as
-`LLM_SERVER_URL` and `LLM_MODEL`, which `zsh/.zshrc` sources — kept out of the
-repo because both differ per machine, and because on Arch the repo *is*
-`~/.config`.
+`LLM_SERVER_URL` and `LLM_MODEL`, which `zsh/.zshrc` sources. The script also
+writes the gitignored `environment.d/90-llm-local.conf` and updates systemd's
+current user environment so Omarchy menu/keybinding launches see the same
+values. Machine-specific values stay out of the repo.
 
 Running this is **optional**: the defaults point at a local ollama
 (`http://localhost:11434/v1`), so a machine running one needs no setup at all.
@@ -161,7 +173,8 @@ whole session (systemd units, app launchers, Hyprland keybinds) and
 from a keybind would get an empty `baseURL`, which fails at request time rather
 than at startup. Run the script only to point opencode at a different host.
 
-`opencode/opencode.json` stays machine-agnostic: it is a *catalog* declaring
+`opencode/opencode.json` is the single tracked global config. It stays
+machine-agnostic: it is a *catalog* declaring
 context/output limits per model, and `{env:LLM_MODEL}` selects the default. The
 script never rewrites it, so running setup on a second machine no longer dirties
 the working tree. Add a `models` entry when you want explicit limits for a model
@@ -209,6 +222,7 @@ dotfiles/
 ├── noctalia/              # Noctalia 5 config.toml (Linux desktops)
 ├── yazi/                  # File manager (shared)
 ├── zsh/                   # Zsh / p10k config (shared via ZDOTDIR)
+├── opencode/              # OpenCode config for the local remote model
 ├── wallpapers/            # Default wallpaper
 ├── keychron/              # Keychron Q1 HE keymap export
 ├── gtk-3.0/, gtk-4.0/     # GTK theme (Linux); noctalia.css is generated + gitignored

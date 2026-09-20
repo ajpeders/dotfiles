@@ -1,0 +1,6 @@
+[Unit]
+Description=Generate Omarchy colors from the active wallpaper
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/scripts/sync-omarchy-colors.sh

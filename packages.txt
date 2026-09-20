@@ -57,9 +57,6 @@ qt6-wayland
 # Terminal
 kitty
 
-# Browser
-librewolf-bin
-
 # Clipboard
 wl-clipboard
 
@@ -93,18 +90,15 @@ ddcutil
 evolution-data-server
 
 # Fonts and icons
-ttf-jetbrains-mono-nerd
 noto-fonts
 noto-fonts-emoji
 papirus-icon-theme
 
 # VPN — AmneziaWG (obfuscated WireGuard; home server runs wg-easy/AmneziaWG).
-# Userspace impl (amneziawg-go) instead of a DKMS kernel module — the Asahi
-# kernel makes out-of-tree modules fragile. Client config: ~/.config/wireguard/
-# (NOT in this repo). Bring up with the `vpn-up` helper in zsh/.zshrc, or
-# directly: awg-quick up ~/.config/wireguard/alex.conf. See HOWTO.md.
+# Client config: ~/.config/wireguard/ (NOT in this repo). Bring up with the
+# `vpn-up` helper in zsh/.zshrc, or directly:
+# awg-quick up ~/.config/wireguard/alex.conf. See HOWTO.md.
 amneziawg-tools
-amneziawg-go
 # resolvconf shim so awg-quick can push the VPN DNS into systemd-resolved
 systemd-resolvconf
 
@@ -126,6 +120,14 @@ cliamp
 
 # Desktop shell (v5, native C++; the v4 noctalia-shell/noctalia-qs pair is legacy)
 noctalia
+
+# Full JetBrains Mono Nerd package. Omarchy depends on
+# ttf-jetbrains-mono-nerd-basic, which provides the same font name and
+# conflicts with this package.
+ttf-jetbrains-mono-nerd
+
+# Browser
+librewolf-bin
 
 # Authentication agent (Omarchy's shell ships its own polkit agent)
 polkit-gnome
@@ -152,3 +154,6 @@ ly
 # `noctalia-qs` Provides+Conflicts it and breaks omarchy-shell. Noctalia 5
 # no longer uses Quickshell, so this only matters if v4 is ever reinstalled.
 quickshell
+
+# Generate Omarchy's palette from the active wallpaper (Wallust-style).
+matugen

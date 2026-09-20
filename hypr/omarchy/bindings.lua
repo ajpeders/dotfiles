@@ -139,3 +139,11 @@ o.bind("SUPER + CTRL + LEFT", "Resize window left", hl.dsp.window.resize({ x = -
 o.bind("SUPER + CTRL + RIGHT", "Resize window right", hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true })
 o.bind("SUPER + CTRL + UP", "Resize window up", hl.dsp.window.resize({ x = 0, y = -50, relative = true }), { repeating = true })
 o.bind("SUPER + CTRL + DOWN", "Resize window down", hl.dsp.window.resize({ x = 0, y = 50, relative = true }), { repeating = true })
+
+-- Custom terminal bindings to prevent opening in current directory.
+-- Foot is gone; Kitty is the only terminal in this repo, on every desktop stack.
+hl.unbind("SUPER + RETURN")
+o.bind("SUPER + RETURN", "Terminal (home)", "kitty")
+
+hl.unbind("SUPER + SHIFT + RETURN")
+o.bind("SUPER + SHIFT + RETURN", "Terminal (current)", "xdg-terminal-exec")

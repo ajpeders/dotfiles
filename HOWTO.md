@@ -148,9 +148,11 @@ before committing to it.
 
 Defaults live in `environment.d/50-llm.conf` (session-wide) and `zsh/.zshrc`
 (shells), both pointing at the local ollama. To use another host, either run
-`bash scripts/setup-llm.sh <base-url>` (writes `~/.local/state/dotfiles/llm.env`,
-picked up by shells) or drop a gitignored `environment.d/90-llm-local.conf` —
-systemd reads `*.conf` in name order, so the higher number wins session-wide.
+`bash scripts/setup-llm.sh <base-url>` or set the files manually. The script
+writes `~/.local/state/dotfiles/llm.env` for shells and the gitignored
+`environment.d/90-llm-local.conf` for app launchers, then updates the current
+systemd user environment. Files under `environment.d` are read in name order,
+so the higher-numbered machine override wins session-wide.
 
 Changes to `environment.d` apply at next login; to test immediately:
 
@@ -158,6 +160,45 @@ Changes to `environment.d` apply at next login; to test immediately:
 systemctl --user set-environment LLM_SERVER_URL=http://host:11434/v1
 opencode debug config      # check the resolved baseURL
 ```
+
+## Agents
+
+`opencode/opencode.json` defines seven agents. Three live in `~/.config/opencode/opencode.jsonc` for machine-specific overrides (currently the `@whisperopencode/push` plugin) — see the *Config layering* section below.
+
+| Agent | Mode | Model | Use |
+|---|---|---|---|
+| `build` | primary | `deepseek/deepseek-v4-pro` (cloud) | Default. Full edit + bash. Capped at 50 steps. Bash guards deny force-push, `mkfs`, `dd if=`, fork-bomb; `git push` and `rm -rf` ask first. |
+| `plan` | primary | `minimax-coding-plan/MiniMax-M3` (cloud) | Read-only planning. Tab to switch; use when you want analysis without changes. |
+| `general` | subagent | `ollama/glm-4.7-flash:latest` | Multi-step delegated work. Invoke with `@general`. |
+| `explore` | subagent | `ollama/qwen3:8b-32k` | Fast read-only codebase search. Invoke with `@explore`. |
+| `scout` | subagent | `ollama/qwen3:8b-32k` | External docs and dependency research; clones into OpenCode's cache. Invoke with `@scout`. |
+| `review` | subagent | `ollama/qwen3-coder:30b` | Local code review, read-only. Strong enough for review; keeps data on-machine. |
+| `debug` | subagent | `ollama/qwen3.6:27b` | Logs, traces, network diagnostics, coredumps. Bounded bash allowlist (no destructive ops). Invoke with `@debug`. |
+| `docs-writer` | subagent | `ollama/glm-4.7-flash:latest` | READMEs, changelogs, ADRs. Edits prose only; bash denied. Invoke with `@docs-writer`. |
+
+### Routing rationale
+
+- **Cloud for primaries.** Build and plan need the strongest reasoning — coding and architecture reward paying for it. Subagents stay local.
+- **Subagent model matters less than variety.** arch-alex has `OLLAMA_NUM_PARALLEL=1`, so a different subagent model causes a swap (~5–15 s load). Keep subagents on the fewest models possible.
+- **review → local coding model.** Even though review is invoked often during build cycles, `qwen3-coder:30b` is purpose-built for code understanding and avoids per-review cloud cost.
+
+### Config layering
+
+1. `~/.config/opencode/opencode.json` — global, tracked, agents and providers.
+2. `~/.config/opencode/opencode.jsonc` — global, tracked, machine-friendly overrides (plugins, envs).
+3. `~/.config/opencode/prompts/*.txt` — global prompt bodies.
+4. `~/.config/opencode/themes/omarchy.json` — global theme matching the active matugen palette.
+5. `~/.config/opencode/tui.json` — sets `theme: omarchy`.
+6. `~/.config/opencode/.opencode/` — **templates**. Copy `prompts/*.txt` into a project's `.opencode/prompts/` to override locally; same for `themes/`.
+7. `<project>/.opencode/opencode.json` — per-project overrides.
+
+### Prompt templates
+
+`prompts/` holds build, plan, debug, and docs-writer. `.opencode/prompts/` is a mirror for distribution — copy from there into a project's `.opencode/prompts/` and specialize.
+
+### Theme
+
+`themes/omarchy.json` was derived from `~/.local/state/omarchy/current/theme/colors.toml`. If you change themes (`omarchy theme set <name>`), regenerate the JSON with the new palette or pick a built-in via `:theme` in the TUI.
 
 ## Boot loader (Limine, desktop only)
 
@@ -230,7 +271,13 @@ Two independent VPNs. AmneziaWG is never enabled at boot; `tailscaled.service` i
 
 ### WireGuard / AmneziaWG
 
-We use the userspace `amneziawg-go` rather than a DKMS kernel module, because out-of-tree modules are fragile on the Asahi kernel. `awg-quick` handles both obfuscated and plain WireGuard configs — with no `Jc`/`S1`/`S2`/`H1..H4` keys present it falls back to standard WireGuard framing — so `wireguard-tools` is not installed and `wg`/`wg-quick` are unavailable. Use `awg`/`awg-quick`.
+We use AmneziaWG through `amneziawg-tools`. On aarch64/Asahi, the userspace
+`amneziawg-go` backend may need to stay manually pinned: the current AUR
+PKGBUILD rejects `aarch64`, so it is intentionally not synced from
+`packages.txt`. `awg-quick` handles both obfuscated and plain WireGuard configs
+— with no `Jc`/`S1`/`S2`/`H1..H4` keys present it falls back to standard
+WireGuard framing — so `wireguard-tools` is not installed and `wg`/`wg-quick`
+are unavailable. Use `awg`/`awg-quick`.
 
 Client configs are **not in this repo** (they hold private keys). They live in `~/.config/wireguard/`, mode `600`, covered by the catch-all ignore in `.gitignore`. `vpn-list` shows what's available:
 

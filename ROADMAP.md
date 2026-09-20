@@ -51,6 +51,7 @@ Desktops run Noctalia 5 (native C++ rewrite, since 2026-09-09) on Hyprland; the 
 - [ ] Capture the laptop's internal panel (`eDP-1`) the same way, and confirm the
       relative layout behaves when docking/undocking there
 - [ ] Test scripts/install.sh on a fresh system
+- [ ] Integrate Omarchy and personal dotfiles more tightly: document ownership boundaries, reduce duplicated Hypr/desktop config, and make install/update behavior clearer across Omarchy, Noctalia, headless, and macOS machines
 - [ ] Review wlsunset — Noctalia has built-in night light, may be redundant
 
 ## Ideas
