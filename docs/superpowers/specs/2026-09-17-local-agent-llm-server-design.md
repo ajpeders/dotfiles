@@ -62,6 +62,9 @@ Kept: `OLLAMA_VULKAN=1`, `OLLAMA_FLASH_ATTENTION=1`, `OLLAMA_KV_CACHE_TYPE=q8_0`
 `GGML_VK_VISIBLE_DEVICES=0`, `OLLAMA_HOST=0.0.0.0:11434`,
 `OLLAMA_MODELS=/home/ollama`, `ProtectHome=no`.
 
+> **Superseded 2026-09-19** — backend, KV type, context length and loaded-model
+> count all changed after measurement. See *Revisions — 2026-09-19* at the end.
+
 Apply sequence, with rollback:
 
 ```sh
@@ -169,8 +172,9 @@ config Codex would ignore), adding `[model_providers.ollama]` with
 `base_url = "http://100.84.247.20:11434/v1"` and `wire_api = "responses"`, plus
 `[profiles.local]`. Used as `codex -p local`; default stays `gpt-6-astra`.
 
-**hermes, Open WebUI, companion apps.** These reach the desktop through
-`llm-router` on isis, whose live config is
+**hermes, Open WebUI, companion apps.** *(Superseded 2026-09-19: llm-router is
+retired; these point at `http://100.84.247.20:11434` directly. See Revisions.)*
+These reached the desktop through `llm-router` on isis, whose live config was
 `BACKENDS_JSON={"arch":"http://192.168.0.40:11434","arch-vpn2":"http://10.8.0.15:11434"}`
 with `BACKEND_TIER=mac,arch,arch-vpn2`. Two changes:
 repoint `arch` at `100.84.247.20` (it currently uses the DHCP address this
@@ -213,3 +217,48 @@ it timing out every 30s refresh. Then recreate the container.
   `thinking` (e.g. `qwen3.6:27b`). Scope any fix to those.
 - Docs to update in `~/.config` per the repo's own rule: README, ARCHITECTURE,
   ROADMAP, HOWTO.
+
+## Revisions — 2026-09-19
+
+Driven by a live audit of the server under real agent traffic. Measurements are
+from the server's own timing logs and `llama-bench` on an otherwise idle GPU.
+
+**Backend: ROCm instead of Vulkan.** `ollama-rocm` (ROCm 7.2.4, gfx1201 native)
+is installed alongside `ollama-vulkan`; the drop-in has `OLLAMA_VULKAN=1` and
+`GGML_VK_VISIBLE_DEVICES=0` commented out, so Ollama auto-selects ROCm and drops
+the iGPU itself. qwen3-coder:30b prompt processing roughly doubled (3219 tok/s at
+11k depth, 2595 at 22k, vs ~1800/~1130 on Vulkan). Short-context generation is
+slower on HIP (≈95 vs ≈170 tok/s; the GPU is compute-bound at 300 W during
+decode, a kernel-efficiency problem — none of `GGML_CUDA_DISABLE_GRAPHS`,
+`GGML_CUDA_DISABLE_FUSION`, `GGML_CUDA_GRAPH_OPT` helped). At the 20–80k depths
+agents actually run, decode is roughly even. Revert = uncomment the two lines.
+
+**KV cache f16, context 98304, one slot.** f16 KV is 47–60 % faster than q8_0 at
+prompt processing in the 16–32k range on this card. It doubles KV memory, so the
+default context dropped from 131072 to 98304 to fit beside the 17.5 GB model.
+`OLLAMA_NUM_PARALLEL=1` (the drift to 2 was found and reverted).
+`OLLAMA_MAX_LOADED_MODELS=2` so a small side model no longer evicts the coder
+model — in practice the coder model now uses 28 GB, so eviction still happens;
+lowering context to ~80k would fix that if it matters.
+
+**`num_batch 2048`** is baked into the `qwen3-coder:30b` tag (re-created `FROM`
+itself with one `PARAMETER`; there is no env var). +20–30 % prompt speed at depth.
+
+**Model decision: qwen3-coder:30b, not glm-4.7-flash.** On this backend glm's
+prompt processing was ~3x slower at 14k (530 vs 1750 tok/s) and collapsed to
+129 tok/s at 38k (a 301 s turn), with decode falling to 21 tok/s. isis hermes'
+fallback provider now names `qwen3-coder:30b`. glm-4.7-flash is still on disk.
+
+**llm-router retired.** Only its model-list poll was hitting the server, its
+`arch-vpn2` backend was dead, and `REQUEST_TIMEOUT_MS=300000` was cancelling
+long turns at exactly 5m0s. open-webui, myproject, gym-app, carsearch,
+hermes-agent and the Traefik routes (`llm.thelunadog.com`, `ollama.thelunadog.com`,
+`gateway.local`) point at `http://100.84.247.20:11434`; the public hostname stays
+behind the `local-only` middleware. Change lives in the homelab repo on isis.
+
+**Operational notes.** Root disk on the desktop is at 99 % (14 GB free) after
+the ROCm install; two idle 16–17 GB models were kept by choice. Never run
+`llama-bench` while Ollama is serving: an incoming request will be scheduled
+against the reduced free VRAM and land half on CPU. To benchmark safely, insert
+`tcp dport 11434 reject with tcp reset` at position 3 of `inet ollama_gate input`,
+unload with `keep_alive: 0`, bench, delete the rule by handle.
