@@ -93,7 +93,8 @@ bash scripts/install.sh
 
 Automatic: a `dotfiles-autopull` timer (systemd user timer on Linux, LaunchAgent
 `com.alex.dotfiles-autopull` on macOS) runs `scripts/autopull.sh` every 15 minutes.
-It fast-forwards `main` from GitHub over HTTPS. It skips when offline or on another branch, and
+It fast-forwards `main` from **Forgejo** (the primary) over the clone's SSH remote, and falls back to GitHub over HTTPS.
+It skips when offline or on another branch, and
 refuses (logs, never merges) if local commits or uncommitted edits would conflict.
 The installers set it up; to enable it by hand on an existing Linux install:
 
@@ -102,7 +103,17 @@ systemctl --user daemon-reload && systemctl --user enable --now dotfiles-autopul
 journalctl --user -u dotfiles-autopull      # what the last runs did
 ```
 
-Manual pull any time: `~/.config/scripts/autopull.sh`. New packages still need `bash scripts/install.sh`.
+Manual pull any time: `~/.config/scripts/autopull.sh`.
+
+**Remotes: Forgejo is primary, GitHub is a copy.** On every machine, `main` tracks the Forgejo remote, and that remote pushes to both,
+so a plain `git push` updates Forgejo and GitHub together. One-time setup per clone (`F` = the remote pointing at git.thelunadog.com):
+
+```bash
+F=$(git remote -v | awk '/thelunadog.*fetch/{print $1; exit}')
+git config branch.main.remote $F
+git remote set-url --push $F "$(git remote get-url $F)"
+git remote set-url --add --push $F git@github.com:ajpeders/dotfiles.git
+``` New packages still need `bash scripts/install.sh`.
 
 ## Configure monitors
 
