@@ -179,34 +179,34 @@ opencode debug config      # check the resolved baseURL
 
 ## Agents
 
-`opencode/opencode.json` defines seven agents. Three live in `~/.config/opencode/opencode.jsonc` for machine-specific overrides (currently the `@whisperopencode/push` plugin) — see the *Config layering* section below.
+`opencode/opencode.json` defines eight agents, the Ollama provider, and the `@whisperopencode/push` plugin.
 
 | Agent | Mode | Model | Use |
 |---|---|---|---|
 | `build` | primary | `deepseek/deepseek-v4-pro` (cloud) | Default. Full edit + bash. Capped at 50 steps. Bash guards deny force-push, `mkfs`, `dd if=`, fork-bomb; `git push` and `rm -rf` ask first. |
 | `plan` | primary | `minimax-coding-plan/MiniMax-M3` (cloud) | Read-only planning. Tab to switch; use when you want analysis without changes. |
-| `general` | subagent | `ollama/glm-4.7-flash:latest` | Multi-step delegated work. Invoke with `@general`. |
+| `general` | subagent | `ollama/qwen3-coder:30b` | Multi-step delegated work. Invoke with `@general`. |
 | `explore` | subagent | `ollama/qwen3:8b-32k` | Fast read-only codebase search. Invoke with `@explore`. |
 | `scout` | subagent | `ollama/qwen3:8b-32k` | External docs and dependency research; clones into OpenCode's cache. Invoke with `@scout`. |
 | `review` | subagent | `ollama/qwen3-coder:30b` | Local code review, read-only. Strong enough for review; keeps data on-machine. |
 | `debug` | subagent | `ollama/qwen3.6:27b` | Logs, traces, network diagnostics, coredumps. Bounded bash allowlist (no destructive ops). Invoke with `@debug`. |
-| `docs-writer` | subagent | `ollama/glm-4.7-flash:latest` | READMEs, changelogs, ADRs. Edits prose only; bash denied. Invoke with `@docs-writer`. |
+| `docs-writer` | subagent | `ollama/qwen3-coder:30b` | READMEs, changelogs, ADRs. Edits prose only; bash denied. Invoke with `@docs-writer`. |
 
 ### Routing rationale
 
 - **Cloud for primaries.** Build and plan need the strongest reasoning — coding and architecture reward paying for it. Subagents stay local.
 - **Subagent model matters less than variety.** arch-alex has `OLLAMA_NUM_PARALLEL=1`, so a different subagent model causes a swap (~5–15 s load). Keep subagents on the fewest models possible.
+- **glm-4.7-flash is retired (2026-09-19).** On the desktop's ROCm backend it processed prompts ~3x slower than `qwen3-coder:30b` and collapsed at long context. Everything local runs on `qwen3-coder:30b` (28 GB resident, 96k ctx, f16 KV) plus `qwen3:8b-32k` for cheap lookups. Exception: `claude-local` defaults to `qwen3.6:27b` because qwen3-coder emits text-formatted tool calls under Claude Code's prompt. Server details: `docs/superpowers/specs/2026-09-17-local-agent-llm-server-design.md` → *Revisions — 2026-09-19*.
 - **review → local coding model.** Even though review is invoked often during build cycles, `qwen3-coder:30b` is purpose-built for code understanding and avoids per-review cloud cost.
 
 ### Config layering
 
-1. `~/.config/opencode/opencode.json` — global, tracked, agents and providers.
-2. `~/.config/opencode/opencode.jsonc` — global, tracked, machine-friendly overrides (plugins, envs).
-3. `~/.config/opencode/prompts/*.txt` — global prompt bodies.
-4. `~/.config/opencode/themes/omarchy.json` — global theme matching the active matugen palette.
-5. `~/.config/opencode/tui.json` — sets `theme: omarchy`.
-6. `~/.config/opencode/.opencode/` — **templates**. Copy `prompts/*.txt` into a project's `.opencode/prompts/` to override locally; same for `themes/`.
-7. `<project>/.opencode/opencode.json` — per-project overrides.
+1. `~/.config/opencode/opencode.json` — global, tracked, agents, providers, and plugins.
+2. `~/.config/opencode/prompts/*.txt` — global prompt bodies.
+3. `~/.config/opencode/themes/omarchy.json` — global theme matching the active matugen palette.
+4. `~/.config/opencode/tui.json` — sets `theme: omarchy`.
+5. `~/.config/opencode/.opencode/` — **templates**. Copy `prompts/*.txt` into a project's `.opencode/prompts/` to override locally; same for `themes/`.
+6. `<project>/.opencode/opencode.json` — per-project overrides.
 
 ### Prompt templates
 
