@@ -4,7 +4,7 @@
 set -euo pipefail
 
 : "${LLM_HOST:=http://100.84.247.20:11434}"
-: "${LLM_MODEL:=qwen3-coder:30b}"
+: "${LLM_MODEL:=qwen3.6:27b}"
 
 export ANTHROPIC_BASE_URL="$LLM_HOST"
 export ANTHROPIC_AUTH_TOKEN="ollama"
