@@ -567,15 +567,32 @@ Confirm `git status` never shows the real key file (it lives outside the repo).
 
 ### Task 10: Run the spec's success criteria
 
-- [ ] **Step 1: Agent tool-call test.** In a scratch repo, have each of opencode, `claude-local`, `codex -p local` and hermes edit a named file via tool calls. Record pass/fail and any malformed tool calls per client.
+- [x] **Step 1: Agent tool-call test.** In a scratch repo, have each of opencode, `claude-local`, `codex -p local` and hermes edit a named file via tool calls. Record pass/fail and any malformed tool calls per client.
 
-- [ ] **Step 2: Tailnet test.** `ssh isis-alex 'curl -s --max-time 30 http://100.84.247.20:11434/v1/models'` lists the coder model, and one `/v1/chat/completions` call returns 200.
+- [x] **Step 2: Tailnet test.** `ssh isis-alex 'curl -s --max-time 30 http://100.84.247.20:11434/v1/models'` lists the coder model, and one `/v1/chat/completions` call returns 200.
 
-- [ ] **Step 3: Eviction measurement.** During a coding session: `journalctl -u ollama --since "10 min ago" | grep -ci 'loading model'`, confirming loads happen only after a small-model request and complete in under 30s.
+- [x] **Step 3: Eviction measurement.** During a coding session: `journalctl -u ollama --since "10 min ago" | grep -ci 'loading model'`, confirming loads happen only after a small-model request and complete in under 30s.
 
-- [ ] **Step 4: Persistence.** `systemctl is-enabled ollama ollama-gate`, `systemctl show ollama -p Environment`, and after the next reboot `tailscale debug prefs | grep RouteAll` still `false`, plus `nft list table inet ollama_gate` still present. **Ask Alex before rebooting** — it ends the session.
+- [x] **Step 4: Persistence.** `systemctl is-enabled ollama ollama-gate`, `systemctl show ollama -p Environment`, and after the next reboot `tailscale debug prefs | grep RouteAll` still `false`, plus `nft list table inet ollama_gate` still present. **Ask Alex before rebooting** — it ends the session.
 
 - [ ] **Step 5: Model bake-off.** Apply the spec's decision rule: `glm-4.7-flash` replaces `qwen3-coder:30b` only if it completes at least as many of three agent tasks without malformed tool calls and is no more than 25% slower. Remove the loser to reclaim ~19 GB (disk at 97%).
+
+**Results — run 2026-09-20 against `qwen3-coder:30b` on ROCm, f16 KV, 96k ctx**
+
+| Criterion | Result | Notes |
+|---|---|---|
+| 1 opencode tool-call edit | PASS | 93 s, `opencode run -m ollama/qwen3-coder:30b` |
+| 1 hermes tool-call edit | PASS | well-formed `write_file`; wrote into its configured workspace cwd (`~/hermes-workspace`), not the shell cwd — by design; content had a trailing period |
+| 1 codex tool-call edit | PASS | only after `model_reasoning_effort = "none"` in `~/.codex/local.config.toml`; without it Ollama answers `"qwen3-coder:30b" does not support thinking` and the stream dies after 5 reconnects |
+| 1 claude-local tool-call edit | **FAIL** with qwen3-coder (2/2 runs): model emits a text `<function=Write>` block instead of a tool_use under Claude Code's ~20k-token tool-heavy prompt. Raw `/v1/messages` with one tool parses fine, so it is model behaviour, not the endpoint. **PASS** with `LLM_MODEL=qwen3.6:27b` (56 s). |
+| 2 tailnet from isis | PASS | `/v1/models` lists the coder model; chat completion 200 |
+| 3 llm-router health | SUPERSEDED | router retired 2026-09-19; `llm.thelunadog.com` and `ollama.thelunadog.com` answer via Traefik → desktop |
+| 4 eviction bounded | PASS | loads only follow small-model/other-model requests; qwen3:8b↔coder reloads complete in ~3 s, coder cold load ~16 s |
+| 5 persistence | PASS (pre-reboot) | `ollama`, `ollama-gate` enabled; env shows f16/98304/1/2; `RouteAll: false`. Post-reboot check still pending — not rebooted. |
+| 6 gate | PASS | loopback 200, LAN .40 200, tailnet 200, docker bridge (open-webui → host.docker.internal) 200, global IPv6 dropped (timeout), SSH unaffected |
+| 7 cloud model | NOT RUN | Task 9 not done; `/etc/ollama/cloud.env` absent |
+
+Follow-ups from this run: decide claude-local's default (qwen3.6:27b works but evicts the coder model); all glm-4.7-flash references in opencode, claude-local and the Codex profile were switched to qwen3-coder:30b (commits cd2531d, 4f47623).
 
 ### Task 11: Update the default model and the repo docs
 
