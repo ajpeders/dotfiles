@@ -33,7 +33,7 @@
       }
     },
     "plan": {
-      "model": "minimax-coding-plan/MiniMax-M3",
+      "model": "openai/gpt-5.5",
       "prompt": "{file:./prompts/plan.txt}",
       "color": "secondary",
       "temperature": 0.1,
