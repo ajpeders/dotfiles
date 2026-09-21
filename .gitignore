@@ -73,6 +73,8 @@ opencode/.gitignore
 !systemd/user/noctalia-shell.service
 !systemd/user/omarchy-wallpaper-colors.path
 !systemd/user/omarchy-wallpaper-colors.service
+!systemd/user/dotfiles-autopull.service
+!systemd/user/dotfiles-autopull.timer
 !librewolf/
 !librewolf/policies.json
 

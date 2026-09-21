@@ -91,10 +91,18 @@ bash scripts/install.sh
 
 ## Update existing install
 
+Automatic: a `dotfiles-autopull` timer (systemd user timer on Linux, LaunchAgent
+`com.alex.dotfiles-autopull` on macOS) runs `scripts/autopull.sh` every 15 minutes.
+It fast-forwards `main` from GitHub over HTTPS. It skips when offline or on another branch, and
+refuses (logs, never merges) if local commits or uncommitted edits would conflict.
+The installers set it up; to enable it by hand on an existing Linux install:
+
 ```bash
-cd ~/.config
-bash scripts/update.sh
+systemctl --user daemon-reload && systemctl --user enable --now dotfiles-autopull.timer
+journalctl --user -u dotfiles-autopull      # what the last runs did
 ```
+
+Manual pull any time: `~/.config/scripts/autopull.sh`. New packages still need `bash scripts/install.sh`.
 
 ## Configure monitors
 
