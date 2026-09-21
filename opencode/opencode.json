@@ -47,12 +47,12 @@
       "temperature": 0.3
     },
     "explore": {
-      "model": "ollama/qwen3:8b-32k",
+      "model": "ollama/qwen3-coder:30b",
       "color": "info",
       "temperature": 0.3
     },
     "scout": {
-      "model": "ollama/qwen3:8b-32k",
+      "model": "ollama/qwen3-coder:30b",
       "color": "info",
       "temperature": 0.3
     },
