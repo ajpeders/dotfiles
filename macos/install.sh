@@ -113,6 +113,7 @@ phase_dotfiles() {
     link "$SCRIPT_DIR/aerospace" "$HOME/.config/aerospace"
     link "$SCRIPT_DIR/com.alex.mount.share.plist" "$HOME/Library/LaunchAgents/com.alex.mount.share.plist"
     link "$SCRIPT_DIR/com.alex.tailscale.plist" "$HOME/Library/LaunchAgents/com.alex.tailscale.plist"
+    link "$SCRIPT_DIR/com.alex.dotfiles-autopull.plist" "$HOME/Library/LaunchAgents/com.alex.dotfiles-autopull.plist"
 
     # Cross-platform configs from the repo root
     link "$REPO_DIR/kitty" "$HOME/.config/kitty"
@@ -178,6 +179,7 @@ phase_launchagents() {
     }
 
     load_agent com.alex.mount.share
+    load_agent com.alex.dotfiles-autopull
 
     # Tailscale's standalone build ships TailscaleStartOnLogin=0 and registers no
     # login item, so this agent is what actually brings it up at login.
