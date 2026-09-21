@@ -191,7 +191,7 @@ opencode debug config      # check the resolved baseURL
 
 | Agent | Mode | Model | Use |
 |---|---|---|---|
-| `build` | primary | `deepseek/deepseek-v4-pro` (cloud) | Default. Full edit + bash. Capped at 50 steps. Bash guards deny force-push, `mkfs`, `dd if=`, fork-bomb; `git push` and `rm -rf` ask first. |
+| `build` | primary | `openai/gpt-5.5` (cloud, falls back to MiniMax-M3 → DeepSeek v4 Pro) | Default. Full edit + bash. Capped at 50 steps. Bash guards deny force-push, `mkfs`, `dd if=`, fork-bomb; `git push` and `rm -rf` ask first. |
 | `plan` | primary | `minimax-coding-plan/MiniMax-M3` (cloud) | Read-only planning. Tab to switch; use when you want analysis without changes. |
 | `general` | subagent | `ollama/qwen3-coder:30b` | Multi-step delegated work. Invoke with `@general`. |
 | `explore` | subagent | `ollama/qwen3-coder:30b` | Fast read-only codebase search. Invoke with `@explore`. |
@@ -203,6 +203,7 @@ opencode debug config      # check the resolved baseURL
 ### Routing rationale
 
 - **Cloud for primaries.** Build and plan need the strongest reasoning — coding and architecture reward paying for it. Subagents stay local.
+- **Fallback chain for primaries: GPT-5.5 → MiniMax-M3 → DeepSeek v4 Pro.** `opencode/plugins/model-fallback.js` (opencode has no native fallback). On a provider error, or after 2 rate-limit retries, it reverts the turn and replays your message on the next model. A toast shows the switch. Every new message starts at GPT again. It only acts on chain models; local subagents are untouched. Edit `CHAIN` in the plugin to change the order.
 - **Subagent model matters less than variety.** arch-alex has `OLLAMA_NUM_PARALLEL=1`, so a different subagent model causes a swap (~5–15 s load). Keep subagents on the fewest models possible.
 - **glm-4.7-flash is retired (2026-09-19).** On the desktop's ROCm backend it processed prompts ~3x slower than `qwen3-coder:30b` and collapsed at long context. Everything local runs on `qwen3-coder:30b` (28 GB resident, 96k ctx, f16 KV).
 - **explore/scout moved off `qwen3:8b-32k` (2026-09-20).** The coder and the 8B can't both fit in 32 GB, so running them side by side made them evict each other (5 swaps in 12 min in the logs). The coder is also faster: it's MoE with ~3B active parameters, 169 vs 102 t/s generation on Vulkan. Only `debug` (`qwen3.6:27b`) still triggers a swap. Benchmarks: `/srv/projects/ollama/bench/results.md`. Exception: `claude-local` defaults to `qwen3.6:27b` because qwen3-coder emits text-formatted tool calls under Claude Code's prompt. Server details: `docs/superpowers/specs/2026-09-17-local-agent-llm-server-design.md` → *Revisions — 2026-09-19*.
