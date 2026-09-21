@@ -4,6 +4,12 @@
   "model": "deepseek/deepseek-v4-pro",
   "small_model": "ollama/glm-4.7-flash:latest",
 
+  "plugin": [
+    "@whisperopencode/push"
+  ],
+
+  "disabled_providers": ["xai"],
+
   "agent": {
     "build": {
       "model": "deepseek/deepseek-v4-pro",
@@ -30,7 +36,10 @@
       "model": "minimax-coding-plan/MiniMax-M3",
       "prompt": "{file:./prompts/plan.txt}",
       "color": "secondary",
-      "temperature": 0.1
+      "temperature": 0.1,
+      "permission": {
+        "bash": "deny"
+      }
     },
     "general": {
       "model": "ollama/glm-4.7-flash:latest",
@@ -145,34 +154,11 @@
           "name": "Qwen3 8B 32K",
           "limit": { "context": 40960, "output": 16384 }
         },
-        "qwen3:8b": {
-          "name": "Qwen3 8B",
-          "limit": { "context": 40960, "output": 16384 }
-        },
-        "qwen2.5:7b-instruct": {
-          "name": "Qwen2.5 7B Instruct",
-          "limit": { "context": 32768, "output": 8192 }
-        },
-        "qwen2.5-coder:1.5b-base": {
-          "name": "Qwen2.5 Coder 1.5B Base",
-          "limit": { "context": 32768, "output": 8192 }
-        },
         "glm-4.7-flash:latest": {
           "name": "GLM 4.7 Flash",
           "limit": { "context": 202752, "output": 16384 }
-        },
-        "hf.co/mradermacher/Huihui-ThinkingCap-Qwen3.6-27B-abliterated-GGUF:Q4_K_M": {
-          "name": "ThinkingCap Qwen3.6 27B Abliterated",
-          "limit": { "context": 262144, "output": 16384 }
-        },
-        "hf.co/bartowski/TheDrummer_Cydonia-24B-v4.3-GGUF:Q5_K_M": {
-          "name": "Cydonia 24B v4.3",
-          "limit": { "context": 131072, "output": 16384 }
         }
       }
-    },
-    "xai": {
-      "disable": true
     }
   }
 }
