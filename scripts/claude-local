@@ -17,7 +17,7 @@ export ANTHROPIC_SMALL_FAST_MODEL="$LLM_MODEL"
 export ANTHROPIC_DEFAULT_HAIKU_MODEL="$LLM_MODEL"
 # Claude Code does not know these models and would otherwise assume a 200k
 # window, larger than the server's OLLAMA_CONTEXT_LENGTH. Tell it the truth.
-: "${CLAUDE_CODE_MAX_CONTEXT_TOKENS:=131072}"
+: "${CLAUDE_CODE_MAX_CONTEXT_TOKENS:=98304}"   # = OLLAMA_CONTEXT_LENGTH; more and the server silently truncates
 export CLAUDE_CODE_MAX_CONTEXT_TOKENS
 
 exec claude "$@"
