@@ -29,7 +29,8 @@
           "dd if=*": "deny",
           ":(){ :|:& };:*": "deny"
         },
-        "webfetch": "allow"
+        "webfetch": "allow",
+        "websearch": "allow"
       }
     },
     "plan": {
