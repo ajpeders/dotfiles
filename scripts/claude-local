@@ -4,7 +4,7 @@
 set -euo pipefail
 
 : "${LLM_HOST:=http://100.84.247.20:11434}"
-: "${LLM_MODEL:=qwen3.6:27b}"
+: "${LLM_MODEL:=qwen3-coder:30b}"   # the 27B needs a model swap; the coder passes with the cwd prompt below
 
 export ANTHROPIC_BASE_URL="$LLM_HOST"
 export ANTHROPIC_AUTH_TOKEN="ollama"
@@ -20,4 +20,6 @@ export ANTHROPIC_DEFAULT_HAIKU_MODEL="$LLM_MODEL"
 : "${CLAUDE_CODE_MAX_CONTEXT_TOKENS:=98304}"   # = OLLAMA_CONTEXT_LENGTH; more and the server silently truncates
 export CLAUDE_CODE_MAX_CONTEXT_TOKENS
 
-exec claude "$@"
+# Without this, qwen3-coder ignores the working directory and guesses /home/alex/... paths
+# (3/3 runs on 2026-09-20). With it: 3/3 clean, 34-49 s vs 144 s for qwen3.6:27b (2026-09-22).
+exec claude --append-system-prompt "Your working directory is $PWD. Create and edit files only inside it: use relative paths, or absolute paths under $PWD. Never write elsewhere under /home." "$@"
