@@ -85,7 +85,7 @@
     "debug": {
       "description": "Investigates bugs, crashes, and runtime issues using logs, traces, and network diagnostics. Read-only — never modifies project files.",
       "mode": "subagent",
-      "model": "ollama/qwen3.6:27b",
+      "model": "ollama/qwen3-coder:30b",
       "prompt": "{file:./prompts/debug.txt}",
       "color": "error",
       "temperature": 0.2,
