@@ -36,7 +36,7 @@
 -- rules below override it.
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
 
--- ====== Home desk: absolute layout ======
+-- ====== Samsung + AOC desk: absolute layout ======
 -- These three are positioned absolutely, on purpose. The relative
 -- auto-* directives can't express this arrangement: the portable has
 -- to be centered under BOTH upper panels, and auto-center-down centers
@@ -91,10 +91,10 @@ hl.monitor({
 })
 
 -- ====== Centered below both ======
--- Portable 16" panel. This panel travels, so its x depends on the desk:
---   home:     1520 = (4960 - 1920) / 2  (centered under Samsung+AOC)
---   vacation: 1600 = (5120 - 1920) / 2  (centered under the two LGs)
--- Set to the vacation value while away (Sep 2026); restore 1520 at home.
+-- Portable 16" panel, centered under whichever pair is above it. The x
+-- is (total_width - 1920) / 2, so it depends on the upper row:
+--   1600 = (5120 - 1920) / 2  (under the two LGs)      <- current desk
+--   1520 = (4960 - 1920) / 2  (under Samsung + AOC)
 hl.monitor({
     output   = "desc:AOP 16PM1Q",
     mode     = "1920x1080@60",
@@ -102,7 +102,7 @@ hl.monitor({
     scale    = 1.0,
 })
 
--- ====== Vacation desk (Sep 2026): two LG UltraGears ======
+-- ====== Desk: two LG UltraGears ======
 -- Same model string on both panels, so serials are REQUIRED here to
 -- tell left from right — the "omit serials" rule above only works for
 -- distinct models. Bottom edges at y=1440 align with the portable row.
