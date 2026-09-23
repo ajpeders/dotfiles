@@ -1,0 +1,14 @@
+[Unit]
+Description=Restrict Ollama (11434) to LAN, tailnet, docker bridges and wg-isis
+Wants=network-pre.target
+Before=network-pre.target
+Before=ollama.service docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/nft -f /etc/ollama-gate.nft
+ExecStop=/usr/bin/nft destroy table inet ollama_gate
+
+[Install]
+WantedBy=multi-user.target

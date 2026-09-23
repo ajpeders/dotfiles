@@ -19,7 +19,16 @@ hl.config({
     misc = {
         force_default_wallpaper = 0,
         disable_hyprland_logo   = true,
-        vrr                     = 0,
+        -- 2 = VRR only for fullscreen windows (games). Panels without
+        -- adaptive sync are unaffected; Hyprland checks per output.
+        vrr                     = 2,
+    },
+
+    render = {
+        -- Fullscreen games scan out directly, skipping the compositor
+        -- pass (one frame less latency). Falls back automatically when
+        -- the buffer isn't scanout-compatible.
+        direct_scanout = 1,
     },
 
     debug = {

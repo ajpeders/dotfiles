@@ -54,6 +54,21 @@ and `btop/themes/noctalia.theme`, all gitignored, on every palette change.
 systemctl --user restart noctalia-shell.service   # or SUPER+SHIFT+R
 ```
 
+## Stop the screen locking mid-game or mid-video
+
+Idle is owned by hypridle (`hypr/hypridle-{ac,battery}.conf`), which locks
+after 5 min without keyboard/mouse input. Gamepad input never reaches the
+Wayland seat and XWayland games don't speak the idle-inhibit protocol, so
+`hypr/config/windowrules.lua` has `idle_inhibit = "fullscreen"` on every
+window: anything fullscreen blocks the lock. Check it with:
+
+```bash
+hyprctl clients -j | jq '.[] | select(.fullscreen > 0) | .inhibitingIdle'
+```
+
+For a windowed app, toggle caffeine instead (`SUPER+SHIFT+A`, or
+`noctalia msg caffeine-toggle`); it takes a logind idle inhibitor that
+hypridle honours. `systemd-inhibit --list` shows it as `Caffeine`.
 ## Add a Hyprland keybind
 
 Edit `~/.config/hypr/config/keybinds.lua`. The file already defines `mod` (from
@@ -75,9 +90,36 @@ bash scripts/install.sh
 
 ## Update existing install
 
+Automatic: a `dotfiles-autopull` timer (systemd user timer on Linux, LaunchAgent
+`com.alex.dotfiles-autopull` on macOS) runs `scripts/autopull.sh` every 15 minutes.
+It fast-forwards `main` from **Forgejo** (the primary) over the clone's SSH remote, and falls back to GitHub over HTTPS.
+It skips when offline or on another branch, and
+refuses (logs, never merges) if local commits or uncommitted edits would conflict.
+The installers set it up; to enable it by hand on an existing Linux install:
+
+```bash
+systemctl --user daemon-reload && systemctl --user enable --now dotfiles-autopull.timer
+journalctl --user -u dotfiles-autopull      # what the last runs did
+```
+
+Manual pull any time: `~/.config/scripts/autopull.sh`.
+
+Pulling only moves files. New packages and re-linked configs still need a run of
+the installer:
+
 ```bash
 cd ~/.config
-bash scripts/update.sh
+bash scripts/install.sh
+```
+
+**Remotes: Forgejo is primary, GitHub is a copy.** On every machine, `main` tracks the Forgejo remote, and that remote pushes to both,
+so a plain `git push` updates Forgejo and GitHub together. One-time setup per clone (`F` = the remote pointing at git.thelunadog.com):
+
+```bash
+F=$(git remote -v | awk '/thelunadog.*fetch/{print $1; exit}')
+git config branch.main.remote $F
+git remote set-url --push $F "$(git remote get-url $F)"
+git remote set-url --add --push $F git@github.com:ajpeders/dotfiles.git
 ```
 
 ## Configure monitors
@@ -163,34 +205,36 @@ opencode debug config      # check the resolved baseURL
 
 ## Agents
 
-`opencode/opencode.json` defines seven agents. Three live in `~/.config/opencode/opencode.jsonc` for machine-specific overrides (currently the `@whisperopencode/push` plugin) — see the *Config layering* section below.
+`opencode/opencode.json` defines eight agents, the Ollama provider, and the `@whisperopencode/push` plugin.
 
 | Agent | Mode | Model | Use |
 |---|---|---|---|
-| `build` | primary | `deepseek/deepseek-v4-pro` (cloud) | Default. Full edit + bash. Capped at 50 steps. Bash guards deny force-push, `mkfs`, `dd if=`, fork-bomb; `git push` and `rm -rf` ask first. |
-| `plan` | primary | `minimax-coding-plan/MiniMax-M3` (cloud) | Read-only planning. Tab to switch; use when you want analysis without changes. |
-| `general` | subagent | `ollama/glm-4.7-flash:latest` | Multi-step delegated work. Invoke with `@general`. |
-| `explore` | subagent | `ollama/qwen3:8b-32k` | Fast read-only codebase search. Invoke with `@explore`. |
-| `scout` | subagent | `ollama/qwen3:8b-32k` | External docs and dependency research; clones into OpenCode's cache. Invoke with `@scout`. |
+| `build` | primary | `openai/gpt-5.5` (cloud, falls back to MiniMax-M3 → DeepSeek v4 Pro) | Default. Full edit + bash. Capped at 50 steps. Bash guards deny force-push, `mkfs`, `dd if=`, fork-bomb; `git push` and `rm -rf` ask first. |
+| `plan` | primary | `openai/gpt-5.5` (cloud, same fallback chain as build) | Read-only planning. Tab to switch; use when you want analysis without changes. |
+| `general` | subagent | `ollama/qwen3-coder:30b` | Multi-step delegated work. Invoke with `@general`. |
+| `explore` | subagent | `ollama/qwen3-coder:30b` | Fast read-only codebase search. Invoke with `@explore`. |
+| `scout` | subagent | `ollama/qwen3-coder:30b` | External docs and dependency research; clones into OpenCode's cache. Invoke with `@scout`. |
 | `review` | subagent | `ollama/qwen3-coder:30b` | Local code review, read-only. Strong enough for review; keeps data on-machine. |
 | `debug` | subagent | `ollama/qwen3.6:27b` | Logs, traces, network diagnostics, coredumps. Bounded bash allowlist (no destructive ops). Invoke with `@debug`. |
-| `docs-writer` | subagent | `ollama/glm-4.7-flash:latest` | READMEs, changelogs, ADRs. Edits prose only; bash denied. Invoke with `@docs-writer`. |
+| `docs-writer` | subagent | `ollama/qwen3-coder:30b` | READMEs, changelogs, ADRs. Edits prose only; bash denied. Invoke with `@docs-writer`. |
 
 ### Routing rationale
 
 - **Cloud for primaries.** Build and plan need the strongest reasoning — coding and architecture reward paying for it. Subagents stay local.
 - **Subagent model matters less than variety.** arch-alex has `OLLAMA_NUM_PARALLEL=1`, so a different subagent model causes a swap (~5–15 s load). Keep subagents on the fewest models possible.
+- **`glm-4.7-flash is retired (2026-09-19).** On the desktop's ROCm backend it processed prompts ~3x slower than `qwen3-coder:30b` and collapsed at long context. Everything local runs on `qwen3-coder:30b` (28 GB resident, 96k ctx, f16 KV).
+- **explore/scout moved off `qwen3:8b-32k` (2026-09-20).** The coder and the 8B can't both fit in 32 GB, so running them side by side made them evict each other (5 swaps in 12 min in the logs). The coder is also faster: it's MoE with ~3B active parameters, 169 vs 102 t/s generation on Vulkan. Nothing uses `qwen3.6:27b` by default any more, so nothing swaps the coder out (`debug` moved 2026-09-22). Benchmarks: `/srv/projects/ollama/bench/results.md`.
+- **`claude-local` moved to `qwen3-coder:30b` (2026-09-22).** On 09-20 it stayed on `qwen3.6:27b` because the coder guessed wrong `/home/alex/…` paths in 3/3 runs. The launcher now passes `--append-system-prompt` with `$PWD`; with that, 4/4 sandboxed runs were clean at 34–49 s (vs 144 s for the 27B), and there's no model swap. To go back: `LLM_MODEL=qwen3.6:27b claude-local`. opencode `debug` moved the same day: a "start in the working directory" step in `prompts/debug.txt` took it from 0/3 to 3/3 on a sandboxed root-cause test (8–18 s vs 35–47 s on the 27B).
 - **review → local coding model.** Even though review is invoked often during build cycles, `qwen3-coder:30b` is purpose-built for code understanding and avoids per-review cloud cost.
 
 ### Config layering
 
-1. `~/.config/opencode/opencode.json` — global, tracked, agents and providers.
-2. `~/.config/opencode/opencode.jsonc` — global, tracked, machine-friendly overrides (plugins, envs).
-3. `~/.config/opencode/prompts/*.txt` — global prompt bodies.
-4. `~/.config/opencode/themes/omarchy.json` — global theme matching the active matugen palette.
-5. `~/.config/opencode/tui.json` — sets `theme: omarchy`.
-6. `~/.config/opencode/.opencode/` — **templates**. Copy `prompts/*.txt` into a project's `.opencode/prompts/` to override locally; same for `themes/`.
-7. `<project>/.opencode/opencode.json` — per-project overrides.
+1. `~/.config/opencode/opencode.json` — global, tracked, agents, providers, and plugins.
+2. `~/.config/opencode/prompts/*.txt` — global prompt bodies.
+3. `~/.config/opencode/themes/omarchy.json` — global theme matching the active matugen palette.
+4. `~/.config/opencode/tui.json` — sets `theme: omarchy`.
+5. `~/.config/opencode/.opencode/` — **templates**. Copy `prompts/*.txt` into a project's `.opencode/prompts/` to override locally; same for `themes/`.
+6. `<project>/.opencode/opencode.json` — per-project overrides.
 
 ### Prompt templates
 

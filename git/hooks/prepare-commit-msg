@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# prepare-commit-msg hook (global)
+# Strip Claude-attribution trailers from commit messages before commit.
+# Patterns stripped (case-insensitive, line-start):
+#   Co-Authored-By: Claude <anything>
+#   Claude-Session: ...
+#   Claude-Model: ...
+#   Claude: ...
+# Human co-authors are untouched.
+#
+# Wired up via: git config --global core.hooksPath ~/.config/git/hooks
+#
+# Args (from git): $1=msg-file  $2=source  $3=sha1
+COMMIT_MSG_FILE="$1"
+SOURCE="$2"
+
+# Don't touch messages git generated automatically:
+#   merge, commit (amend), squash, template
+case "$SOURCE" in
+  merge)            exit 0 ;;
+esac
+
+# -E: extended regex. -i: case-insensitive (GNU grep; on BSD use -i too, works either way).
+grep -v -i -E \
+  '^[ \t]*(Co-Authored-By:[ \t]*Claude|Claude(-Session|-Model)?:)' \
+  "$COMMIT_MSG_FILE" > "$COMMIT_MSG_FILE.tmp" \
+  && mv "$COMMIT_MSG_FILE.tmp" "$COMMIT_MSG_FILE"
+
+exit 0

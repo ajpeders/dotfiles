@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Run Claude Code against the local Ollama server instead of Anthropic.
+# Plain `claude` is unaffected.
+set -euo pipefail
+
+: "${LLM_HOST:=http://100.84.247.20:11434}"
+: "${LLM_MODEL:=qwen3-coder:30b}"   # the 27B needs a model swap; the coder passes with the cwd prompt below
+
+export ANTHROPIC_BASE_URL="$LLM_HOST"
+export ANTHROPIC_AUTH_TOKEN="ollama"
+export ANTHROPIC_MODEL="$LLM_MODEL"
+# Background tasks (titles, summaries) must use the SAME model: only one model
+# fits in VRAM, so a different small model would evict the coder every turn.
+# SMALL_FAST is the deprecated alias of DEFAULT_HAIKU; identical values make
+# precedence moot.
+export ANTHROPIC_SMALL_FAST_MODEL="$LLM_MODEL"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="$LLM_MODEL"
+# Claude Code does not know these models and would otherwise assume a 200k
+# window, larger than the server's OLLAMA_CONTEXT_LENGTH. Tell it the truth.
+: "${CLAUDE_CODE_MAX_CONTEXT_TOKENS:=98304}"   # = OLLAMA_CONTEXT_LENGTH; more and the server silently truncates
+export CLAUDE_CODE_MAX_CONTEXT_TOKENS
+
+# Without this, qwen3-coder ignores the working directory and guesses /home/alex/... paths
+# (3/3 runs on 2026-09-20). With it: 3/3 clean, 34-49 s vs 144 s for qwen3.6:27b (2026-09-22).
+exec claude --append-system-prompt "Your working directory is $PWD. Create and edit files only inside it: use relative paths, or absolute paths under $PWD. Never write elsewhere under /home." "$@"

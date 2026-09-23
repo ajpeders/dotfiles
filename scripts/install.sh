@@ -447,6 +447,12 @@ phase_dotfiles() {
         fi
     done
 
+    mkdir -p "$HOME/.config/systemd/user"
+    backup_and_link "$REPO_DIR/systemd/user/dotfiles-autopull.service" \
+        "$HOME/.config/systemd/user/dotfiles-autopull.service"
+    backup_and_link "$REPO_DIR/systemd/user/dotfiles-autopull.timer" \
+        "$HOME/.config/systemd/user/dotfiles-autopull.timer"
+
     if [ "$HEADLESS" -ne 1 ] && [ "$OMARCHY" -eq 1 ]; then
         mkdir -p "$HOME/.config/systemd/user"
         backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.service" \
@@ -558,6 +564,12 @@ phase_services() {
     # Tailscale: the unit is enough to bring the tunnel up at boot; the node
     # still needs a one-time `sudo tailscale up` to authenticate.
     enable_system_service tailscaled
+
+    # Keep this clone in sync with GitHub main (scripts/autopull.sh).
+    if [ -n "${DBUS_SESSION_BUS_ADDRESS:-}${XDG_RUNTIME_DIR:-}" ]; then
+        systemctl --user daemon-reload
+    fi
+    enable_user_service dotfiles-autopull.timer
 
     if [ "$HEADLESS" -eq 1 ]; then
         enable_system_service sshd

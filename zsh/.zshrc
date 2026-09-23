@@ -85,6 +85,9 @@ source $ZSH/oh-my-zsh.sh
 # Claude Code's completion can't parse anchor-based matching.
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
+# fzf-tab — replace Tab with an fzf picker showing flags + descriptions
+source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
