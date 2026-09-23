@@ -125,15 +125,14 @@ hl.monitor({
 -- non-TV output off through generated Lua overrides loaded below; this
 -- rule stays in place and is re-applied when the mode is exited.
 --
--- Scale is the one knob worth tuning: 1.0 is the EDID default and
--- gives full 3840x2160 logical (small from the couch, sharp in
--- games). Raise to ~1.5 for couch-friendly UI text — 3840/1.5=2560 and
--- 2160/1.5=1440 are both integers, so the integer-scale rule still
--- holds.
+-- Scale is the one knob worth tuning. 2.0 is the couch setting: on a
+-- 55" panel it gives 1920x1080 logical, which is readable from across
+-- the room and divides 3840x2160 exactly, so the integer-scale rule
+-- holds and nothing is resampled. 1.0 is the EDID default and yields
+-- the full 3840x2160 — sharper for games, too small to read from a
+-- sofa. 1.5 (2560x1440) is the middle option and is also integral.
 --
--- For a 55" TV (which is quite large), 2x scale makes the UI comfortable
--- at normal viewing distance while maintaining sharpness for detailed work.
--- Positioned to right of the desk setup: x=5120, y=0 (same as original)
+-- Positioned right of the desk setup at x=5120, y=0.
 hl.monitor({
     output   = "HDMI-A-1",
     mode     = "preferred",
