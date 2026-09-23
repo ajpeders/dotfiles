@@ -4,7 +4,13 @@
 
 hl.config({
   general = {
-    -- Omarchy default is 2. Carried over from the old Noctalia config.
+    -- Declared, not inherited, so both desktop stacks stay in step: these are
+    -- the values hypr/config/variables.lua sets for Noctalia. Omarchy's
+    -- defaults happen to agree on the gaps today (5/10) and differ on the
+    -- border (2), but an `omarchy update` can move its defaults, and then the
+    -- two stacks would drift apart silently.
+    gaps_in     = 5,
+    gaps_out    = 10,
     border_size = 3,
   },
 

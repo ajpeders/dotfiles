@@ -4,6 +4,13 @@
 -- Monitor scale is Hyprland's scale for the output. It sizes everything
 -- Wayland-native, accepts fractions (1.6, 1.75), and applies immediately.
 -- "auto" lets Hyprland pick per display.
+--
+-- Left on "auto", which matches hypr/config/monitors.lua on the Noctalia side:
+-- that file pins known panels by desc: and falls through to an auto catch-all
+-- for everything else. The Air's internal panel reports an empty EDID
+-- description (`hyprctl monitors all` shows description ''), so there is
+-- nothing to match on and the catch-all is the only way to reach it. "auto"
+-- picks 2 on its 2560x1600 panel, giving 1280x800 logical.
 local omarchy_monitor_scale = "auto"
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = omarchy_monitor_scale })
 
