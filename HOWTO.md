@@ -395,7 +395,7 @@ PKGBUILD rejects `aarch64`, so it is intentionally not synced from
 WireGuard framing — so `wireguard-tools` is not installed and `wg`/`wg-quick`
 are unavailable. Use `awg`/`awg-quick`.
 
-Client configs are **not in this repo** (they hold private keys). They live in `~/.config/wireguard/`, mode `600`, covered by the catch-all ignore in `.gitignore`. `vpn-list` shows what's available:
+Client configs are **not in this repo** (they hold private keys). They live in `~/.config/wireguard/`, mode `600`, covered by the catch-all ignore in `.gitignore`. `scripts/sync-private.sh` pulls them from the main host on a new machine. `vpn-list` shows what's available:
 
 | Config | Address | Issued | Obfuscation |
 |---|---|---|---|

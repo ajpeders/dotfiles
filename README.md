@@ -137,7 +137,8 @@ bash scripts/update.sh
 ```
 
 ```bash
-# Both — sync private files (wallpapers, SSH hosts, librewolf profile) from a remote host
+# Both — sync private files from a remote host: wallpapers, SSH host drop-ins,
+# rclone remotes, WireGuard configs, gh auth, librewolf profile
 bash scripts/sync-private.sh user@host
 ```
 

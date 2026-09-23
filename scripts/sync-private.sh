@@ -72,8 +72,41 @@ if [ -x "$OMARCHY_WALLPAPER_HOOK" ]; then
     print_status "Made shared wallpapers available to the current Omarchy theme"
 fi
 
-# SSH hosts
-sync_dir ".ssh/config.d/" "$HOME/.ssh/config.d"
+# SSH hosts. The synced drop-ins are inert unless ~/.ssh/config includes them,
+# and ssh_config is first-match-wins, so the Include has to lead the file for
+# the main host's definitions to beat any stale local block.
+ensure_ssh_include() {
+    local cfg="$HOME/.ssh/config"
+
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+    [ -f "$cfg" ] || : > "$cfg"
+
+    if grep -qE '^[[:space:]]*Include[[:space:]]+.*\.ssh/config\.d/' "$cfg"; then
+        return
+    fi
+
+    { printf 'Include ~/.ssh/config.d/*\n\n'; cat "$cfg"; } > "$cfg.new"
+    mv "$cfg.new" "$cfg"
+    chmod 600 "$cfg"
+    print_status "Added 'Include ~/.ssh/config.d/*' to $cfg"
+}
+
+sync_dir ".ssh/config.d/" "$HOME/.ssh/config.d" --chmod=D700,F600
+ensure_ssh_include
+
+# Secrets that are portable between machines, unlike host identity (sunshine /
+# wayvnc pairing keys, the SSH host key) which must stay per-machine.
+# --chmod pins the local mode regardless of how the remote stores them.
+
+# rclone remotes + OAuth refresh tokens
+sync_dir ".config/rclone/" "$HOME/.config/rclone" --chmod=D700,F600
+
+# WireGuard/AmneziaWG client configs (hold private keys) — see HOWTO.md#vpn
+sync_dir ".config/wireguard/" "$HOME/.config/wireguard" --chmod=D700,F600
+
+# GitHub CLI auth token (hosts.yml) + config
+sync_dir ".config/gh/" "$HOME/.config/gh" --chmod=D700,F600
 
 # Librewolf profile (extensions, bookmarks, settings — excluding caches)
 # Local path differs per OS; remote source stays Linux-style.
