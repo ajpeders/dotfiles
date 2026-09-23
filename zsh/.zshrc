@@ -85,8 +85,13 @@ source $ZSH/oh-my-zsh.sh
 # Claude Code's completion can't parse anchor-based matching.
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
-# fzf-tab — replace Tab with an fzf picker showing flags + descriptions
-source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
+# fzf-tab — replace Tab with an fzf picker showing flags + descriptions.
+# Cloned into the oh-my-zsh custom tree by scripts/install.sh, alongside
+# zsh-autosuggestions; sourced (not listed in plugins=) so it loads after
+# compinit. Guarded so a clone that predates the installer still starts.
+_fzf_tab="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fzf-tab/fzf-tab.plugin.zsh"
+[ -r "$_fzf_tab" ] && source "$_fzf_tab"
+unset _fzf_tab
 
 # User configuration
 

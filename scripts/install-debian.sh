@@ -265,6 +265,13 @@ phase_shell() {
         print_status "zsh-syntax-highlighting installed"
     fi
 
+    if [ -d "$zsh_custom/plugins/fzf-tab" ]; then
+        print_status "fzf-tab already installed"
+    else
+        git clone https://github.com/Aloxaf/fzf-tab "$zsh_custom/plugins/fzf-tab"
+        print_status "fzf-tab installed"
+    fi
+
     if [ -d "$zsh_custom/themes/powerlevel10k" ]; then
         print_status "powerlevel10k already installed"
     else
