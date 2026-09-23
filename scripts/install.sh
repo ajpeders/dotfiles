@@ -447,6 +447,10 @@ phase_dotfiles() {
         fi
     done
 
+    mkdir -p "$HOME/.local/bin"
+    backup_and_link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
+    backup_and_link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
+
     mkdir -p "$HOME/.config/systemd/user"
     backup_and_link "$REPO_DIR/systemd/user/dotfiles-autopull.service" \
         "$HOME/.config/systemd/user/dotfiles-autopull.service"

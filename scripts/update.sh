@@ -273,6 +273,10 @@ phase_dotfiles() {
         [ -d "$REPO_DIR/$dir" ] && backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
     done
 
+    mkdir -p "$HOME/.local/bin"
+    backup_and_link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
+    backup_and_link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
+
     if [ "$HEADLESS" -ne 1 ] && [ "$OMARCHY" -eq 1 ]; then
         mkdir -p "$HOME/.config/systemd/user"
         backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.service" \

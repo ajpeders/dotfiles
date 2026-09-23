@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export OPENCODE_FALLBACK_CHAIN="ollama/qwen3-coder:30b"
+exec opencode "$@"
