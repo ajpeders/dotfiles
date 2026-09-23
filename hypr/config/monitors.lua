@@ -132,9 +132,13 @@ hl.monitor({
 -- the full 3840x2160 — sharper for games, too small to read from a
 -- sofa. 1.5 (2560x1440) is the middle option and is also integral.
 --
+-- Matched by EDID like every other panel here, so the rule only fires on
+-- the machine the TV is actually plugged into. The EDID reports the make
+-- as "Ines GmbH", not Insignia; livingroom-mode.sh uses the same string.
+--
 -- Positioned right of the desk setup at x=5120, y=0.
 hl.monitor({
-    output   = "HDMI-A-1",
+    output   = "desc:Ines GmbH NS55DF710NA21",
     mode     = "preferred",
     position = "5120x0",
     scale    = 2.0,
