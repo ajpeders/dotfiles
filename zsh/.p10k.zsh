@@ -909,9 +909,11 @@
   # Default context format (no privileges, no SSH): user@hostname.
   typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%n@%m'
 
-  # Don't show context unless running with privileges or in SSH.
-  # Tip: Remove the next line to always show context.
-  typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION=
+  # Always show user@hostname, not just over SSH or as root: these dotfiles run
+  # on several machines (vega, the M1 Air, the homeserver, the Pi) and the
+  # prompt is the only thing that says which one a terminal is on. p10k's
+  # default blanks the DEFAULT/SUDO classes here; leaving it out keeps
+  # POWERLEVEL9K_CONTEXT_TEMPLATE ('%n@%m') in effect for every class.
 
   # Custom icon.
   # typeset -g POWERLEVEL9K_CONTEXT_VISUAL_IDENTIFIER_EXPANSION='⭐'
