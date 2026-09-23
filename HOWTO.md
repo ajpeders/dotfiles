@@ -1,5 +1,20 @@
 # HOWTO
 
+## Use Neovim LSP
+
+The native Neovim LSP configuration supports Lua, shell, Python, JSON/JSONC,
+CSS, TOML, and Markdown. It starts the matching server when a supported file
+opens.
+
+- `K` — show documentation
+- `gd` — go to definition
+- `gr` — find references
+- `Space rn` — rename symbol
+- `Space ca` — code action
+- `Space f` — format the buffer
+- `Space e` — explain the diagnostic under the cursor
+- `:checkhealth vim.lsp` — inspect active servers and errors
+
 ## Change wallpaper
 
 Noctalia manages wallpapers. Use IPC or the settings window:
@@ -69,6 +84,47 @@ hyprctl clients -j | jq '.[] | select(.fullscreen > 0) | .inhibitingIdle'
 For a windowed app, toggle caffeine instead (`SUPER+SHIFT+A`, or
 `noctalia msg caffeine-toggle`); it takes a logind idle inhibitor that
 hypridle honours. `systemd-inhibit --list` shows it as `Caffeine`.
+
+## What gamemode shuts down (CPU mode, AI stack, Ollama)
+
+`~/.config/gamemode.ini` runs `~/bin/gamemode-hook` on entry and exit, which
+hands the box's AI workloads over to the game and puts them back afterwards:
+
+| | `start` (game launches) | `end` (game exits) |
+|---|---|---|
+| CPU | `sudo -n x3d-mode cache` | `sudo -n x3d-mode frequency` |
+| AI stack | `~/bin/ai-stack stop` | `~/bin/ai-stack start` |
+| Ollama | `gamemode-ollama-toggle start` | `gamemode-ollama-toggle end` |
+
+`gamemode.ini` also sets `renice=10` and `inhibit_screensaver=1`, and gives the
+hooks 90 s (`script_timeout`) because the systemctl round trip is slow.
+
+**None of this is in the repo.** `gamemode.ini` is not allow-listed in
+`.gitignore`, and `~/bin/` is outside `~/.config` entirely, so the hook and both
+scripts are machine-local and unversioned — a fresh install does not get them.
+
+### Gotchas
+
+- **`gamemode-ollama-toggle`'s `disable`/`enable` calls silently fail.** The
+  hooks run with no tty, so every `sudo` must be covered by NOPASSWD. The rule
+  (`sudo -l`) grants exactly:
+
+  ```
+  (root) NOPASSWD: /usr/local/bin/x3d-mode,
+                   /usr/bin/systemctl stop ollama.service,
+                   /usr/bin/systemctl start ollama.service
+  ```
+
+  but the script also runs `systemctl disable ollama.service` on start and
+  `enable` on end, which are *not* in that list. `stop`/`start` work, so
+  gamemode still frees the GPU; the `disable`/`enable` half just errors out
+  unseen. Simplest fix is to drop those two lines — they only control whether
+  Ollama comes back at boot, which is not something a game should be toggling.
+- The hook has no `set -e` and gamemode discards its output, so a failing step
+  never surfaces. Test changes by hand with
+  `~/bin/gamemode-hook start; ~/bin/gamemode-hook end`.
+
+
 ## Add a Hyprland keybind
 
 Edit `~/.config/hypr/config/keybinds.lua`. The file already defines `mod` (from
@@ -172,6 +228,22 @@ hyprctl eval "hl.monitor({ output = 'desc:AOC 2460G4', mode = '1920x1080@144', p
 
 Applies immediately; reverts on the next config reload. Use this to test a mode
 before committing to it.
+
+### Display modes
+
+`~/.config/hypr/scripts/livingroom-mode.sh` cycles through three modes:
+
+1. all monitors on
+2. only the TV on
+3. everything except the TV on
+
+It writes temporary Lua monitor overrides under `~/.local/state/dotfiles/` and
+reloads Hyprland. The TV-only mode focuses the TV; the other modes focus a desk
+monitor.
+
+The TV is matched by `desc:` using its captured EDID make and model. To update
+the match for another TV, plug it in, run `capture-monitor.sh`, and update
+`TV_DESC` in the script.
 
 ### Gotchas
 
