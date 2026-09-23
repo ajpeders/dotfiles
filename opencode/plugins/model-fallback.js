@@ -1,13 +1,15 @@
 // Model fallback for the frontier chain. When the current model errors, or is
 // stuck in rate-limit retries, abort, revert the turn, and replay the user's
-// message on the next model in CHAIN. Every new message starts again at the top
-// of the chain (the TUI's selected model), so GPT is always tried first.
+// message on the next model in CHAIN. Fallback resumes from whatever model
+// actually failed, so every new message starts again at the TUI's selected
+// model -- ollama, the head of the chain, unless it is switched by hand.
 // opencode has no native fallback yet: https://github.com/anomalyco/opencode/issues/7602
 //
 // OPENCODE_FALLBACK_CHAIN="provider/model,provider/model,..." overrides CHAIN (for testing).
 
 const CHAIN = (process.env.OPENCODE_FALLBACK_CHAIN?.split(",") ?? [
-  "openai/gpt-5.5",
+  "ollama/qwen3-coder:30b",
+  "openai/gpt-5.6-sol",
   "minimax-coding-plan/MiniMax-M3",
   "deepseek/deepseek-v4-pro",
 ]).map((s) => s.trim())
@@ -79,7 +81,7 @@ export const ModelFallback = async ({ client }) => {
   return {
     event: async ({ event }) => {
       const p = event.properties
-      if (event.type === "session.status" && p.status.type === "retry" && p.status.attempt >= RETRY_ATTEMPTS_BEFORE_FALLBACK) {
+      if (event.type === "session.status" && p?.status?.type === "retry" && p.status.attempt >= RETRY_ATTEMPTS_BEFORE_FALLBACK) {
         await fallback(p.sessionID, `retry ${p.status.attempt}: ${p.status.message}`)
       } else if (event.type === "session.error" && p.sessionID && p.error && !IGNORED_ERRORS.has(p.error.name)) {
         await fallback(p.sessionID, `${p.error.name}: ${p.error.data?.message ?? ""}`)
