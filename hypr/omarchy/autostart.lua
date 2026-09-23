@@ -18,3 +18,5 @@
 -- hl.on("hyprland.start", function()
 --   hl.exec_cmd(o.launch("some-app"))
 -- end)
+
+pcall(require, "hypr.omarchy.omarchy-shell")
