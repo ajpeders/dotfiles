@@ -10,6 +10,15 @@ zsh
 
 # Editor
 neovim
+lua-language-server
+bash-language-server
+pyright
+vscode-json-languageserver
+vscode-css-languageserver
+taplo-cli
+marksman
+shellcheck
+shfmt
 
 # Utilities
 git
