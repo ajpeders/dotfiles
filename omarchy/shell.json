@@ -2,7 +2,7 @@
   "version": 1,
   "idle": {
     "screensaver": 150,
-    "lock": 300
+    "lock": 900
   },
   "bar": {
     "position": "top",
@@ -60,6 +60,9 @@
         },
         {
           "id": "omarchy.power"
+        },
+        {
+          "id": "jetshell.settings"
         }
       ]
     }
