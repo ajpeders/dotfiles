@@ -146,19 +146,21 @@ bash scripts/install.sh
 
 ## Update existing install
 
-Automatic: a `dotfiles-autopull` timer (systemd user timer on Linux, LaunchAgent
-`com.alex.dotfiles-autopull` on macOS) runs `scripts/autopull.sh` every 15 minutes.
-It fast-forwards `main` from **Forgejo** (the primary) over the clone's SSH remote, and falls back to GitHub over HTTPS.
-It skips when offline or on another branch, and
-refuses (logs, never merges) if local commits or uncommitted edits would conflict.
-The installers set it up; to enable it by hand on an existing Linux install:
+Pull by hand, when you want the update:
 
 ```bash
-systemctl --user daemon-reload && systemctl --user enable --now dotfiles-autopull.timer
-journalctl --user -u dotfiles-autopull      # what the last runs did
+git -C ~/.config pull --ff-only forgejo main
 ```
 
-Manual pull any time: `~/.config/scripts/autopull.sh`.
+There is no automatic pull. A `dotfiles-autopull` timer used to fast-forward
+`main` every 15 minutes; it was removed because a clone that rewrites itself
+underneath a running session causes more trouble than the convenience is worth.
+If an old machine still has it enabled, turn it off:
+
+```bash
+systemctl --user disable --now dotfiles-autopull.timer   # Linux
+launchctl bootout gui/$UID/com.alex.dotfiles-autopull    # macOS
+```
 
 Pulling only moves files. New packages and re-linked configs still need a run of
 the installer:
