@@ -61,6 +61,7 @@ opencode/package.json
 opencode/package-lock.json
 opencode/bun.lock
 opencode/.gitignore
+opencode/.opencode/
 
 # Vaultwarden CLI: server/email config + keyring-backed pinentry shim (no secrets)
 !rbw/

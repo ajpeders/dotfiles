@@ -346,12 +346,11 @@ opencode debug config      # check the resolved baseURL
 1. `~/.config/opencode/opencode.json` — global, tracked, agents, providers, and plugins.
 2. `~/.config/opencode/prompts/*.txt` — global prompt bodies.
 3. `~/.config/opencode/tui.json` — sets `theme: system`.
-4. `~/.config/opencode/.opencode/` — **templates**. Copy `prompts/*.txt` into a project's `.opencode/prompts/` to override locally.
-5. `<project>/.opencode/opencode.json` — per-project overrides.
+4. `<project>/.opencode/prompts/*.txt` and `<project>/.opencode/opencode.json` — per-project overrides; project-local wins.
 
 ### Prompt templates
 
-`prompts/` holds build, plan, debug, and docs-writer. `.opencode/prompts/` is a mirror for distribution — copy from there into a project's `.opencode/prompts/` and specialize.
+`prompts/` holds build, plan, debug, and docs-writer. To specialize one for a repo, copy it into that project's `.opencode/prompts/` (`mkdir -p .opencode/prompts && cp ~/.config/opencode/prompts/build.txt .opencode/prompts/`) and edit the copy.
 
 ### Theme
 
