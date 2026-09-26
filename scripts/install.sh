@@ -79,7 +79,7 @@ done
 # the display manager. The shared detector in lib-dotfiles.sh is the single
 # source of truth; this shim keeps the old name working.
 detect_desktop() {
-    OMARCHY=-1 dotfiles_detect_desktop >/dev/null
+    dotfiles_detect_desktop >/dev/null
 }
 
 desktop_label() {

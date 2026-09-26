@@ -31,8 +31,10 @@ DOTFILES_DESKTOP_STATE="$DOTFILES_STATE_DIR/dotfiles-desktop"
 #
 # Usage:
 #   dotfiles_detect_desktop            # auto-detect
-#   OMARCHY=-1 dotfiles_detect_desktop # auto-detect (default sentinel)
-#   OMARCHY=1  dotfiles_detect_desktop # forced Omarchy via flag
+#   OMARCHY=-1; dotfiles_detect_desktop  # auto-detect (default sentinel)
+#   OMARCHY=1;  dotfiles_detect_desktop  # forced Omarchy via flag
+# Never write `OMARCHY=x dotfiles_detect_desktop`: a prefix assignment is
+# scoped to the call, so the OMARCHY the function sets is thrown away.
 dotfiles_detect_desktop() {
     if [ "${OMARCHY:- -1}" != " -1" ] && [ "${OMARCHY:-}" != "-1" ]; then
         # Caller already set OMARCHY via --omarchy / --no-omarchy. Respect it.

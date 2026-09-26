@@ -64,7 +64,7 @@ fi
 # Single source of truth for desktop detection lives in lib-dotfiles.sh.
 # dotfiles_detect_desktop honors explicit --omarchy/--no-omarchy overrides
 # first, then the omarchy pacman package, then dotfiles-desktop state file.
-OMARCHY=-1 dotfiles_detect_desktop >/dev/null
+dotfiles_detect_desktop >/dev/null
 
 desktop_label() {
     if [ "$OMARCHY" -eq 1 ]; then echo "Omarchy"; else echo "Noctalia"; fi
