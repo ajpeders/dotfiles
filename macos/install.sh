@@ -121,6 +121,13 @@ phase_dotfiles() {
     link "$REPO_DIR/tmux" "$HOME/.config/tmux"
     link "$REPO_DIR/opencode" "$HOME/.config/opencode"
     link "$REPO_DIR/git" "$HOME/.config/git"
+    link "$REPO_DIR/nvim" "$HOME/.config/nvim"
+
+    # Launchers
+    mkdir -p "$HOME/.local/bin"
+    link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
+    link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
+    link "$REPO_DIR/scripts/claude-local" "$HOME/.local/bin/claude-local"
 
     # ZDOTDIR so zsh reads ~/.config/zsh/.zshrc
     if [ ! -f "$HOME/.zshenv" ]; then
