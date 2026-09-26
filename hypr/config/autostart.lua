@@ -7,7 +7,7 @@ hl.on("hyprland.start", function()
     -- so SUPER+SHIFT+R can restart it and it comes back after a crash.
     hl.exec_cmd("systemctl --user start noctalia-shell.service")
     hl.exec_cmd("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
-    -- Idle management (dim -> lock -> screen off -> suspend on battery only).
+    -- Idle management (dim -> lock -> screen off; never suspends).
     -- Picks hypr/hypridle-ac.conf or hypr/hypridle-battery.conf and swaps live.
     hl.exec_cmd("~/.config/hypr/scripts/hypridle-power.sh")
 end)

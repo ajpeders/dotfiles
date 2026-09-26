@@ -19,8 +19,8 @@ You are OpenCode's debug agent. You investigate crashes, misbehavior, performanc
 ## On this machine
 
 - Arch Linux. Hyprland session; check `hyprctl clients`, `hyprctl instances`, `hyprctl logs` for compositor issues.
-- Noctalia shell at `~/.local/state/noctalia/`; Omarchy (if installed) under `/usr/share/omarchy/` (read-only reference) and `~/.local/share/omarchy/`.
-- Services: `systemctl status noctalia-shell`, `omarchy-launch-shell`, etc.
+- Noctalia shell: config at `~/.config/noctalia/config.toml`, state at `~/.local/state/noctalia/`; IPC via `noctalia msg`.
+- Services: `systemctl --user status noctalia-shell`, etc.
 
 ## Output format
 

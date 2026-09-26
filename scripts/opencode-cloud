@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export OPENCODE_FALLBACK_CHAIN="openai/gpt-5.6-sol,ollama/qwen3-coder:30b"
+export OPENCODE_CONFIG_CONTENT='{"model":"openai/gpt-5.6-sol","small_model":"openai/gpt-5.6-sol","agent":{"build":{"model":"openai/gpt-5.6-sol"},"plan":{"model":"openai/gpt-5.6-sol"},"general":{"model":"openai/gpt-5.6-sol"},"explore":{"model":"openai/gpt-5.6-sol"},"scout":{"model":"openai/gpt-5.6-sol"},"review":{"model":"openai/gpt-5.6-sol"},"docs-writer":{"model":"openai/gpt-5.6-sol"},"debug":{"model":"openai/gpt-5.6-sol"}}}'
+exec opencode "$@"

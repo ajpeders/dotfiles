@@ -71,10 +71,6 @@ opencode/.gitignore
 !systemd/
 !systemd/user/
 !systemd/user/noctalia-shell.service
-!systemd/user/omarchy-wallpaper-colors.path
-!systemd/user/omarchy-wallpaper-colors.service
-!systemd/user/dotfiles-autopull.service
-!systemd/user/dotfiles-autopull.timer
 !librewolf/
 !librewolf/policies.json
 
@@ -83,29 +79,6 @@ opencode/.gitignore
 !environment.d/
 !environment.d/*.conf
 environment.d/90-llm-local.conf
-
-# Omarchy (4.x) user-owned config. Omarchy itself lives in /usr/share/omarchy
-# and is package-managed; only these user override files belong in the repo.
-!omarchy/
-!omarchy/shell.json
-!omarchy/extensions/
-!omarchy/extensions/**
-!omarchy/branding/
-!omarchy/branding/**
-!omarchy/defaults/
-!omarchy/defaults/agent
-!omarchy/themes/
-!omarchy/themes/**
-# Rendered per-theme by scripts/sync-omarchy-colors.sh.
-omarchy/themes/*/colors.toml
-!omarchy/hooks/
-!omarchy/hooks/**
-!omarchy/matugen/
-!omarchy/matugen/**
-# Omarchy ships these as stock samples / installs them on update; they are not
-# user configuration and would churn on every `omarchy update`.
-omarchy/hooks/**/*.sample
-omarchy/hooks/**/*.hook
 
 # Generated hypridle symlink (written by hypr/scripts/hypridle-power.sh;
 # points at hypridle-ac.conf or hypridle-battery.conf depending on power source)
@@ -128,4 +101,7 @@ zsh/.zsh_sessions/
 **/*.bak
 **/*.bak-*
 **/*.pre-dotfiles
-**/*.omarchy-template.bak
+
+# Python bytecode caches
+**/__pycache__/
+**/*.pyc

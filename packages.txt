@@ -10,6 +10,15 @@ zsh
 
 # Editor
 neovim
+lua-language-server
+bash-language-server
+pyright
+vscode-json-languageserver
+vscode-css-languageserver
+taplo-cli
+marksman
+shellcheck
+shfmt
 
 # Utilities
 git
@@ -111,49 +120,24 @@ realesrgan-ncnn-vulkan
 # Music player (terminal, Winamp-style; Plex creds via `cliamp setup`)
 cliamp
 
-# ================================================================
-# === NOCTALIA DESKTOP (skipped on Omarchy machines) ===
-# The pre-Omarchy Hyprland desktop: Noctalia shell, ly display manager,
-# and the standalone daemons Omarchy replaces with its own shell.
-# Parsed by install.sh / update.sh — do not rename the marker line above.
-# ================================================================
-
 # Desktop shell (v5, native C++; the v4 noctalia-shell/noctalia-qs pair is legacy)
 noctalia
 
-# Full JetBrains Mono Nerd package. Omarchy depends on
-# ttf-jetbrains-mono-nerd-basic, which provides the same font name and
-# conflicts with this package.
+# Full JetBrains Mono Nerd package.
 ttf-jetbrains-mono-nerd
 
 # Browser
-librewolf-bin
+librewolf
 
-# Authentication agent (Omarchy's shell ships its own polkit agent)
+# Authentication agent
 polkit-gnome
 
-# System tray applets (Omarchy's bar has network/bluetooth widgets)
+# System tray applets
 network-manager-applet
 blueman
 
-# Idle management (Omarchy uses idle.screensaver / idle.lock in shell.json)
+# Idle management
 hypridle
 
-# Display manager (Omarchy uses sddm, which its package depends on)
+# Display manager
 ly
-
-# ================================================================
-# === OMARCHY DESKTOP (skipped on non-Omarchy machines) ===
-# Omarchy itself is installed by its own installer, not from here.
-# This section only covers what a dotfiles resync must guarantee.
-# Parsed by install.sh / update.sh — do not rename the marker line above.
-# ================================================================
-
-# Upstream Quickshell, which the Omarchy shell (bar, notifications, OSD,
-# lock screen) runs on. Must be the real `quickshell`: Noctalia 4's fork
-# `noctalia-qs` Provides+Conflicts it and breaks omarchy-shell. Noctalia 5
-# no longer uses Quickshell, so this only matters if v4 is ever reinstalled.
-quickshell
-
-# Generate Omarchy's palette from the active wallpaper (Wallust-style).
-matugen

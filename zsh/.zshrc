@@ -85,8 +85,13 @@ source $ZSH/oh-my-zsh.sh
 # Claude Code's completion can't parse anchor-based matching.
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
-# fzf-tab — replace Tab with an fzf picker showing flags + descriptions
-source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
+# fzf-tab — replace Tab with an fzf picker showing flags + descriptions.
+# Cloned into the oh-my-zsh custom tree by scripts/install.sh, alongside
+# zsh-autosuggestions; sourced (not listed in plugins=) so it loads after
+# compinit. Guarded so a clone that predates the installer still starts.
+_fzf_tab="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fzf-tab/fzf-tab.plugin.zsh"
+[ -r "$_fzf_tab" ] && source "$_fzf_tab"
+unset _fzf_tab
 
 # User configuration
 
@@ -281,14 +286,18 @@ fi
 
 # opencode — packaged on Arch (pacman) and macOS (brew), so this only
 # matters where upstream's installer put it in ~/.opencode/bin (Debian).
-[ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"
+# Only as a fallback: a stale upstream copy must not shadow the package.
+if ! command -v opencode >/dev/null && [ -d "$HOME/.opencode/bin" ]; then
+    export PATH="$HOME/.opencode/bin:$PATH"
+fi
 
 # LLM_SERVER_URL + LLM_MODEL for opencode, written per-machine by
 # scripts/setup-llm.sh. Under ~/.local/state, not ~/.config: on Arch the repo
 # is ~/.config itself.
 [ -f "$HOME/.local/state/dotfiles/llm.env" ] && . "$HOME/.local/state/dotfiles/llm.env"
-# opencode.json resolves {env:LLM_SERVER_URL} and {env:LLM_MODEL}; unset would
-# leave a bare "ollama/" and an empty baseURL, which only fail at request time.
+# opencode.json resolves {env:LLM_SERVER_URL} for the ollama baseURL (its models
+# are fixed in the file); claude-local reads LLM_MODEL. An unset URL would leave
+# an empty baseURL, which only fails at request time.
 # Default to the local ollama so a machine with no llm.env just works; running
 # setup-llm.sh is only needed to point at a different host.
 export LLM_SERVER_URL="${LLM_SERVER_URL:-http://localhost:11434/v1}"

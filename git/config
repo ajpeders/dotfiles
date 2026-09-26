@@ -11,6 +11,7 @@
 	st = status
 [core]
 	editor = nvim
+	hooksPath = ~/.config/git/hooks   # Global hooks; replaces every repo's own .git/hooks
 [init]
 	defaultBranch = main
 [pull]

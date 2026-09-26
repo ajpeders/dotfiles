@@ -13,14 +13,7 @@ For every plan:
 2. **Files** — bullet list of `path/to/file:line_range` with what changes in each.
 3. **Approach** — the concrete steps in order, with the smallest viable diff.
 4. **Trade-offs** — call out anything destructive, non-idiomatic, or that conflicts with existing patterns.
-5. **Validation** — exact commands the user should run (`hyprctl reload`, `omarchy update --dry-run`, etc.).
+5. **Validation** — exact commands the user should run (`hyprctl reload && hyprctl configerrors`, etc.).
 6. **Risks** — what could break and how to roll back.
 
 Keep it tight. Bullets, code snippets, file:line references. No prose padding.
-
-## Domain notes
-
-- Hyprland: prefer extending `hypr/config/*.lua`; Omarchy-specific deltas go in `hypr/omarchy/*.lua` and must `hl.unbind` first when rebinding.
-- Config changes to kitty/foot/alacritty are visible to Omarchy via tracked `include=` lines pointing into `~/.local/state/omarchy/current/theme/`. Theming lives in state, not in tracked config.
-- `/usr/share/omarchy/` is read-only — never propose editing it.
-- The Noctalia and Omarchy stacks share `hypr/hyprland.lua`; check `~/.local/state/dotfiles-desktop` before recommending stack-specific changes.

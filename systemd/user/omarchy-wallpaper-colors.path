@@ -1,9 +1,0 @@
-[Unit]
-Description=Watch the active Omarchy wallpaper for color changes
-
-[Path]
-PathChanged=%h/.local/state/omarchy/current
-Unit=omarchy-wallpaper-colors.service
-
-[Install]
-WantedBy=default.target

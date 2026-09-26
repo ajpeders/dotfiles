@@ -18,44 +18,6 @@ NC='\033[0m'
 
 DOTFILES_LOCK_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 DOTFILES_LOCK_PATH="$DOTFILES_LOCK_DIR/dotfiles.lock"
-DOTFILES_MIGRATIONS_DIR="$HOME/.local/state/dotfiles/migrations"
-DOTFILES_STATE_DIR="$HOME/.local/state/dotfiles"
-DOTFILES_DESKTOP_STATE="$DOTFILES_STATE_DIR/dotfiles-desktop"
-
-# dotfiles_detect_desktop -- decide which desktop stack we are on.
-# Single source of truth shared by install.sh and update.sh. Honors explicit
-# overrides (--omarchy / --no-omarchy), then the omarchy package, then the
-# on-disk dotfiles-desktop state file. Returns the string "omarchy" or
-# "noctalia". Sets OMARCHY=1 or OMARCHY=0 in the caller for backwards
-# compatibility with existing scripts.
-#
-# Usage:
-#   dotfiles_detect_desktop            # auto-detect
-#   OMARCHY=-1 dotfiles_detect_desktop # auto-detect (default sentinel)
-#   OMARCHY=1  dotfiles_detect_desktop # forced Omarchy via flag
-dotfiles_detect_desktop() {
-    if [ "${OMARCHY:- -1}" != " -1" ] && [ "${OMARCHY:-}" != "-1" ]; then
-        # Caller already set OMARCHY via --omarchy / --no-omarchy. Respect it.
-        if [ "$OMARCHY" -eq 1 ]; then
-            echo "omarchy"; return 0
-        fi
-        echo "noctalia"; return 0
-    fi
-
-    local detected="noctalia"
-    if command -v pacman >/dev/null 2>&1 && pacman -Qq omarchy >/dev/null 2>&1; then
-        detected="omarchy"
-    elif [ -r "$DOTFILES_DESKTOP_STATE" ] && [ "$(cat "$DOTFILES_DESKTOP_STATE")" = "omarchy" ]; then
-        detected="omarchy"
-    fi
-
-    if [ "$detected" = "omarchy" ]; then
-        OMARCHY=1
-    else
-        OMARCHY=0
-    fi
-    echo "$detected"
-}
 
 # dotfiles_acquire_lock -- grab a non-blocking flock on DOTFILES_LOCK_PATH.
 # Sets DOTFILES_LOCK_FD in the caller; on failure, prints and exits.
@@ -78,26 +40,3 @@ dotfiles_release_lock() {
     fi
 }
 
-# dotfiles_run_migration <name> <command...>
-# Run a one-shot migration that is keyed by <name>. Skips when the marker
-# already exists. Writes the marker only after the command exits 0.
-dotfiles_run_migration() {
-    local name="$1"; shift
-    local marker="$DOTFILES_MIGRATIONS_DIR/$name"
-
-    mkdir -p "$DOTFILES_MIGRATIONS_DIR"
-
-    if [ -e "$marker" ]; then
-        return 0
-    fi
-
-    echo -e "${YELLOW}[i]${NC} Running migration: $name"
-    if "$@"; then
-        : >"$marker"
-        echo -e "${GREEN}[✓]${NC} Migration $name complete"
-    else
-        local rc=$?
-        echo -e "${RED}[✗]${NC} Migration $name failed (exit $rc); will retry next run." >&2
-        return "$rc"
-    fi
-}

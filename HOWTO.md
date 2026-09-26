@@ -1,5 +1,20 @@
 # HOWTO
 
+## Use Neovim LSP
+
+The native Neovim LSP configuration supports Lua, shell, Python, JSON/JSONC,
+CSS, TOML, and Markdown. It starts the matching server when a supported file
+opens.
+
+- `K` — show documentation
+- `gd` — go to definition
+- `gr` — find references
+- `Space rn` — rename symbol
+- `Space ca` — code action
+- `Space f` — format the buffer
+- `Space e` — explain the diagnostic under the cursor
+- `:checkhealth vim.lsp` — inspect active servers and errors
+
 ## Change wallpaper
 
 Noctalia manages wallpapers. Use IPC or the settings window:
@@ -70,6 +85,46 @@ For a windowed app, toggle caffeine instead (`SUPER+SHIFT+A`, or
 `noctalia msg caffeine-toggle`); it takes a logind idle inhibitor that
 hypridle honours. `systemd-inhibit --list` shows it as `Caffeine`.
 
+## What gamemode shuts down (CPU mode, AI stack, Ollama)
+
+`~/.config/gamemode.ini` runs `~/bin/gamemode-hook` on entry and exit, which
+hands the box's AI workloads over to the game and puts them back afterwards:
+
+| | `start` (game launches) | `end` (game exits) |
+|---|---|---|
+| CPU | `sudo -n x3d-mode cache` | `sudo -n x3d-mode frequency` |
+| AI stack | `~/bin/ai-stack stop` | `~/bin/ai-stack start` |
+| Ollama | `gamemode-ollama-toggle start` | `gamemode-ollama-toggle end` |
+
+`gamemode.ini` also sets `renice=10` and `inhibit_screensaver=1`, and gives the
+hooks 90 s (`script_timeout`) because the systemctl round trip is slow.
+
+**None of this is in the repo.** `gamemode.ini` is not allow-listed in
+`.gitignore`, and `~/bin/` is outside `~/.config` entirely, so the hook and both
+scripts are machine-local and unversioned — a fresh install does not get them.
+
+### Gotchas
+
+- **`gamemode-ollama-toggle`'s `disable`/`enable` calls silently fail.** The
+  hooks run with no tty, so every `sudo` must be covered by NOPASSWD. The rule
+  (`sudo -l`) grants exactly:
+
+  ```
+  (root) NOPASSWD: /usr/local/bin/x3d-mode,
+                   /usr/bin/systemctl stop ollama.service,
+                   /usr/bin/systemctl start ollama.service
+  ```
+
+  but the script also runs `systemctl disable ollama.service` on start and
+  `enable` on end, which are *not* in that list. `stop`/`start` work, so
+  gamemode still frees the GPU; the `disable`/`enable` half just errors out
+  unseen. Simplest fix is to drop those two lines — they only control whether
+  Ollama comes back at boot, which is not something a game should be toggling.
+- The hook has no `set -e` and gamemode discards its output, so a failing step
+  never surfaces. Test changes by hand with
+  `~/bin/gamemode-hook start; ~/bin/gamemode-hook end`.
+
+
 ## Add a Hyprland keybind
 
 Edit `~/.config/hypr/config/keybinds.lua`. The file already defines `mod` (from
@@ -91,19 +146,29 @@ bash scripts/install.sh
 
 ## Update existing install
 
-Automatic: a `dotfiles-autopull` timer (systemd user timer on Linux, LaunchAgent
-`com.alex.dotfiles-autopull` on macOS) runs `scripts/autopull.sh` every 15 minutes.
-It fast-forwards `main` from **Forgejo** (the primary) over the clone's SSH remote, and falls back to GitHub over HTTPS.
-It skips when offline or on another branch, and
-refuses (logs, never merges) if local commits or uncommitted edits would conflict.
-The installers set it up; to enable it by hand on an existing Linux install:
+Pull by hand, when you want the update:
 
 ```bash
-systemctl --user daemon-reload && systemctl --user enable --now dotfiles-autopull.timer
-journalctl --user -u dotfiles-autopull      # what the last runs did
+git -C ~/.config pull --ff-only forgejo main
 ```
 
-Manual pull any time: `~/.config/scripts/autopull.sh`.
+There is no automatic pull. A `dotfiles-autopull` timer used to fast-forward
+`main` every 15 minutes; it was removed because a clone that rewrites itself
+underneath a running session causes more trouble than the convenience is worth.
+If an old machine still has it enabled, turn it off:
+
+```bash
+systemctl --user disable --now dotfiles-autopull.timer   # Linux
+launchctl bootout gui/$UID/com.alex.dotfiles-autopull    # macOS
+```
+
+Pulling only moves files. New packages and re-linked configs still need a run of
+the installer:
+
+```bash
+cd ~/.config
+bash scripts/install.sh
+```
 
 **Remotes: Forgejo is primary, GitHub is a copy.** On every machine, `main` tracks the Forgejo remote, and that remote pushes to both,
 so a plain `git push` updates Forgejo and GitHub together. One-time setup per clone (`F` = the remote pointing at git.thelunadog.com):
@@ -113,7 +178,47 @@ F=$(git remote -v | awk '/thelunadog.*fetch/{print $1; exit}')
 git config branch.main.remote $F
 git remote set-url --push $F "$(git remote get-url $F)"
 git remote set-url --add --push $F git@github.com:ajpeders/dotfiles.git
-``` New packages still need `bash scripts/install.sh`.
+```
+
+## Migrate off Omarchy
+
+Omarchy was removed from these dotfiles on 2026-09-26. A machine still running
+it (the M1 Air) converts like this, from a TTY or SSH session rather than the
+Omarchy desktop, since step 2 removes that desktop:
+
+```bash
+# 1. Pull. This deletes the tracked Omarchy files (hypr/omarchy/, omarchy/, ...).
+git -C ~/.config pull --ff-only forgejo main
+
+# 2. Remove the Omarchy packages. -s also drops the dependencies it pulled in
+#    that nothing else needs (sddm, quickshell, ...); read the list first.
+sudo pacman -Rns $(pacman -Qq | grep '^omarchy')
+
+# 3. Drop the pacman repo and key Omarchy's installer added, if any.
+grep -n -i omarchy /etc/pacman.conf /etc/pacman.d/* 2>/dev/null
+
+# 4. Install the Noctalia desktop. This installs noctalia, ly and hypridle,
+#    disables sddm and enables ly.
+bash ~/.config/scripts/install.sh
+
+# 5. Remove what Omarchy left in $HOME (none of it is tracked).
+rm -rf ~/.local/share/omarchy ~/.local/state/omarchy ~/.config/omarchy
+```
+
+Reboot, pick **Hyprland** from ly, then check with `bash scripts/doctor.sh`.
+It reports any `omarchy*` package still installed and warns if ly is not the
+only display manager. The never-suspend logind drop-in
+(`/etc/systemd/logind.conf.d/10-kitchen-power.conf`) is system state and is
+unaffected.
+
+The desktops never ran Omarchy, but they may still have the old Omarchy-shell
+/ jetshell experiment in `$HOME`. It is inert (nothing starts it any more) and
+safe to delete:
+
+```bash
+rm -rf ~/.local/share/omarchy-shell ~/.local/bin/omarchy-shell-start \
+       ~/.local/state/omarchy ~/.local/state/jetshell ~/.config/omarchy
+```
 
 ## Configure monitors
 
@@ -166,6 +271,22 @@ hyprctl eval "hl.monitor({ output = 'desc:AOC 2460G4', mode = '1920x1080@144', p
 Applies immediately; reverts on the next config reload. Use this to test a mode
 before committing to it.
 
+### Display modes
+
+`~/.config/hypr/scripts/livingroom-mode.sh` cycles through three modes:
+
+1. all monitors on
+2. only the TV on
+3. everything except the TV on
+
+It writes temporary Lua monitor overrides under `~/.local/state/dotfiles/` and
+reloads Hyprland. The TV-only mode focuses the TV; the other modes focus a desk
+monitor.
+
+The TV is matched by `desc:` using its captured EDID make and model. To update
+the match for another TV, plug it in, run `capture-monitor.sh`, and update
+`TV_DESC` in the script.
+
 ### Gotchas
 
 - **Scale must yield integer logical sizes.** `width / scale` and `height / scale`
@@ -198,37 +319,35 @@ opencode debug config      # check the resolved baseURL
 
 ## Agents
 
-`opencode/opencode.json` defines eight agents, the Ollama provider, and the `@whisperopencode/push` plugin.
+`opencode/opencode.json` defines eight agents, the `anthropic`, `ollama` and (disabled) `xai` providers, and two plugins: `@whisperopencode/push` and `./plugins/model-fallback.js`.
 
 | Agent | Mode | Model | Use |
 |---|---|---|---|
-| `build` | primary | `openai/gpt-5.5` (cloud, falls back to MiniMax-M3 → DeepSeek v4 Pro) | Default. Full edit + bash. Capped at 50 steps. Bash guards deny force-push, `mkfs`, `dd if=`, fork-bomb; `git push` and `rm -rf` ask first. |
-| `plan` | primary | `openai/gpt-5.5` (cloud, same fallback chain as build) | Read-only planning. Tab to switch; use when you want analysis without changes. |
+| `build` | primary | `ollama/qwen3-coder:30b` (on error falls back to `openai/gpt-5.6-sol` → MiniMax-M3 → DeepSeek v4 Pro) | Default. Full edit + bash. Capped at 50 steps. Bash guards deny force-push, `mkfs`, `dd if=`, fork-bomb; `git push` and `rm -rf` ask first. |
+| `plan` | primary | `ollama/qwen3-coder:30b` (same fallback chain as build) | Read-only planning. Tab to switch; use when you want analysis without changes. |
 | `general` | subagent | `ollama/qwen3-coder:30b` | Multi-step delegated work. Invoke with `@general`. |
 | `explore` | subagent | `ollama/qwen3-coder:30b` | Fast read-only codebase search. Invoke with `@explore`. |
 | `scout` | subagent | `ollama/qwen3-coder:30b` | External docs and dependency research; clones into OpenCode's cache. Invoke with `@scout`. |
 | `review` | subagent | `ollama/qwen3-coder:30b` | Local code review, read-only. Strong enough for review; keeps data on-machine. |
-| `debug` | subagent | `ollama/qwen3.6:27b` | Logs, traces, network diagnostics, coredumps. Bounded bash allowlist (no destructive ops). Invoke with `@debug`. |
+| `debug` | subagent | `ollama/qwen3-coder:30b` | Logs, traces, network diagnostics, coredumps. Bounded bash allowlist (no destructive ops). Invoke with `@debug`. |
 | `docs-writer` | subagent | `ollama/qwen3-coder:30b` | READMEs, changelogs, ADRs. Edits prose only; bash denied. Invoke with `@docs-writer`. |
 
 ### Routing rationale
 
-- **Cloud for primaries.** Build and plan need the strongest reasoning — coding and architecture reward paying for it. Subagents stay local.
-- **Fallback chain for both primaries (build, plan): GPT-5.5 → MiniMax-M3 → DeepSeek v4 Pro.** `opencode/plugins/model-fallback.js` (opencode has no native fallback). On a provider error, or after 2 rate-limit retries, it reverts the turn and replays your message on the next model. A toast shows the switch. Every new message starts at GPT again. It only acts on chain models; local subagents are untouched. Edit `CHAIN` in the plugin to change the order.
+- **Local first, cloud on failure.** Every agent runs on `qwen3-coder:30b`. `model-fallback.js` moves build/plan down the frontier chain when the local model errors; switch to a cloud model by hand when a task needs stronger reasoning.
 - **Subagent model matters less than variety.** arch-alex has `OLLAMA_NUM_PARALLEL=1`, so a different subagent model causes a swap (~5–15 s load). Keep subagents on the fewest models possible.
-- **glm-4.7-flash is retired (2026-09-19).** On the desktop's ROCm backend it processed prompts ~3x slower than `qwen3-coder:30b` and collapsed at long context. Everything local runs on `qwen3-coder:30b` (28 GB resident, 96k ctx, f16 KV).
-- **explore/scout moved off `qwen3:8b-32k` (2026-09-20).** The coder and the 8B can't both fit in 32 GB, so running them side by side made them evict each other (5 swaps in 12 min in the logs). The coder is also faster: it's MoE with ~3B active parameters, 169 vs 102 t/s generation on Vulkan. Only `debug` and `claude-local` (`qwen3.6:27b`) still trigger a swap. Benchmarks: `/srv/projects/ollama/bench/results.md`.
-- **`claude-local` stays on `qwen3.6:27b` (re-tested 2026-09-20).** The old reason (qwen3-coder emitting text-formatted tool calls) no longer reproduces: all its tool calls were structured. But in 3/3 runs the coder ignored Claude Code's working directory and guessed `/home/alex/…` paths. Unsandboxed, that once created stray files in `~`. The 27B took 6 direct turns with no wrong paths (vs 13–15), at 144 s vs 71 s. With full shell access, correct paths matter more than speed. Server details: `docs/superpowers/specs/2026-09-17-local-agent-llm-server-design.md` → *Revisions — 2026-09-19*.
+- **`glm-4.7-flash` is retired (2026-09-19).** On the desktop's ROCm backend it processed prompts ~3x slower than `qwen3-coder:30b` and collapsed at long context. Everything local runs on `qwen3-coder:30b` (28 GB resident, 96k ctx, f16 KV).
+- **explore/scout moved off `qwen3:8b-32k` (2026-09-20).** The coder and the 8B can't both fit in 32 GB, so running them side by side made them evict each other (5 swaps in 12 min in the logs). The coder is also faster: it's MoE with ~3B active parameters, 169 vs 102 t/s generation on Vulkan. Nothing uses `qwen3.6:27b` by default any more, so nothing swaps the coder out (`debug` moved 2026-09-22). Benchmarks: `/srv/projects/ollama/bench/results.md`.
+- **`claude-local` moved to `qwen3-coder:30b` (2026-09-22).** On 09-20 it stayed on `qwen3.6:27b` because the coder guessed wrong `/home/alex/…` paths in 3/3 runs. The launcher now passes `--append-system-prompt` with `$PWD`; with that, 4/4 sandboxed runs were clean at 34–49 s (vs 144 s for the 27B), and there's no model swap. To go back: `LLM_MODEL=qwen3.6:27b claude-local`. opencode `debug` moved the same day: a "start in the working directory" step in `prompts/debug.txt` took it from 0/3 to 3/3 on a sandboxed root-cause test (8–18 s vs 35–47 s on the 27B).
 - **review → local coding model.** Even though review is invoked often during build cycles, `qwen3-coder:30b` is purpose-built for code understanding and avoids per-review cloud cost.
 
 ### Config layering
 
 1. `~/.config/opencode/opencode.json` — global, tracked, agents, providers, and plugins.
 2. `~/.config/opencode/prompts/*.txt` — global prompt bodies.
-3. `~/.config/opencode/themes/omarchy.json` — global theme matching the active matugen palette.
-4. `~/.config/opencode/tui.json` — sets `theme: omarchy`.
-5. `~/.config/opencode/.opencode/` — **templates**. Copy `prompts/*.txt` into a project's `.opencode/prompts/` to override locally; same for `themes/`.
-6. `<project>/.opencode/opencode.json` — per-project overrides.
+3. `~/.config/opencode/tui.json` — sets `theme: system`.
+4. `~/.config/opencode/.opencode/` — **templates**. Copy `prompts/*.txt` into a project's `.opencode/prompts/` to override locally.
+5. `<project>/.opencode/opencode.json` — per-project overrides.
 
 ### Prompt templates
 
@@ -236,7 +355,9 @@ opencode debug config      # check the resolved baseURL
 
 ### Theme
 
-`themes/omarchy.json` was derived from `~/.local/state/omarchy/current/theme/colors.toml`. If you change themes (`omarchy theme set <name>`), regenerate the JSON with the new palette or pick a built-in via `:theme` in the TUI.
+`system` uses the terminal's own colors, which Noctalia's kitty template renders
+from the wallpaper palette, so opencode follows theme changes with no extra file.
+Pick another built-in with `:theme` in the TUI.
 
 ## Boot loader (Limine, desktop only)
 
@@ -317,7 +438,7 @@ PKGBUILD rejects `aarch64`, so it is intentionally not synced from
 WireGuard framing — so `wireguard-tools` is not installed and `wg`/`wg-quick`
 are unavailable. Use `awg`/`awg-quick`.
 
-Client configs are **not in this repo** (they hold private keys). They live in `~/.config/wireguard/`, mode `600`, covered by the catch-all ignore in `.gitignore`. `vpn-list` shows what's available:
+Client configs are **not in this repo** (they hold private keys). They live in `~/.config/wireguard/`, mode `600`, covered by the catch-all ignore in `.gitignore`. `scripts/sync-private.sh` pulls them from the main host on a new machine. `vpn-list` shows what's available:
 
 | Config | Address | Issued | Obfuscation |
 |---|---|---|---|

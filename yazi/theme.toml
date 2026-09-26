@@ -1,13 +1,5 @@
-# Yazi theme — generated from the Omarchy semantic palette.
-#
-# Omarchy's theme renderer substitutes these tokens at `omarchy theme set`
-# time. A theme-set hook copies the rendered theme.toml into ~/.config/yazi/
-# so yazi picks it up the next time it starts.
-#
-# Token map (omarchy-theme-color --all):
-#   background, foreground, muted, accent, selection
-#   red, green, yellow, blue, magenta, cyan
-#   bright_*, dark_foreground, light_foreground
+# Yazi theme. Static colors, originally rendered from the Omarchy palette;
+# Noctalia has no yazi template, so edit these by hand.
 
 [mgr]
 cwd = { fg = "#dc441f" }

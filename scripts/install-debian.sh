@@ -204,6 +204,10 @@ phase_dotfiles() {
         fi
     done
 
+    mkdir -p "$HOME/.local/bin"
+    backup_and_link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
+    backup_and_link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
+
     if [ ! -f "$HOME/.zshenv" ]; then
         printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
         print_status "Created ~/.zshenv with ZDOTDIR"
@@ -263,6 +267,13 @@ phase_shell() {
     else
         git clone https://github.com/zsh-users/zsh-syntax-highlighting "$zsh_custom/plugins/zsh-syntax-highlighting"
         print_status "zsh-syntax-highlighting installed"
+    fi
+
+    if [ -d "$zsh_custom/plugins/fzf-tab" ]; then
+        print_status "fzf-tab already installed"
+    else
+        git clone https://github.com/Aloxaf/fzf-tab "$zsh_custom/plugins/fzf-tab"
+        print_status "fzf-tab installed"
     fi
 
     if [ -d "$zsh_custom/themes/powerlevel10k" ]; then

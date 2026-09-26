@@ -1,15 +1,11 @@
 #!/bin/bash
 # Arch Linux dotfiles update script.
-# Usage: bash scripts/update.sh [--headless | --full] [--omarchy | --no-omarchy]
+# Usage: bash scripts/update.sh [--headless | --full]
 # Run from within the dotfiles repo. Pulls latest changes and syncs everything.
 #
 # If no flag is given, mode is read from ~/.local/state/dotfiles-mode
 # (written by scripts/install.sh); falls back to full-desktop mode if absent.
-#
-# The desktop stack is detected from the installed omarchy package, falling
-# back to ~/.local/state/dotfiles-desktop. Override with --omarchy /
-# --no-omarchy. This script never installs Omarchy; use
-# `scripts/install.sh --install-omarchy` for that.
+
 
 set -euo pipefail
 
@@ -27,19 +23,13 @@ print_phase()  { echo -e "\n${BOLD}== $1 ==${NC}"; }
 # The repo root is one level up: this script lives in <repo>/scripts/.
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
-NOCTALIA_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*NOCTALIA'
-OMARCHY_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*OMARCHY'
 STATE_FILE="$HOME/.local/state/dotfiles-mode"
-DESKTOP_STATE_FILE="$HOME/.local/state/dotfiles-desktop"
 
 HEADLESS=""
-OMARCHY=-1   # -1 = auto-detect, 0 = Noctalia stack, 1 = Omarchy stack
 for arg in "$@"; do
     case "$arg" in
         --headless) HEADLESS=1 ;;
         --full)     HEADLESS=0 ;;
-        --omarchy)     OMARCHY=1 ;;
-        --no-omarchy)  OMARCHY=0 ;;
         --help|-h)
             # Print the whole leading comment block, so editing the header
             # above cannot silently truncate --help.
@@ -61,19 +51,10 @@ if [ -z "$HEADLESS" ]; then
     fi
 fi
 
-# Single source of truth for desktop detection lives in lib-dotfiles.sh.
-# dotfiles_detect_desktop honors explicit --omarchy/--no-omarchy overrides
-# first, then the omarchy pacman package, then dotfiles-desktop state file.
-OMARCHY=-1 dotfiles_detect_desktop >/dev/null
-
-desktop_label() {
-    if [ "$OMARCHY" -eq 1 ]; then echo "Omarchy"; else echo "Noctalia"; fi
-}
-
 if [ "$HEADLESS" -eq 1 ]; then
     print_info "Mode: HEADLESS (GUI packages and desktop dotfiles will be skipped)"
 else
-    print_info "Mode: FULL DESKTOP / $(desktop_label)"
+    print_info "Mode: FULL DESKTOP"
 fi
 
 aur_helper=""
@@ -83,25 +64,6 @@ detect_aur_helper() {
         return 0
     fi
     return 1
-}
-
-# Re-create ~/.local/state/dotfiles-desktop if a prior install.sh run was
-# interrupted before phase_state could write it. Idempotent: the marker file
-# marks completion, so this only runs once per machine.
-phase_migrations() {
-    print_phase "Phase 0: Migrations"
-
-    # Re-create ~/.local/state/dotfiles-desktop if a prior install.sh run was
-    # interrupted before phase_state could write it. Idempotent: the marker
-    # file marks completion, so this only runs once per machine.
-    if [ ! -r "$HOME/.local/state/dotfiles-desktop" ]; then
-        local detected="noctalia"
-        if command -v pacman >/dev/null 2>&1 && pacman -Qq omarchy >/dev/null 2>&1; then
-            detected="omarchy"
-        fi
-        dotfiles_run_migration ensure-dotfiles-desktop \
-            bash -c "echo '$detected' > '$HOME/.local/state/dotfiles-desktop'"
-    fi
 }
 
 phase_pull() {
@@ -166,21 +128,7 @@ phase_packages() {
             section=gui
             continue
         fi
-        if [[ "$line" =~ $NOCTALIA_MARKER_REGEX ]]; then
-            section=noctalia
-            continue
-        fi
-        if [[ "$line" =~ $OMARCHY_MARKER_REGEX ]]; then
-            section=omarchy
-            continue
-        fi
         if [ "$section" != base ] && [ "$HEADLESS" -eq 1 ]; then
-            continue
-        fi
-        if [ "$section" = noctalia ] && [ "$OMARCHY" -eq 1 ]; then
-            continue
-        fi
-        if [ "$section" = omarchy ] && [ "$OMARCHY" -ne 1 ]; then
             continue
         fi
         line="${line%%#*}"
@@ -226,12 +174,7 @@ phase_dotfiles() {
     if [ "$HEADLESS" -eq 1 ]; then
         config_dirs=(zsh yazi git tmux nvim opencode)
     else
-        config_dirs=(hypr kitty wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim opencode)
-        if [ "$OMARCHY" -eq 1 ]; then
-            config_dirs+=(omarchy)
-        else
-            config_dirs+=(noctalia)
-        fi
+        config_dirs=(hypr kitty wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim opencode noctalia)
     fi
     local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
@@ -273,13 +216,9 @@ phase_dotfiles() {
         [ -d "$REPO_DIR/$dir" ] && backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
     done
 
-    if [ "$HEADLESS" -ne 1 ] && [ "$OMARCHY" -eq 1 ]; then
-        mkdir -p "$HOME/.config/systemd/user"
-        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.service" \
-            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.service"
-        backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.path" \
-            "$HOME/.config/systemd/user/omarchy-wallpaper-colors.path"
-    fi
+    mkdir -p "$HOME/.local/bin"
+    backup_and_link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
+    backup_and_link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
 
     # Ensure ~/.zshenv is configured
     if [ ! -f "$HOME/.zshenv" ]; then
@@ -342,11 +281,6 @@ phase_reload() {
         return
     fi
 
-    if [ "$OMARCHY" -eq 1 ]; then
-        systemctl --user daemon-reload
-        systemctl --user enable --now omarchy-wallpaper-colors.path
-    fi
-
     # Hyprland
     if command -v hyprctl >/dev/null 2>&1; then
         if hyprctl reload >/dev/null 2>&1; then
@@ -365,18 +299,9 @@ phase_reload() {
         fi
     fi
 
-    # Desktop shell
-    if [ "$OMARCHY" -eq 1 ]; then
-        if command -v omarchy >/dev/null 2>&1; then
-            omarchy restart shell >/dev/null 2>&1 && print_status "Omarchy shell restarted" \
-                || print_error "omarchy restart shell failed (non-fatal)"
-        fi
-    fi
-
     print_status "Live reload complete"
 }
 
-phase_migrations
 phase_pull
 phase_packages
 phase_dotfiles

@@ -1,7 +1,0 @@
-[Unit]
-Description=Fast-forward ~/.config dotfiles from GitHub
-After=network-online.target
-
-[Service]
-Type=oneshot
-ExecStart=%h/.config/scripts/autopull.sh
