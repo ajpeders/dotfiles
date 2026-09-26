@@ -286,7 +286,10 @@ fi
 
 # opencode — packaged on Arch (pacman) and macOS (brew), so this only
 # matters where upstream's installer put it in ~/.opencode/bin (Debian).
-[ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"
+# Only as a fallback: a stale upstream copy must not shadow the package.
+if ! command -v opencode >/dev/null && [ -d "$HOME/.opencode/bin" ]; then
+    export PATH="$HOME/.opencode/bin:$PATH"
+fi
 
 # LLM_SERVER_URL + LLM_MODEL for opencode, written per-machine by
 # scripts/setup-llm.sh. Under ~/.local/state, not ~/.config: on Arch the repo
