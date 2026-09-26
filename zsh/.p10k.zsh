@@ -30,7 +30,7 @@
 
   # The list of segments shown on the left. Fill it with the most important segments.
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
-    # os_icon               # os identifier
+    os_icon                 # os identifier
     context                 # user@hostname
     dir                     # current directory
     vcs                     # git status
@@ -181,8 +181,9 @@
   fi
 
   #################################[ os_icon: os identifier ]##################################
-  # OS identifier color.
-  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=
+  # OS identifier color. Arch's blue on the Linux boxes, so the distro mark
+  # reads as itself rather than as part of the tan context segment next to it.
+  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=39
   # Custom icon.
   # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='⭐'
 
@@ -917,8 +918,12 @@
   # It leads the left prompt, where the right prompt's overlap-hiding can't
   # take it away from a long command line.
 
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_CONTEXT_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Icons: a user glyph locally, a terminal glyph over SSH (so a remote shell is
+  # obvious at a glance) and a bolt when running with privileges. All three are
+  # in the Font Awesome range every Nerd Font ships, so they survive a font swap.
+  typeset -g POWERLEVEL9K_CONTEXT_VISUAL_IDENTIFIER_EXPANSION=''
+  typeset -g POWERLEVEL9K_CONTEXT_{REMOTE,REMOTE_SUDO}_VISUAL_IDENTIFIER_EXPANSION=''
+  typeset -g POWERLEVEL9K_CONTEXT_ROOT_VISUAL_IDENTIFIER_EXPANSION=''
   # Custom prefix.
   # typeset -g POWERLEVEL9K_CONTEXT_PREFIX='%fwith '
 
