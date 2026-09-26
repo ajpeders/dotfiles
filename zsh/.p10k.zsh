@@ -31,6 +31,7 @@
   # The list of segments shown on the left. Fill it with the most important segments.
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
     # os_icon               # os identifier
+    context                 # user@hostname
     dir                     # current directory
     vcs                     # git status
     prompt_char             # prompt symbol
@@ -80,7 +81,6 @@
     gcloud                  # google cloud cli account and project (https://cloud.google.com/)
     google_app_cred         # google application credentials (https://cloud.google.com/docs/authentication/production)
     toolbox                 # toolbox name (https://github.com/containers/toolbox)
-    context                 # user@hostname
     nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
     ranger                  # ranger shell (https://github.com/ranger/ranger)
     yazi                    # yazi shell (https://github.com/sxyazi/yazi)
@@ -914,6 +914,8 @@
   # prompt is the only thing that says which one a terminal is on. p10k's
   # default blanks the DEFAULT/SUDO classes here; leaving it out keeps
   # POWERLEVEL9K_CONTEXT_TEMPLATE ('%n@%m') in effect for every class.
+  # It leads the left prompt, where the right prompt's overlap-hiding can't
+  # take it away from a long command line.
 
   # Custom icon.
   # typeset -g POWERLEVEL9K_CONTEXT_VISUAL_IDENTIFIER_EXPANSION='⭐'
