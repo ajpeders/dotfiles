@@ -248,7 +248,7 @@ phase_shell() {
         print_status "oh-my-zsh already installed"
     else
         print_info "Installing oh-my-zsh..."
-        RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
         print_status "oh-my-zsh installed"
     fi
 
