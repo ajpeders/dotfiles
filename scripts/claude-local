@@ -3,7 +3,11 @@
 # Plain `claude` is unaffected.
 set -euo pipefail
 
-: "${LLM_HOST:=http://100.84.247.20:11434}"
+# Same server as opencode: LLM_SERVER_URL comes from setup-llm.sh's llm.env
+# (sourced by zsh/.zshrc). Ollama's Anthropic API lives at the root, not /v1.
+: "${LLM_HOST:=${LLM_SERVER_URL:-http://localhost:11434/v1}}"
+LLM_HOST=${LLM_HOST%/}
+LLM_HOST=${LLM_HOST%/v1}
 : "${LLM_MODEL:=qwen3-coder:30b}"   # the 27B needs a model swap; the coder passes with the cwd prompt below
 
 export ANTHROPIC_BASE_URL="$LLM_HOST"

@@ -207,6 +207,7 @@ phase_dotfiles() {
     mkdir -p "$HOME/.local/bin"
     backup_and_link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
     backup_and_link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
+    backup_and_link "$REPO_DIR/scripts/claude-local" "$HOME/.local/bin/claude-local"
 
     if [ ! -f "$HOME/.zshenv" ]; then
         printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
