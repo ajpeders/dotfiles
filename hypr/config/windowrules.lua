@@ -1,6 +1,6 @@
 -- ====== Transparency ======
+-- kitty is left out: its own background_opacity keeps text opaque.
 local translucent = {
-    "^(kitty)$",
     "^(code|code-url-handler|Code|code-oss|VSCodium)$",
     "^(discord)$",
     "^(steam|Steam)$",
