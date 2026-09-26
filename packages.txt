@@ -37,6 +37,7 @@ fd
 ripgrep
 fzf
 zoxide
+inetutils
 
 # Remote access
 mosh
