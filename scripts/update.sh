@@ -253,7 +253,7 @@ phase_browser_policies() {
         return
     fi
 
-    if ! pacman -Qq librewolf-bin librewolf >/dev/null 2>&1; then
+    if ! pacman -Qq librewolf >/dev/null 2>&1; then
         print_info "Librewolf is not installed — skipping policies"
         return
     fi
