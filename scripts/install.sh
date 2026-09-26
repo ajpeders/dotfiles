@@ -457,17 +457,6 @@ phase_dotfiles() {
             "$HOME/.config/systemd/user/omarchy-wallpaper-colors.service"
         backup_and_link "$REPO_DIR/systemd/user/omarchy-wallpaper-colors.path" \
             "$HOME/.config/systemd/user/omarchy-wallpaper-colors.path"
-
-        # kitty.conf has a conditional Noctalia include that points nowhere
-        # on a host that has never run Noctalia. Comment it out so future
-        # kitty reloads stop warning about a missing include.
-        if ! pacman -Qq noctalia >/dev/null 2>&1; then
-            local kitty_conf="$HOME/.config/kitty/kitty.conf"
-            if [ -r "$kitty_conf" ] && grep -qE '^include[[:space:]]+themes/noctalia\.conf[[:space:]]*$' "$kitty_conf"; then
-                sed -i 's|^include[[:space:]]\+themes/noctalia\.conf[[:space:]]*$|# include themes/noctalia.conf -- not on a Noctalia host|' "$kitty_conf"
-                print_status "Disabled Noctalia include in kitty.conf"
-            fi
-        fi
     fi
 
     if [ ! -f "$HOME/.zshenv" ]; then
