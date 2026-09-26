@@ -12,6 +12,10 @@ hl.bind(mod .. " + E",         hl.dsp.exec_cmd(d.browser))
 hl.bind(mod .. " + SHIFT + B", hl.dsp.exec_cmd(d.terminal .. " btop"))
 hl.bind(mod .. " + Space",     hl.dsp.exec_cmd(ipc .. " panel-toggle launcher"))
 hl.bind(mod .. " + V",         hl.dsp.exec_cmd(ipc .. " panel-toggle clipboard"))
+-- macOS-style copy: forward CTRL+C to the focused window. Kitty maps plain
+-- ctrl+c to copy_or_interrupt, so it copies a selection there and still sends
+-- SIGINT when there is none.
+hl.bind(mod .. " + C",         hl.dsp.send_shortcut({ mods = "CTRL", key = "C", window = "activewindow" }))
 hl.bind(mod .. " + J",         hl.dsp.layout("togglesplit"))
 hl.bind(mod .. " + M",         hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 hl.bind(mod .. " + F",         hl.dsp.window.fullscreen({ mode = "maximized" }))
