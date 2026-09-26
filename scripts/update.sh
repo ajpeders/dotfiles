@@ -219,6 +219,7 @@ phase_dotfiles() {
     mkdir -p "$HOME/.local/bin"
     backup_and_link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
     backup_and_link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
+    backup_and_link "$REPO_DIR/scripts/claude-local" "$HOME/.local/bin/claude-local"
 
     # Ensure ~/.zshenv is configured
     if [ ! -f "$HOME/.zshenv" ]; then
@@ -252,7 +253,7 @@ phase_browser_policies() {
         return
     fi
 
-    if ! pacman -Qq librewolf-bin librewolf >/dev/null 2>&1; then
+    if ! pacman -Qq librewolf >/dev/null 2>&1; then
         print_info "Librewolf is not installed — skipping policies"
         return
     fi

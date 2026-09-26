@@ -1,8 +1,3 @@
+# user/init come from the shared ~/.config/git/config.
 [safe]
-	directory = /home/ween/homelab
 	directory = *
-[user]
-	name = alex
-	email = alexjpeders@gmail.com
-[init]
-	defaultBranch = main

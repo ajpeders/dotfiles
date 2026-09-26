@@ -134,8 +134,39 @@ phase_dotfiles() {
     fi
 }
 
+phase_shell() {
+    print_phase "Phase 5: Shell (oh-my-zsh + plugins)"
+
+    # zsh/.zshrc sources $ZSH/oh-my-zsh.sh and expects the theme and plugins
+    # under $ZSH_CUSTOM, same layout as scripts/install.sh's phase_shell.
+    if [ -d "$HOME/.oh-my-zsh" ]; then
+        print_status "oh-my-zsh already installed"
+    else
+        print_info "Installing oh-my-zsh..."
+        RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        print_status "oh-my-zsh installed"
+    fi
+
+    local zsh_custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+    local name url dst
+    while read -r name url; do
+        dst="$zsh_custom/$name"
+        if [ -d "$dst" ]; then
+            print_status "${name##*/} already installed"
+        else
+            git clone --depth=1 "$url" "$dst"
+            print_status "${name##*/} installed"
+        fi
+    done <<'LIST'
+plugins/zsh-autosuggestions https://github.com/zsh-users/zsh-autosuggestions
+plugins/zsh-syntax-highlighting https://github.com/zsh-users/zsh-syntax-highlighting
+plugins/fzf-tab https://github.com/Aloxaf/fzf-tab
+themes/powerlevel10k https://github.com/romkatv/powerlevel10k.git
+LIST
+}
+
 phase_keychain() {
-    print_phase "Phase 5: Keychain (SMB password)"
+    print_phase "Phase 6: Keychain (SMB password)"
 
     if /usr/bin/security find-internet-password -a ween -s share.thelunadog.com >/dev/null 2>&1; then
         print_status "SMB keychain entry already exists for ween@share.thelunadog.com"
@@ -158,7 +189,7 @@ phase_keychain() {
 }
 
 phase_launchagents() {
-    print_phase "Phase 6: LaunchAgents"
+    print_phase "Phase 7: LaunchAgents"
 
     # `launchctl load` is the deprecated legacy syntax and reports success even
     # when it does nothing. bootstrap/print target the GUI domain explicitly,
@@ -224,6 +255,7 @@ phase_preflight
 phase_brew
 phase_packages
 phase_dotfiles
+phase_shell
 phase_keychain
 phase_launchagents
 phase_reminders

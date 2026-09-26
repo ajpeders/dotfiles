@@ -27,7 +27,6 @@ case "${1:-}" in
 esac
 
 info "Linking homeserver \$HOME dotfiles from $HOST_DIR"
-link_home .zshrc
 link_home .gitconfig
 link_home .bashrc
 

@@ -286,6 +286,7 @@ phase_dotfiles() {
     mkdir -p "$HOME/.local/bin"
     backup_and_link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
     backup_and_link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
+    backup_and_link "$REPO_DIR/scripts/claude-local" "$HOME/.local/bin/claude-local"
 
     if [ ! -f "$HOME/.zshenv" ]; then
         printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
@@ -317,7 +318,7 @@ phase_shell() {
         print_status "oh-my-zsh already installed"
     else
         print_info "Installing oh-my-zsh..."
-        RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
         print_status "oh-my-zsh installed"
     fi
 
@@ -469,7 +470,7 @@ phase_browser_policies() {
         return
     fi
 
-    if ! pacman -Qq librewolf-bin librewolf >/dev/null 2>&1; then
+    if ! pacman -Qq librewolf >/dev/null 2>&1; then
         print_info "Librewolf is not installed — skipping policies"
         return
     fi
