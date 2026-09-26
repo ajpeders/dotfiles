@@ -136,7 +136,7 @@ noctalia
 ttf-jetbrains-mono-nerd
 
 # Browser
-librewolf-bin
+librewolf
 
 # Authentication agent (Omarchy's shell ships its own polkit agent)
 polkit-gnome
