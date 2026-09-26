@@ -18,8 +18,8 @@ set -euo pipefail
 command -v jq >/dev/null || { echo "capture-monitor: jq is required" >&2; exit 1; }
 
 echo "-- Captured $(date +%Y-%m-%d) on $(uname -n)"
-echo "-- Positions are guesses: the first entry anchors at 0x0, adjust"
-echo "-- the rest (auto-center-left/right/up/down) to match your desk."
+echo "-- Positions are placeholders: replace them with absolute coordinates"
+echo "-- (see the header of config/monitors.lua)."
 echo
 
 hyprctl -j monitors | jq -r '
@@ -29,7 +29,7 @@ hyprctl -j monitors | jq -r '
   "hl.monitor({\n" +
   "    output   = \"desc:\($m.make) \($m.model)\",\n" +
   "    mode     = \"\($m.width)x\($m.height)@\($m.refreshRate | floor)\",\n" +
-  "    position = \"" + (if .key == 0 then "auto" else "auto-center-right" end) + "\",\n" +
+  "    position = \"0x0\",\n" +
   "    scale    = \($m.scale),\n" +
   "})\n"
 '

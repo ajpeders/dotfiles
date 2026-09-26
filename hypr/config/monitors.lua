@@ -5,7 +5,7 @@
 -- nwg-displays writes connector-keyed rules to monitors.conf, which
 -- this file deliberately ignores. See HOWTO.md ("Monitors").
 --
--- Two rules make this work across every machine and desk:
+-- Three rules make this work across every machine and desk:
 --
 --   1. Match on `desc:` (EDID make/model), never on DP-2/DP-3/eDP-1.
 --      Connector names describe a *port*, not a *panel* — the same

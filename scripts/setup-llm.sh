@@ -154,8 +154,8 @@ fi
 mkdir -p "$ENV_DIR" "$SYSTEMD_ENV_DIR"
 cat > "$ENV_FILE" <<EOF
 # Written by scripts/setup-llm.sh — per-machine, intentionally outside the repo.
-# opencode reads both of these via {env:...} in opencode/opencode.json. The URL
-# and the default model both differ per machine, so neither belongs in the repo.
+# opencode reads LLM_SERVER_URL via {env:...} in opencode/opencode.json;
+# claude-local reads both.
 export LLM_SERVER_URL="$BASE_URL"
 export LLM_MODEL="$MODEL_ID"
 EOF

@@ -40,8 +40,8 @@ tv=$(get_tv_name || true)
 if [[ -z "$tv" ]]; then
     echo "livingroom-mode: TV not found (looking for '$TV_DESC')" >&2
     echo "  - is the TV plugged in?" >&2
-    echo "  - replace <MODEL> above with the TV's model string," >&2
-    echo "    run hypr/scripts/capture-monitor.sh to find it" >&2
+    echo "  - different TV? update TV_DESC in this script;" >&2
+    echo "    hypr/scripts/capture-monitor.sh prints its desc" >&2
     exit 1
 fi
 
