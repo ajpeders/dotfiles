@@ -23,7 +23,7 @@ NC='\033[0m'
 ok()   { echo -e "${GREEN}[✓]${NC} $1"; }
 err()  { echo -e "${RED}[✗]${NC} $1"; }
 info() { echo -e "${YELLOW}[i]${NC} $1"; }
-head() { echo -e "\n${BOLD}== $1 ==${NC}"; }
+section() { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 STRICT=0
 for arg in "$@"; do
@@ -52,7 +52,7 @@ note_error() { errors=$((errors + 1)); }
 # Stack consistency
 # ---------------------------------------------------------------------------
 
-head "Stack consistency"
+section "Stack consistency"
 
 mode_value=""
 if [ -r "$STATE_FILE" ]; then
@@ -85,7 +85,7 @@ fi
 # Display managers (graphical hosts only)
 # ---------------------------------------------------------------------------
 
-head "Display managers"
+section "Display managers"
 
 if ! command -v systemctl >/dev/null 2>&1; then
     info "systemctl unavailable; skipping."
@@ -125,10 +125,12 @@ fi
 # Hyprland config
 # ---------------------------------------------------------------------------
 
-head "Hyprland config"
+section "Hyprland config"
 
 if ! command -v hyprctl >/dev/null 2>&1; then
     info "hyprctl unavailable; skipping live checks."
+elif [ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+    info "Not inside a Hyprland session; skipping live checks."
 else
     cfg_errors="$(hyprctl configerrors 2>/dev/null || true)"
     if [ -z "$cfg_errors" ]; then
@@ -152,7 +154,7 @@ fi
 # Terminal theme includes
 # ---------------------------------------------------------------------------
 
-head "Terminal theme includes"
+section "Terminal theme includes"
 
 kitty_conf="$HOME/.config/kitty/kitty.conf"
 if [ -r "$kitty_conf" ]; then
@@ -175,7 +177,7 @@ fi
 # Working tree
 # ---------------------------------------------------------------------------
 
-head "Working tree"
+section "Working tree"
 
 if command -v git >/dev/null 2>&1 && [ -d "$REPO_DIR/.git" ]; then
     dirty="$(git -C "$REPO_DIR" status --porcelain 2>/dev/null || true)"
@@ -191,7 +193,7 @@ fi
 # Summary
 # ---------------------------------------------------------------------------
 
-head "Summary"
+section "Summary"
 
 if [ "$errors" -eq 0 ]; then
     ok "No findings."
