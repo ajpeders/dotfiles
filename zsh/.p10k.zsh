@@ -918,10 +918,11 @@
   # It leads the left prompt, where the right prompt's overlap-hiding can't
   # take it away from a long command line.
 
-  # Icons: a user glyph locally, a terminal glyph over SSH (so a remote shell is
-  # obvious at a glance) and a bolt when running with privileges. All three are
-  # in the Font Awesome range every Nerd Font ships, so they survive a font swap.
-  typeset -g POWERLEVEL9K_CONTEXT_VISUAL_IDENTIFIER_EXPANSION=''
+  # No icon in the common case: os_icon is already sitting immediately to the
+  # left, and two glyphs in front of the hostname is one too many. The icon is
+  # kept for the two states worth flagging — a terminal over SSH and a bolt when
+  # running with privileges. Both are Font Awesome codepoints every Nerd Font
+  # ships, so they survive a font swap.
   typeset -g POWERLEVEL9K_CONTEXT_{REMOTE,REMOTE_SUDO}_VISUAL_IDENTIFIER_EXPANSION=''
   typeset -g POWERLEVEL9K_CONTEXT_ROOT_VISUAL_IDENTIFIER_EXPANSION=''
   # Custom prefix.
