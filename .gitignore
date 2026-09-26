@@ -4,7 +4,6 @@
 
 # Repo metadata + docs
 !.gitignore
-!CLAUDE.md
 !README.md
 !ARCHITECTURE.md
 !ROADMAP.md
