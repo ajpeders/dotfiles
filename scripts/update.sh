@@ -15,11 +15,6 @@ source "$SCRIPT_DIR/lib-dotfiles.sh"
 trap dotfiles_release_lock EXIT
 dotfiles_acquire_lock
 
-print_status() { echo -e "${GREEN}[✓]${NC} $1"; }
-print_error()  { echo -e "${RED}[✗]${NC} $1"; }
-print_info()   { echo -e "${YELLOW}[i]${NC} $1"; }
-print_phase()  { echo -e "\n${BOLD}== $1 ==${NC}"; }
-
 # The repo root is one level up: this script lives in <repo>/scripts/.
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 GUI_MARKER_REGEX='^#[[:space:]]*===[[:space:]]*GUI'
@@ -56,15 +51,6 @@ if [ "$HEADLESS" -eq 1 ]; then
 else
     print_info "Mode: FULL DESKTOP"
 fi
-
-aur_helper=""
-detect_aur_helper() {
-    if command -v paru >/dev/null 2>&1 && paru --version >/dev/null 2>&1; then
-        aur_helper="paru"
-        return 0
-    fi
-    return 1
-}
 
 phase_pull() {
     print_phase "Phase 1: Pull Latest Changes"
@@ -170,70 +156,10 @@ phase_packages() {
 phase_dotfiles() {
     print_phase "Phase 3: Dotfile Sync"
 
-    local config_dirs
     if [ "$HEADLESS" -eq 1 ]; then
-        config_dirs=(zsh yazi git tmux nvim opencode)
+        dotfiles_link_configs "${DOTFILES_CLI_DIRS[@]}"
     else
-        config_dirs=(hypr kitty wallpapers gtk-3.0 gtk-4.0 zsh yazi git tmux nvim opencode noctalia)
-    fi
-    local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
-    local backed_up=false
-
-    mkdir -p "$HOME/.config"
-
-    backup_and_link() {
-        local src="$1"
-        local dst="$2"
-        local name
-        name="$(basename "$dst")"
-
-        local resolved_src resolved_dst
-        resolved_src="$(readlink -f "$src")"
-        resolved_dst="$(readlink -f "$dst" 2>/dev/null || true)"
-        if [ "$resolved_src" = "$resolved_dst" ]; then
-            print_status "Already in place: $name"
-            return
-        fi
-
-        if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
-            print_status "Already linked: $name"
-            return
-        fi
-
-        if [ -e "$dst" ] || [ -L "$dst" ]; then
-            mkdir -p "$backup_dir"
-            mv "$dst" "$backup_dir/"
-            backed_up=true
-            print_info "Backed up existing $name to $backup_dir/"
-        fi
-
-        ln -sfn "$src" "$dst"
-        print_status "Linked: $name"
-    }
-
-    local dir
-    for dir in "${config_dirs[@]}"; do
-        [ -d "$REPO_DIR/$dir" ] && backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
-    done
-
-    mkdir -p "$HOME/.local/bin"
-    backup_and_link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
-    backup_and_link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
-    backup_and_link "$REPO_DIR/scripts/claude-local" "$HOME/.local/bin/claude-local"
-
-    # Ensure ~/.zshenv is configured
-    if [ ! -f "$HOME/.zshenv" ]; then
-        printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
-        print_status "Created ~/.zshenv with ZDOTDIR"
-    elif ! grep -q 'ZDOTDIR=.*\.config/zsh' "$HOME/.zshenv"; then
-        printf '\nexport ZDOTDIR="$HOME/.config/zsh"\n' >> "$HOME/.zshenv"
-        print_status "Added ZDOTDIR to ~/.zshenv"
-    else
-        print_status "~/.zshenv already configured"
-    fi
-
-    if [ "$backed_up" = true ]; then
-        print_info "Old configs backed up to: $backup_dir"
+        dotfiles_link_configs "${DOTFILES_CLI_DIRS[@]}" "${DOTFILES_DESKTOP_DIRS[@]}"
     fi
     print_status "Dotfiles in sync"
 }
@@ -244,28 +170,7 @@ phase_browser_policies() {
     fi
 
     print_phase "Phase 4: Browser Policies"
-
-    local src="$REPO_DIR/librewolf/policies.json"
-    local dst="/etc/librewolf/policies/policies.json"
-
-    if [ ! -f "$src" ]; then
-        print_info "No librewolf/policies.json in repo — skipping"
-        return
-    fi
-
-    if ! pacman -Qq librewolf >/dev/null 2>&1; then
-        print_info "Librewolf is not installed — skipping policies"
-        return
-    fi
-
-    if [ -f "$dst" ] && cmp -s "$src" "$dst"; then
-        print_status "Librewolf policies already up to date"
-        return
-    fi
-
-    print_info "Updating Librewolf policies at $dst (requires sudo)..."
-    sudo install -Dm644 "$src" "$dst"
-    print_status "Librewolf policies updated; restart Librewolf to pick up changes"
+    dotfiles_librewolf_policies
 }
 
 phase_reload() {

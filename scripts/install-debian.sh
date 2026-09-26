@@ -15,18 +15,9 @@
 
 set -euo pipefail
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BOLD='\033[1m'
-NC='\033[0m'
-
-print_status() { echo -e "${GREEN}[✓]${NC} $1"; }
-print_error() { echo -e "${RED}[✗]${NC} $1"; }
-print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
-print_phase() { echo -e "\n${BOLD}== $1 ==${NC}"; }
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib-dotfiles.sh
+source "$SCRIPT_DIR/lib-dotfiles.sh"
 # The repo root is one level up: this script lives in <repo>/scripts/.
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 STATE_FILE="$HOME/.local/state/dotfiles-mode"
@@ -161,67 +152,7 @@ phase_directories() {
 phase_dotfiles() {
     print_phase "Phase 4: Dotfiles"
 
-    local config_dirs=(zsh yazi git tmux nvim opencode)
-    local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
-    local backed_up=false
-
-    mkdir -p "$HOME/.config"
-
-    backup_and_link() {
-        local src="$1"
-        local dst="$2"
-        local name
-        name="$(basename "$dst")"
-
-        local resolved_src resolved_dst
-        resolved_src="$(readlink -f "$src")"
-        resolved_dst="$(readlink -f "$dst" 2>/dev/null || true)"
-        if [ "$resolved_src" = "$resolved_dst" ]; then
-            print_status "Already in place: $name"
-            return
-        fi
-
-        if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
-            print_status "Already linked: $name"
-            return
-        fi
-
-        if [ -e "$dst" ] || [ -L "$dst" ]; then
-            mkdir -p "$backup_dir"
-            mv "$dst" "$backup_dir/"
-            backed_up=true
-            print_info "Backed up existing $name to $backup_dir/"
-        fi
-
-        ln -sfn "$src" "$dst"
-        print_status "Linked: $name"
-    }
-
-    local dir
-    for dir in "${config_dirs[@]}"; do
-        if [ -d "$REPO_DIR/$dir" ]; then
-            backup_and_link "$REPO_DIR/$dir" "$HOME/.config/$dir"
-        fi
-    done
-
-    mkdir -p "$HOME/.local/bin"
-    backup_and_link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
-    backup_and_link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
-    backup_and_link "$REPO_DIR/scripts/claude-local" "$HOME/.local/bin/claude-local"
-
-    if [ ! -f "$HOME/.zshenv" ]; then
-        printf 'export ZDOTDIR="$HOME/.config/zsh"\n' > "$HOME/.zshenv"
-        print_status "Created ~/.zshenv with ZDOTDIR"
-    elif grep -q 'ZDOTDIR=.*\.config/zsh' "$HOME/.zshenv"; then
-        print_status "~/.zshenv already configures ZDOTDIR"
-    else
-        printf '\nexport ZDOTDIR="$HOME/.config/zsh"\n' >> "$HOME/.zshenv"
-        print_status "Added ZDOTDIR to ~/.zshenv"
-    fi
-
-    if [ "$backed_up" = true ]; then
-        print_info "Old configs backed up to: $backup_dir"
-    fi
+    dotfiles_link_configs "${DOTFILES_CLI_DIRS[@]}"
     print_status "Dotfiles linked"
 }
 
