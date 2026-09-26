@@ -23,7 +23,9 @@ builtin = "Ayu"
 enable_builtin_templates = true
 # hyprland -> ~/.config/hypr/noctalia.lua (border colours), required from hyprland.lua
 # kitty    -> ~/.config/kitty/themes/noctalia.conf, included from kitty.conf
-builtin_ids = ["hyprland", "kitty"]
+# gtk3/4   -> ~/.config/gtk-{3,4}.0/noctalia.css, @imported from gtk.css
+# btop     -> btop theme
+builtin_ids = ["btop", "gtk3", "gtk4", "hyprland", "kitty"]
 
 [wallpaper]
 enabled             = true
