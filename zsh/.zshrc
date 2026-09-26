@@ -282,7 +282,10 @@ if (( ${+functions[_zsh_autosuggest_fetch]} )); then
   functions[_zsh_autosuggest_fetch]="${functions[_zsh_autosuggest_fetch_min]}"
 fi
 
+# ~/.local/bin holds the installers' launchers (claude-local, opencode-*).
+# uv's env script adds it where uv is installed; make sure of it everywhere.
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+[[ ":$PATH:" == *":$HOME/.local/bin:"* ]] || export PATH="$HOME/.local/bin:$PATH"
 
 # opencode — packaged on Arch (pacman) and macOS (brew), so this only
 # matters where upstream's installer put it in ~/.opencode/bin (Debian).

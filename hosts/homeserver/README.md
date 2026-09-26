@@ -4,10 +4,9 @@ Home-directory dotfiles for the `alex` account on the homelab server — the
 files that live in `$HOME` itself, as opposed to the shared `~/.config`
 contents this repo already manages.
 
-Captured 2026-08-27. This host runs headless Arch; the shell setup is
-oh-my-zsh + powerlevel10k, same as the other machines, but kept as its own
-profile because the server accumulates host-specific aliases and PATH entries
-that shouldn't follow to laptops.
+Captured 2026-08-27. This host runs headless Arch. zsh uses the shared
+`zsh/.zshrc` via `ZDOTDIR` like every other machine (the old host `.zshrc` was
+never read once `--full` set `ZDOTDIR`).
 
 Install (from the repo root, i.e. `~/.config`):
 
