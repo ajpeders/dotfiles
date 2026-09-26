@@ -19,10 +19,6 @@
 !packages.txt
 !packages-asahi.txt
 
-# Per-host $HOME dotfiles (see hosts/<name>/README.md)
-!hosts/
-!hosts/**
-
 # Shared config dirs (whole tree tracked)
 !hypr/
 !hypr/**

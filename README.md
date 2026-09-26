@@ -18,7 +18,7 @@ git clone ssh://git@git.thelunadog.com:2222/alex/dotfiles.git ~/dotfiles
 bash ~/dotfiles/macos/install.sh
 ```
 
-Then run `p10k configure`. Per-host `$HOME` files live in `hosts/<name>/`.
+Then run `p10k configure`.
 
 ## Keep in sync
 
