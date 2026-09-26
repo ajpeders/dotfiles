@@ -279,24 +279,24 @@ opencode debug config      # check the resolved baseURL
 
 ## Agents
 
-`opencode/opencode.json` defines eight agents, the Ollama provider, and the `@whisperopencode/push` plugin.
+`opencode/opencode.json` defines eight agents, the `anthropic`, `ollama` and (disabled) `xai` providers, and two plugins: `@whisperopencode/push` and `./plugins/model-fallback.js`.
 
 | Agent | Mode | Model | Use |
 |---|---|---|---|
-| `build` | primary | `openai/gpt-5.5` (cloud, falls back to MiniMax-M3 → DeepSeek v4 Pro) | Default. Full edit + bash. Capped at 50 steps. Bash guards deny force-push, `mkfs`, `dd if=`, fork-bomb; `git push` and `rm -rf` ask first. |
-| `plan` | primary | `openai/gpt-5.5` (cloud, same fallback chain as build) | Read-only planning. Tab to switch; use when you want analysis without changes. |
+| `build` | primary | `ollama/qwen3-coder:30b` (on error falls back to `openai/gpt-5.6-sol` → MiniMax-M3 → DeepSeek v4 Pro) | Default. Full edit + bash. Capped at 50 steps. Bash guards deny force-push, `mkfs`, `dd if=`, fork-bomb; `git push` and `rm -rf` ask first. |
+| `plan` | primary | `ollama/qwen3-coder:30b` (same fallback chain as build) | Read-only planning. Tab to switch; use when you want analysis without changes. |
 | `general` | subagent | `ollama/qwen3-coder:30b` | Multi-step delegated work. Invoke with `@general`. |
 | `explore` | subagent | `ollama/qwen3-coder:30b` | Fast read-only codebase search. Invoke with `@explore`. |
 | `scout` | subagent | `ollama/qwen3-coder:30b` | External docs and dependency research; clones into OpenCode's cache. Invoke with `@scout`. |
 | `review` | subagent | `ollama/qwen3-coder:30b` | Local code review, read-only. Strong enough for review; keeps data on-machine. |
-| `debug` | subagent | `ollama/qwen3.6:27b` | Logs, traces, network diagnostics, coredumps. Bounded bash allowlist (no destructive ops). Invoke with `@debug`. |
+| `debug` | subagent | `ollama/qwen3-coder:30b` | Logs, traces, network diagnostics, coredumps. Bounded bash allowlist (no destructive ops). Invoke with `@debug`. |
 | `docs-writer` | subagent | `ollama/qwen3-coder:30b` | READMEs, changelogs, ADRs. Edits prose only; bash denied. Invoke with `@docs-writer`. |
 
 ### Routing rationale
 
-- **Cloud for primaries.** Build and plan need the strongest reasoning — coding and architecture reward paying for it. Subagents stay local.
+- **Local first, cloud on failure.** Every agent runs on `qwen3-coder:30b`. `model-fallback.js` moves build/plan down the frontier chain when the local model errors; switch to a cloud model by hand when a task needs stronger reasoning.
 - **Subagent model matters less than variety.** arch-alex has `OLLAMA_NUM_PARALLEL=1`, so a different subagent model causes a swap (~5–15 s load). Keep subagents on the fewest models possible.
-- **`glm-4.7-flash is retired (2026-09-19).** On the desktop's ROCm backend it processed prompts ~3x slower than `qwen3-coder:30b` and collapsed at long context. Everything local runs on `qwen3-coder:30b` (28 GB resident, 96k ctx, f16 KV).
+- **`glm-4.7-flash` is retired (2026-09-19).** On the desktop's ROCm backend it processed prompts ~3x slower than `qwen3-coder:30b` and collapsed at long context. Everything local runs on `qwen3-coder:30b` (28 GB resident, 96k ctx, f16 KV).
 - **explore/scout moved off `qwen3:8b-32k` (2026-09-20).** The coder and the 8B can't both fit in 32 GB, so running them side by side made them evict each other (5 swaps in 12 min in the logs). The coder is also faster: it's MoE with ~3B active parameters, 169 vs 102 t/s generation on Vulkan. Nothing uses `qwen3.6:27b` by default any more, so nothing swaps the coder out (`debug` moved 2026-09-22). Benchmarks: `/srv/projects/ollama/bench/results.md`.
 - **`claude-local` moved to `qwen3-coder:30b` (2026-09-22).** On 09-20 it stayed on `qwen3.6:27b` because the coder guessed wrong `/home/alex/…` paths in 3/3 runs. The launcher now passes `--append-system-prompt` with `$PWD`; with that, 4/4 sandboxed runs were clean at 34–49 s (vs 144 s for the 27B), and there's no model swap. To go back: `LLM_MODEL=qwen3.6:27b claude-local`. opencode `debug` moved the same day: a "start in the working directory" step in `prompts/debug.txt` took it from 0/3 to 3/3 on a sandboxed root-cause test (8–18 s vs 35–47 s on the 27B).
 - **review → local coding model.** Even though review is invoked often during build cycles, `qwen3-coder:30b` is purpose-built for code understanding and avoids per-review cloud cost.

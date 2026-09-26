@@ -44,17 +44,17 @@
       }
     },
     "general": {
-      "model": "ollama/glm-4.7-flash:latest",
+      "model": "ollama/qwen3-coder:30b",
       "color": "accent",
       "temperature": 0.3
     },
     "explore": {
-      "model": "ollama/qwen3:8b-32k",
+      "model": "ollama/qwen3-coder:30b",
       "color": "info",
       "temperature": 0.3
     },
     "scout": {
-      "model": "ollama/qwen3:8b-32k",
+      "model": "ollama/qwen3-coder:30b",
       "color": "info",
       "temperature": 0.3
     },
@@ -73,7 +73,7 @@
     "docs-writer": {
       "description": "Writes and maintains documentation: READMEs, docstrings, changelogs, ADRs. Edits prose files only \u2014 no shell, no code logic changes.",
       "mode": "subagent",
-      "model": "ollama/glm-4.7-flash:latest",
+      "model": "ollama/qwen3-coder:30b",
       "prompt": "{file:./prompts/docs-writer.txt}",
       "color": "success",
       "temperature": 0.5,
@@ -86,7 +86,7 @@
     "debug": {
       "description": "Investigates bugs, crashes, and runtime issues using logs, traces, and network diagnostics. Read-only \u2014 never modifies project files.",
       "mode": "subagent",
-      "model": "ollama/qwen3.6:27b",
+      "model": "ollama/qwen3-coder:30b",
       "prompt": "{file:./prompts/debug.txt}",
       "color": "error",
       "temperature": 0.2,
