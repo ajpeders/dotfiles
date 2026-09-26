@@ -180,9 +180,9 @@ fi
 # ---------- 5. Check the model has a catalog entry ----------
 
 # opencode.json is a machine-agnostic catalog: it declares context/output limits
-# per model, and {env:LLM_MODEL} picks which of them is the default. This script
-# deliberately does NOT rewrite it — doing so dirtied the repo on every machine
-# that served a different model.
+# per model; the agents' models are fixed in the file, and LLM_MODEL is only read
+# by claude-local. This script deliberately does NOT rewrite it — doing so
+# dirtied the repo on every machine that served a different model.
 if [ ! -f "$OPENCODE_CONFIG" ]; then
     print_info "No opencode config at $OPENCODE_CONFIG, skipping catalog check"
 elif ! jq -e . "$OPENCODE_CONFIG" >/dev/null 2>&1; then
