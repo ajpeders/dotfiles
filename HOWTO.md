@@ -180,6 +180,46 @@ git remote set-url --push $F "$(git remote get-url $F)"
 git remote set-url --add --push $F git@github.com:ajpeders/dotfiles.git
 ```
 
+## Migrate off Omarchy
+
+Omarchy was removed from these dotfiles on 2026-09-26. A machine still running
+it (the M1 Air) converts like this, from a TTY or SSH session rather than the
+Omarchy desktop, since step 2 removes that desktop:
+
+```bash
+# 1. Pull. This deletes the tracked Omarchy files (hypr/omarchy/, omarchy/, ...).
+git -C ~/.config pull --ff-only forgejo main
+
+# 2. Remove the Omarchy packages. -s also drops the dependencies it pulled in
+#    that nothing else needs (sddm, quickshell, ...); read the list first.
+sudo pacman -Rns $(pacman -Qq | grep '^omarchy')
+
+# 3. Drop the pacman repo and key Omarchy's installer added, if any.
+grep -n -i omarchy /etc/pacman.conf /etc/pacman.d/* 2>/dev/null
+
+# 4. Install the Noctalia desktop. This installs noctalia, ly and hypridle,
+#    disables sddm and enables ly.
+bash ~/.config/scripts/install.sh
+
+# 5. Remove what Omarchy left in $HOME (none of it is tracked).
+rm -rf ~/.local/share/omarchy ~/.local/state/omarchy ~/.config/omarchy
+```
+
+Reboot, pick **Hyprland** from ly, then check with `bash scripts/doctor.sh`.
+It reports any `omarchy*` package still installed and warns if ly is not the
+only display manager. The never-suspend logind drop-in
+(`/etc/systemd/logind.conf.d/10-kitchen-power.conf`) is system state and is
+unaffected.
+
+The desktops never ran Omarchy, but they may still have the old Omarchy-shell
+/ jetshell experiment in `$HOME`. It is inert (nothing starts it any more) and
+safe to delete:
+
+```bash
+rm -rf ~/.local/share/omarchy-shell ~/.local/bin/omarchy-shell-start \
+       ~/.local/state/omarchy ~/.local/state/jetshell ~/.config/omarchy
+```
+
 ## Configure monitors
 
 Edit `hypr/config/monitors.lua` by hand. **Don't use `nwg-displays`** — it writes
@@ -305,10 +345,9 @@ opencode debug config      # check the resolved baseURL
 
 1. `~/.config/opencode/opencode.json` — global, tracked, agents, providers, and plugins.
 2. `~/.config/opencode/prompts/*.txt` — global prompt bodies.
-3. `~/.config/opencode/themes/omarchy.json` — global theme matching the active matugen palette.
-4. `~/.config/opencode/tui.json` — sets `theme: omarchy`.
-5. `~/.config/opencode/.opencode/` — **templates**. Copy `prompts/*.txt` into a project's `.opencode/prompts/` to override locally; same for `themes/`.
-6. `<project>/.opencode/opencode.json` — per-project overrides.
+3. `~/.config/opencode/tui.json` — sets `theme: system`.
+4. `~/.config/opencode/.opencode/` — **templates**. Copy `prompts/*.txt` into a project's `.opencode/prompts/` to override locally.
+5. `<project>/.opencode/opencode.json` — per-project overrides.
 
 ### Prompt templates
 
@@ -316,7 +355,9 @@ opencode debug config      # check the resolved baseURL
 
 ### Theme
 
-`themes/omarchy.json` was derived from `~/.local/state/omarchy/current/theme/colors.toml`. If you change themes (`omarchy theme set <name>`), regenerate the JSON with the new palette or pick a built-in via `:theme` in the TUI.
+`system` uses the terminal's own colors, which Noctalia's kitty template renders
+from the wallpaper palette, so opencode follows theme changes with no extra file.
+Pick another built-in with `:theme` in the TUI.
 
 ## Boot loader (Limine, desktop only)
 

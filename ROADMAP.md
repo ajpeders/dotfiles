@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Desktops run Noctalia 5 (native C++ rewrite, since 2026-09-09) on Hyprland; the M1 Air runs Omarchy. Both stacks live on `main` since 2026-09-09 (the `alarm` and `omarchy` branches were merged), sharing one `hypr/hyprland.lua` that picks the stack at load time.
+Every Linux machine runs Noctalia 5 (native C++ rewrite, since 2026-09-09) on Hyprland. Omarchy was removed on 2026-09-26; the M1 Air still needs converting (see Next).
 
 ## Done
 
@@ -29,10 +29,14 @@ Desktops run Noctalia 5 (native C++ rewrite, since 2026-09-09) on Hyprland; the 
       QML plugins, colorschemes), the wallust CSS/`theme/` palette, `nwg-displays`,
       and the untracked-file links in the scripts; `.gitignore` deduplicated
 - [x] Dropped wlsunset: nothing launched it, Noctalia's `[nightlight]` does the job
-      (Omarchy keeps hyprsunset via its own package)
+- [x] Removed the Omarchy stack (2026-09-26): runtime branch in `hyprland.lua`,
+      `hypr/omarchy/`, `omarchy/`, `--omarchy` script flags and detection, split
+      package sections, wallpaper-color units, hyprlock/hyprsunset configs
 
 ## Next
 
+- [ ] **Convert the M1 Air from Omarchy to Noctalia** — follow
+      HOWTO.md → "Migrate off Omarchy", then `bash scripts/doctor.sh`
 - [ ] **Re-enable SIP on the MacBook Air.** Partially disabled on 2026-09-01 to
       try yabai (`csrutil enable --without fs --without debug --without nvram`
       plus `sudo nvram boot-args=-arm64e_preview_abi`). yabai never worked —
@@ -51,7 +55,6 @@ Desktops run Noctalia 5 (native C++ rewrite, since 2026-09-09) on Hyprland; the 
 - [ ] Capture the laptop's internal panel (`eDP-1`) the same way, and confirm the
       relative layout behaves when docking/undocking there
 - [ ] Test scripts/install.sh on a fresh system
-- [ ] Integrate Omarchy and personal dotfiles more tightly: document ownership boundaries, reduce duplicated Hypr/desktop config, and make install/update behavior clearer across Omarchy, Noctalia, headless, and macOS machines
 - [ ] Review wlsunset — Noctalia has built-in night light, may be redundant
 
 ## Ideas
