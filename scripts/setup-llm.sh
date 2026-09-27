@@ -148,8 +148,6 @@ print_status "Wrote $SYSTEMD_ENV_FILE"
 # remains the durable source for the next login.
 if systemctl --user show-environment >/dev/null 2>&1; then
     systemctl --user set-environment "LLM_SERVER_URL=$BASE_URL"
-    # Machines set up before LLM_MODEL was retired still have it in the session.
-    systemctl --user unset-environment LLM_MODEL
     print_status "Updated the current systemd user environment"
 fi
 
