@@ -173,8 +173,17 @@ phase_browser_policies() {
     dotfiles_librewolf_policies
 }
 
+phase_llm() {
+    print_phase "Phase 5: LLM Server"
+
+    # Non-fatal: an unreachable server (off the tailnet, say) must not fail the sync.
+    if ! bash "$SCRIPT_DIR/setup-llm.sh" --check; then
+        print_error "LLM server check failed (non-fatal); see above"
+    fi
+}
+
 phase_reload() {
-    print_phase "Phase 5: Live Reload"
+    print_phase "Phase 6: Live Reload"
 
     if [ "$HEADLESS" -eq 1 ]; then
         print_info "Headless mode — no graphical components to reload"
@@ -212,6 +221,7 @@ phase_pull
 phase_packages
 phase_dotfiles
 phase_browser_policies
+phase_llm
 phase_reload
 
 echo ""

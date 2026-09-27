@@ -2,7 +2,16 @@
 # Point the local LLM coding tools (opencode) at a llama-swap / llama.cpp /
 # Ollama / OpenAI-compatible server, and record the URL per-machine.
 # Usage: bash scripts/setup-llm.sh [base-url]
-#   e.g. bash scripts/setup-llm.sh http://<host>:11434/v1   # llama-swap
+#        bash scripts/setup-llm.sh --check
+#   e.g. bash scripts/setup-llm.sh http://<host>:8080/v1    # homelab llm-router
+#
+# Prefer the router over a single llama-swap backend: it queues requests and
+# picks whichever machine already has the model loaded, so opencode and Hermes
+# stop evicting each other's models.
+#
+# --check writes nothing: it re-probes the configured URL, reports if the shell
+# (llm.env) and session (environment.d) copies disagree, and reports catalog
+# drift. scripts/update.sh runs it on every sync.
 #
 # The URL is written to ~/.local/state/dotfiles/llm.env as LLM_SERVER_URL and
 # sourced by zsh/.zshrc. That lives under ~/.local/state (next to dotfiles-mode)
@@ -35,10 +44,12 @@ print_status() { echo -e "${GREEN}[✓]${NC} $1"; }
 print_error() { echo -e "${RED}[✗]${NC} $1"; }
 print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 
+CHECK=0
 for arg in "$@"; do
     case "$arg" in
         # Print the header comment block, however long it happens to be.
         --help|-h) awk 'NR>1{ if (!/^#/) exit; sub(/^# ?/,""); print }' "$0"; exit 0 ;;
+        --check) CHECK=1 ;;
     esac
 done
 
@@ -51,14 +62,29 @@ done
 
 # ---------- 1. Base URL ----------
 
-if [ $# -ge 1 ]; then
+env_file_url() {
+    [ -f "$ENV_FILE" ] || return 0
+    sed -n 's/^export LLM_SERVER_URL=["'\'']\{0,1\}\([^"'\'']*\).*/\1/p' "$ENV_FILE" | head -1
+}
+
+if [ "$CHECK" -eq 1 ]; then
+    BASE_URL="$(env_file_url)"
+    if [ -z "$BASE_URL" ]; then
+        print_info "No $ENV_FILE; opencode uses the localhost default. Run setup-llm.sh to point it elsewhere."
+        exit 0
+    fi
+    session_url=""
+    [ -f "$SYSTEMD_ENV_FILE" ] && session_url="$(sed -n 's/^LLM_SERVER_URL=//p' "$SYSTEMD_ENV_FILE" | tail -1)"
+    if [ "$session_url" != "$BASE_URL" ]; then
+        print_error "Shell and session URLs differ: llm.env=$BASE_URL, environment.d=${session_url:-unset}"
+        print_info "  Re-run: bash scripts/setup-llm.sh $BASE_URL"
+    fi
+elif [ $# -ge 1 ]; then
     BASE_URL="$1"
 else
     default_url=""
     # Offer whatever is already configured as the default, so re-runs are a no-op.
-    if [ -f "$ENV_FILE" ]; then
-        default_url="$(sed -n 's/^export LLM_SERVER_URL=["'\'']\{0,1\}\([^"'\'']*\).*/\1/p' "$ENV_FILE" | head -1)"
-    fi
+    default_url="$(env_file_url)"
     if [ -n "${LLM_SERVER_URL:-}" ]; then
         default_url="$LLM_SERVER_URL"
     fi
@@ -127,6 +153,43 @@ if [ "${#MODEL_IDS[@]}" -eq 0 ]; then
 fi
 print_status "Reachable — ${#MODEL_IDS[@]} model(s) available"
 
+# ---------- 4. Compare the served models with the catalog ----------
+
+check_catalog() {
+    # opencode.json is a machine-agnostic catalog: it declares context/output limits
+    # per model; the agents' models are fixed in the file. This script deliberately
+    # does NOT rewrite it — doing so dirtied the repo on every machine that served a
+    # different model. It only reports the drift, in both directions: an id the
+    # catalog lists but the server dropped 404s the moment an agent picks it.
+    if [ ! -f "$OPENCODE_CONFIG" ]; then
+        print_info "No opencode config at $OPENCODE_CONFIG, skipping catalog check"
+    elif ! jq -e . "$OPENCODE_CONFIG" >/dev/null 2>&1; then
+        print_error "$OPENCODE_CONFIG is not valid JSON; fix it and re-run"
+        exit 1
+    else
+        catalog_ids="$(jq -r --arg p "$PROVIDER" \
+            '.provider[$p].models // {} | keys[]' "$OPENCODE_CONFIG")"
+
+        for id in "${MODEL_IDS[@]}"; do
+            if ! echo "$catalog_ids" | grep -qxF "$id"; then
+                print_info "Served but not in the catalog: $id"
+                print_info "  It still works; add an entry to declare its limits."
+            fi
+        done
+
+        while IFS= read -r id; do
+            [ -n "$id" ] || continue
+            printf '%s\n' "${MODEL_IDS[@]}" | grep -qxF "$id" && continue
+            print_info "In the catalog but not served: $id (picking it 404s)"
+        done <<< "$catalog_ids"
+    fi
+}
+
+if [ "$CHECK" -eq 1 ]; then
+    check_catalog
+    exit 0
+fi
+
 # ---------- 3. Write the env file ----------
 
 mkdir -p "$ENV_DIR" "$SYSTEMD_ENV_DIR"
@@ -150,35 +213,7 @@ if systemctl --user show-environment >/dev/null 2>&1; then
     print_status "Updated the current systemd user environment"
 fi
 
-# ---------- 4. Compare the served models with the catalog ----------
-
-# opencode.json is a machine-agnostic catalog: it declares context/output limits
-# per model; the agents' models are fixed in the file. This script deliberately
-# does NOT rewrite it — doing so dirtied the repo on every machine that served a
-# different model. It only reports the drift, in both directions: an id the
-# catalog lists but the server dropped 404s the moment an agent picks it.
-if [ ! -f "$OPENCODE_CONFIG" ]; then
-    print_info "No opencode config at $OPENCODE_CONFIG, skipping catalog check"
-elif ! jq -e . "$OPENCODE_CONFIG" >/dev/null 2>&1; then
-    print_error "$OPENCODE_CONFIG is not valid JSON; fix it and re-run"
-    exit 1
-else
-    catalog_ids="$(jq -r --arg p "$PROVIDER" \
-        '.provider[$p].models // {} | keys[]' "$OPENCODE_CONFIG")"
-
-    for id in "${MODEL_IDS[@]}"; do
-        if ! echo "$catalog_ids" | grep -qxF "$id"; then
-            print_info "Served but not in the catalog: $id"
-            print_info "  It still works; add an entry to declare its limits."
-        fi
-    done
-
-    while IFS= read -r id; do
-        [ -n "$id" ] || continue
-        printf '%s\n' "${MODEL_IDS[@]}" | grep -qxF "$id" && continue
-        print_info "In the catalog but not served: $id (picking it 404s)"
-    done <<< "$catalog_ids"
-fi
+check_catalog
 
 # ---------- 5. Done ----------
 

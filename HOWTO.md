@@ -123,13 +123,15 @@ Gotchas:
 
 ## LLM: opencode
 
-Everything defaults to the local Ollama (`qwen3.6:35b-a3b`). Launchers, linked into `~/.local/bin` by the installers:
+Everything defaults to the local server (`qwen3.6:35b-a3b`). Launchers, linked into `~/.local/bin` by the installers:
 
 | Command | Models |
 |---|---|
 | `opencode` | local; build/plan fall back to the cloud chain in `opencode/plugins/model-fallback.js` on error |
 | `opencode-local` | local only, no fallback |
 | `opencode-cloud` | every agent on `openai/gpt-5.6-sol` |
+
+Point it at the homelab llm-router (`bash scripts/setup-llm.sh http://<homelab>:8080/v1`), not a single llama-swap host: the router queues and picks whichever machine has the model loaded, so opencode and Hermes don't evict each other's models. `scripts/update.sh` re-checks the configured URL every sync (`setup-llm.sh --check`).
 
 To use another server, run `bash scripts/setup-llm.sh <base-url>`. It writes `~/.local/state/dotfiles/llm.env` (shells) and the gitignored `environment.d/90-llm-local.conf` (session), which override the defaults in `environment.d/50-llm.conf` and `zsh/.zshrc`. Session changes apply at next login; to test now:
 
@@ -138,7 +140,7 @@ systemctl --user set-environment LLM_SERVER_URL=http://host:11434/v1
 opencode debug config
 ```
 
-Keep every agent on one model: the server runs `OLLAMA_NUM_PARALLEL=1`, so a second model means swaps.
+Keep every agent on one model: each llama-swap host runs `--parallel 1`, so a second model means swaps.
 
 Per-project overrides: copy a prompt from `opencode/prompts/` into the project's `.opencode/prompts/`, or add `.opencode/opencode.json`; project-local wins.
 
