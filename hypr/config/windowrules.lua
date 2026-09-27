@@ -58,10 +58,13 @@ hl.workspace_rule({ workspace = "w[tv1-10]", gaps_out = 5, gaps_in = 3 })
 hl.workspace_rule({ workspace = "f[1]",      gaps_out = 5, gaps_in = 3 })
 
 -- ====== Noctalia ======
+-- Settings window: 740 tall fits the laptop panel (1280x800 logical at 2x,
+-- minus the 36px bar); 920 overflowed off the top.
 hl.window_rule({
-    match = { class = "dev.noctalia.Noctalia" },
-    float = true,
-    size  = { 1080, 920 },
+    match  = { class = "dev.noctalia.Noctalia" },
+    float  = true,
+    size   = { 1080, 740 },
+    center = true,
 })
 -- Blur Noctalia surfaces; disable Hyprland's layer animations so they don't
 -- fight Noctalia's own.
