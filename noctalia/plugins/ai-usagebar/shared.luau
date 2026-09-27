@@ -60,6 +60,20 @@ function M.baseProvider(id)
     return (tostring(id or ""):match("^[^@]+") or "")
 end
 
+-- Real brand logos (Simple Icons SVGs in assets/, brand-coloured since
+-- images cannot be tinted) for the glyph names that are only stand-ins.
+local LOGOS = {
+    ["asterisk-simple"] = "assets/claude.svg",
+    ["brand-openai"] = "assets/openai.svg",
+}
+
+-- Drop-in for ui.glyph(props): a logo image when one exists for props.name.
+function M.mark(props)
+    local path = LOGOS[props.name]
+    if path == nil then return ui.glyph(props) end
+    return ui.image({ path = path, width = props.size, height = props.size, fit = "contain" })
+end
+
 function M.providerGlyph(id)
     return PROVIDER_GLYPHS[M.baseProvider(id)] or "brain"
 end
@@ -312,7 +326,8 @@ end
 
 function M.modelGlyph(label)
     local lower = tostring(label or ""):lower()
-    if lower:find("oss", 1, true) or lower:find("claude", 1, true) then return "robot" end
+    if lower:find("claude", 1, true) then return "asterisk-simple" end
+    if lower:find("oss", 1, true) then return "robot" end
     if lower:find("gemini", 1, true) then return "brand-google" end
     if lower:find("gpt", 1, true) or lower:find("openai", 1, true) then return "brand-openai" end
     return "sparkles"

@@ -7,7 +7,7 @@ local polling = false
 local refreshQueued = false
 
 local shared = require("./shared.luau")
-local providerGlyph, parseIso = shared.providerGlyph, shared.parseIso
+local providerGlyph, parseIso, mark = shared.providerGlyph, shared.parseIso, shared.mark
 local countdown, resetClock = shared.countdown, shared.resetClock
 local ratio, headline, severityRole = shared.ratio, shared.headline, shared.severityRole
 local modelHeadlines, isCritical, dualMetrics = shared.modelHeadlines, shared.isCritical, shared.dualMetrics
@@ -208,7 +208,7 @@ local function stackCard(name, readings, glyph)
                 width = 20, height = 20, radius = 5,
                 fill = "primary/0.14", align = "center", justify = "center",
             }, {
-                ui.glyph({ name = glyph or modelGlyph(name), size = 12, color = "primary" }),
+                mark({ name = glyph or modelGlyph(name), size = 12, color = "primary" }),
             }),
             ui.label({ text = glyph and name or modelDisplayName(name), fontSize = 12, fontWeight = "bold",
                        color = "on_surface", maxLines = 1 }),
@@ -450,7 +450,7 @@ local function providerRow(entry, selected, compact)
     local broken = entry.status == "error" or unavailable(entry)
 
     local children = {
-        ui.glyph({
+        mark({
             name = providerGlyph(entry.id),
             size = compact and 16 or 15,
             color = selected and "primary" or "on_surface",
