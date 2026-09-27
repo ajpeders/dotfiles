@@ -123,6 +123,9 @@ cliamp
 
 # Desktop shell (v5, native C++; the v4 noctalia-shell/noctalia-qs pair is legacy)
 noctalia
+# Noctalia plugin deps: dig/nslookup for dns-switcher, the CLI behind ai-usagebar
+bind
+ai-usagebar-bin
 
 # Full JetBrains Mono Nerd package.
 ttf-jetbrains-mono-nerd

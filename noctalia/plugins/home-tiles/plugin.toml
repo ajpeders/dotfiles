@@ -1,0 +1,16 @@
+# Control-center tiles for the bar plugins, which ship no [[shortcut]] of their
+# own. The tile shows the active resolver and opens the switcher panel.
+id = "alex/home-tiles"
+name = "Home Tiles"
+version = "0.1.0"
+author = "alex"
+license = "MIT"
+description = "Control-center tile for dns-switcher."
+dependencies = ["networkmanager"]
+tags = ["shortcut"]
+icon = "layout-grid"
+plugin_api = 24
+
+[[shortcut]]
+id = "dns"
+entry = "dns.luau"

@@ -14,4 +14,5 @@ Hyprland + Noctalia 5 is the only Linux stack (Omarchy removed 2026-09-26). Past
 
 - Desktop widgets via Noctalia
 - Gaming mode toggle (disable shell animations, notifications)
-- Make the repo usable by others: replace homelab-specific hostnames, addresses and paths with env-driven config plus examples
+- Make the repo usable by others: replace homelab-specific hostnames, addresses and paths with env-driven config plus examples (e.g. the `isis` resolver in `noctalia/config.toml`; Noctalia has no env interpolation, but merges every `*.toml` in its dir)
+- Upstream a `[[shortcut]]` to `nightwatch75/dns-switcher`, then drop `noctalia/plugins/home-tiles`

@@ -54,6 +54,28 @@ enabled = false
 [idle.behavior.screen-off]
 enabled = false
 
+# Community plugins, fetched from github.com/noctalia-dev/community-plugins on
+# first start. GUI enables/disables land in settings.toml's [plugins] and win.
+# alex/home-tiles lives in ./plugins/ (control-center DNS tile).
+[plugins]
+enabled = ["nightwatch75/dns-switcher", "felipeartur/ai-usagebar", "alex/home-tiles"]
+
+# Source list as the GUI writes it (built-ins included), plus the local one.
+[[plugins.source]]
+name     = "official"
+kind     = "git"
+location = "https://github.com/noctalia-dev/official-plugins"
+
+[[plugins.source]]
+name     = "community"
+kind     = "git"
+location = "https://github.com/noctalia-dev/community-plugins"
+
+[[plugins.source]]
+name     = "local"
+kind     = "path"
+location = "~/.config/noctalia/plugins"
+
 [bar.main]
 position           = "top"
 thickness          = 36
@@ -65,7 +87,7 @@ padding            = 10
 widget_spacing     = 6
 start  = ["workspaces", "audio-vis", "media"]
 center = ["clock"]
-end    = ["group:tray", "volume", "sysmon", "brightness", "battery", "dns", "notifications", "control-center"]
+end    = ["group:tray", "volume", "sysmon", "brightness", "battery", "ai-usage", "notifications", "control-center"]
 
 # Tray collapses to a chevron; hovering it unfolds the icons to the LEFT
 # (accordion group, reveal direction "start"). Right-click an icon > Pin is
@@ -97,11 +119,24 @@ bands   = 40
 color_1 = "primary"
 color_2 = "secondary"
 
-# Community port of the v4 DNS Switcher (enable with:
-#   noctalia msg plugins enable nightwatch75/dns-switcher).
+# Community port of the v4 DNS Switcher (needs dig/nslookup from `bind`).
 # Left-click: provider panel; right-click: back to ISP default; scroll: cycle.
+[plugin_settings."nightwatch75/dns-switcher"]
+custom_1 = "isis = 100.106.42.30"   # home server's resolver over Tailscale
+
 [widget.dns]
-type = "nightwatch75/dns-switcher:dns-switcher"
+type       = "nightwatch75/dns-switcher:dns-switcher"
+show_label = false                  # icon only; left-click panel shows the active provider
+
+# AI plan usage (Claude, OpenAI, Copilot, OpenCode Go, ...) via the
+# `ai-usagebar` CLI; providers/credentials live in ~/.config/ai-usagebar/.
+# Left-click: panel; right-click: refresh. "auto" shows the busiest provider.
+[widget.ai-usage]
+type           = "felipeartur/ai-usagebar:bar"
+vendor         = "auto"
+visualization  = "none"            # no gauge bars
+extras         = "none"            # no reset countdown; hover/panel still show it
+provider_limit = 1
 
 [widget.clock]
 format = "{:%a %b %-d}  {:%-I:%M:%S %p}"
@@ -110,6 +145,11 @@ format = "{:%a %b %-d}  {:%-I:%M:%S %p}"
 sidebar = "full"
 sidebar_section = "full"
 hidden_tabs = []
+
+# Home grid fits six tiles; session lives in the header's power button.
+# alex/home-tiles:dns comes from noctalia/plugins/home-tiles; click opens the switcher panel.
+[[control_center.shortcuts]]
+type = "alex/home-tiles:dns"
 
 [[control_center.shortcuts]]
 type = "audio"
@@ -121,10 +161,7 @@ type = "mic_mute"
 type = "bluetooth"
 
 [[control_center.shortcuts]]
-type = "network"
+type = "wifi"
 
 [[control_center.shortcuts]]
 type = "system"
-
-[[control_center.shortcuts]]
-type = "session"
