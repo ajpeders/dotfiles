@@ -89,7 +89,7 @@ Gotchas:
 
 ## LLM: opencode
 
-Everything defaults to the local Ollama (`qwen3-coder:30b`). Launchers, linked into `~/.local/bin` by the installers:
+Everything defaults to the local Ollama (`qwen3.6:35b-a3b`). Launchers, linked into `~/.local/bin` by the installers:
 
 | Command | Models |
 |---|---|

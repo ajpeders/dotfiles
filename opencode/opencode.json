@@ -1,8 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
 
-  "model": "ollama/qwen3-coder:30b",
-  "small_model": "ollama/qwen3-coder:30b",
+  "model": "ollama/qwen3.6:35b-a3b",
+  "small_model": "ollama/qwen3.6:35b-a3b",
 
   "plugin": [
     "@whisperopencode/push",
@@ -13,7 +13,7 @@
   ],
   "agent": {
     "build": {
-      "model": "ollama/qwen3-coder:30b",
+      "model": "ollama/qwen3.6:35b-a3b",
       "prompt": "{file:./prompts/build.txt}",
       "color": "primary",
       "temperature": 0.2,
@@ -35,7 +35,7 @@
       }
     },
     "plan": {
-      "model": "ollama/qwen3-coder:30b",
+      "model": "ollama/qwen3.6:35b-a3b",
       "prompt": "{file:./prompts/plan.txt}",
       "color": "secondary",
       "temperature": 0.1,
@@ -44,24 +44,24 @@
       }
     },
     "general": {
-      "model": "ollama/qwen3-coder:30b",
+      "model": "ollama/qwen3.6:35b-a3b",
       "color": "accent",
       "temperature": 0.3
     },
     "explore": {
-      "model": "ollama/qwen3-coder:30b",
+      "model": "ollama/qwen3.6:35b-a3b",
       "color": "info",
       "temperature": 0.3
     },
     "scout": {
-      "model": "ollama/qwen3-coder:30b",
+      "model": "ollama/qwen3.6:35b-a3b",
       "color": "info",
       "temperature": 0.3
     },
     "review": {
       "description": "Reviews code for security, performance, and maintainability without making changes",
       "mode": "subagent",
-      "model": "ollama/qwen3-coder:30b",
+      "model": "ollama/qwen3.6:35b-a3b",
       "prompt": "You are a code reviewer. Focus on security, performance, and maintainability. Provide constructive feedback without making direct changes.",
       "color": "warning",
       "temperature": 0.1,
@@ -73,7 +73,7 @@
     "docs-writer": {
       "description": "Writes and maintains documentation: READMEs, docstrings, changelogs, ADRs. Edits prose files only \u2014 no shell, no code logic changes.",
       "mode": "subagent",
-      "model": "ollama/qwen3-coder:30b",
+      "model": "ollama/qwen3.6:35b-a3b",
       "prompt": "{file:./prompts/docs-writer.txt}",
       "color": "success",
       "temperature": 0.5,
@@ -86,7 +86,7 @@
     "debug": {
       "description": "Investigates bugs, crashes, and runtime issues using logs, traces, and network diagnostics. Read-only \u2014 never modifies project files.",
       "mode": "subagent",
-      "model": "ollama/qwen3-coder:30b",
+      "model": "ollama/qwen3.6:35b-a3b",
       "prompt": "{file:./prompts/debug.txt}",
       "color": "error",
       "temperature": 0.2,
@@ -149,13 +149,6 @@
         "apiKey": "ollama"
       },
       "models": {
-        "qwen3-coder:30b": {
-          "name": "Qwen3 Coder 30B",
-          "limit": {
-            "context": 98304,
-            "output": 16384
-          }
-        },
         "qwen3.8:27b": {
           "name": "Qwen3.8 27B",
           "limit": {
@@ -164,7 +157,11 @@
           }
         },
         "qwen3.6:35b-a3b": {
-          "name": "Qwen3.6 35B-A3B"
+          "name": "Qwen3.6 35B-A3B",
+          "limit": {
+            "context": 98304,
+            "output": 16384
+          }
         },
         "bonsai": {
           "name": "Ternary Bonsai 2 27B",

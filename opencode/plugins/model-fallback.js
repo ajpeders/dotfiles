@@ -8,7 +8,7 @@
 // OPENCODE_FALLBACK_CHAIN="provider/model,provider/model,..." overrides CHAIN (for testing).
 
 const CHAIN = (process.env.OPENCODE_FALLBACK_CHAIN?.split(",") ?? [
-  "ollama/qwen3-coder:30b",
+  "ollama/qwen3.6:35b-a3b",
   "openai/gpt-5.6-sol",
   "minimax-coding-plan/MiniMax-M3",
   "deepseek/deepseek-v4-pro",
