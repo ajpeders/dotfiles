@@ -95,7 +95,7 @@ dotfiles_link_configs() {
         fi
     done
 
-    for launcher in opencode-local opencode-cloud; do
+    for launcher in opencode-local opencode-cloud hq; do
         _dotfiles_link "$REPO_DIR/scripts/$launcher" "$HOME/.local/bin/$launcher"
     done
 

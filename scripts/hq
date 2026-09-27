@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# hq — hand a task to Hermes's kanban board from any terminal.
+#
+#   hq "Add retry to the fetch loop"             # project = this git repo's name
+#   hq -p watcher "Audit the docs" < notes.md    # body from stdin
+#   hq -p jetshell "Title" "Longer body text"    # body from arguments
+#   hq ls [project]                              # list tasks (all, or one project)
+#   hq show <task-id>                            # task, comments and events
+#
+# Options: -p project, -m model (default qwen3.6:35b-a3b), -t runtime cap (default 1h),
+#          -b file it blocked, to start later with `hermes kanban unblock <id>`.
+#
+# Follows the task-intake skill on the Hermes host: tenant = project directory under
+# the shared workspace, worker commits on a branch and never pushes, and completion or
+# block alerts go to ntfy. A project with no workspace directory goes to `inbox`.
+# The host is the ssh alias in $HERMES_SSH_HOST (default isis-alex).
+set -euo pipefail
+
+HOST="${HERMES_SSH_HOST:-isis-alex}"
+WS=/tmp/hermes-ws-alex
+MODEL=qwen3.6:35b-a3b
+RUNTIME=1h
+PROJECT=""
+STATUS=()
+
+usage() { awk 'NR>1{ if (!/^#/) exit; sub(/^# ?/,""); print }' "$0"; }
+
+# Every argument is %q-quoted, so titles and bodies survive the remote shell verbatim.
+remote() {
+    local cmd="export PATH=\$HOME/.local/bin:\$PATH; hermes kanban"
+    local a
+    for a in "$@"; do cmd+=" $(printf '%q' "$a")"; done
+    ssh -o BatchMode=yes "$HOST" "$cmd"
+}
+
+case "${1:-}" in
+    ""|-h|--help) usage; exit 0 ;;
+    ls|list)
+        if [ -n "${2:-}" ]; then remote list --tenant "$2"; else remote list; fi
+        exit ;;
+    show) remote show "${2:?task id}"; exit ;;
+esac
+
+while getopts "p:m:t:bh" opt; do
+    case "$opt" in
+        p) PROJECT="$OPTARG" ;;
+        m) MODEL="$OPTARG" ;;
+        t) RUNTIME="$OPTARG" ;;
+        b) STATUS=(--initial-status blocked) ;;
+        *) usage; exit 1 ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+TITLE="${1:?title required (hq --help)}"
+shift
+if [ $# -gt 0 ]; then
+    BODY="$*"
+elif [ ! -t 0 ]; then
+    BODY="$(cat)"
+else
+    BODY="$TITLE"
+fi
+
+if [ -z "$PROJECT" ]; then
+    top="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+    PROJECT="${top:+$(basename "$top")}"
+fi
+# Only a project with a workspace on the Hermes side can be worked on there.
+if [ -z "$PROJECT" ] || ! ssh -o BatchMode=yes "$HOST" "test -d $(printf '%q' "$WS/projects/$PROJECT")"; then
+    [ -n "$PROJECT" ] && echo "hq: no $WS/projects/$PROJECT on $HOST; filing to inbox" >&2
+    PROJECT=inbox
+    WORKDIR="$WS/scratch"
+else
+    WORKDIR="$WS/projects/$PROJECT"
+fi
+
+BODY+="
+
+---
+Workspace: $WORKDIR. Read the project's AGENTS.md / HERMES.md first if present.
+For code changes: commit on a branch; do not push; do not merge.
+Filed from $(hostname) via hq."
+
+slug="$(printf '%s' "$TITLE" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//;s/-$//' | cut -c1-60)"
+
+json="$(printf '%s' "$BODY" | remote create \
+    --assignee default --tenant "$PROJECT" \
+    --workspace "dir:$WORKDIR" --model "$MODEL" --max-runtime "$RUNTIME" \
+    --idempotency-key "$PROJECT:$slug" --created-by hq \
+    ${STATUS[@]+"${STATUS[@]}"} --body-file - --json "$TITLE")"
+id="$(printf '%s' "$json" | jq -r '.id // .task.id // empty')"
+if [ -z "$id" ]; then
+    echo "hq: unexpected reply from hermes:" >&2
+    printf '%s\n' "$json" >&2
+    exit 1
+fi
+
+# Chat-filed tasks auto-subscribe; CLI-filed ones need it done explicitly.
+remote notify-subscribe --platform ntfy --chat-id homelab-alerts --chat-type channel "$id" >/dev/null \
+    || echo "hq: filed, but subscribing to ntfy alerts failed" >&2
+
+echo "#$id [$PROJECT] $TITLE"

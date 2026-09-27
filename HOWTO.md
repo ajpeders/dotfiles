@@ -142,6 +142,19 @@ opencode debug config
 
 Keep every agent on one model: each llama-swap host runs `--parallel 1`, so a second model means swaps.
 
+## LLM: hand work to Hermes
+
+`hq` (linked into `~/.local/bin`) files a task on Hermes's kanban board over ssh, following its `task-intake` skill: project = the current git repo (or `-p`), worker model `qwen3.6:35b-a3b`, commits on a branch without pushing, alerts on ntfy.
+
+```bash
+hq "Backfill tests for the parser"          # from inside the repo
+hq -p watcher "Audit the docs" < notes.md   # body from stdin
+hq -b "Big refactor" "…"                    # filed blocked; start with `hermes kanban unblock <id>`
+hq ls [project]; hq show <id>
+```
+
+Rule of thumb: Claude Code for work you're watching, opencode for cheap local edits, `hq` for anything that can run unattended.
+
 Per-project overrides: copy a prompt from `opencode/prompts/` into the project's `.opencode/prompts/`, or add `.opencode/opencode.json`; project-local wins.
 
 ### Ollama server setup
