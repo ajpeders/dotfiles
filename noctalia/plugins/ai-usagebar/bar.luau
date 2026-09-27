@@ -20,7 +20,7 @@ local colorByUsage = noctalia.getConfig("color_by_usage") ~= false
 local report = nil
 
 local shared = require("./shared.luau")
-local providerGlyph, baseProvider, mark = shared.providerGlyph, shared.baseProvider, shared.mark
+local providerGlyph, baseProvider = shared.providerGlyph, shared.baseProvider
 local fixedCountdown = shared.fixedCountdown
 local ratio, headline, elapsedPercent = shared.ratio, shared.headline, shared.elapsedPercent
 local modelHeadlines, isCritical, dualMetrics = shared.modelHeadlines, shared.isCritical, shared.dualMetrics
@@ -234,7 +234,7 @@ local function chip(entry, flagged, isVert)
         local nodes = { ui.label({ text = "—", color = "on_surface_variant" }) }
         if showGlyph then
             table.insert(nodes, glyphAfter and #nodes + 1 or 1,
-                mark({ name = providerGlyph(entry.id), size = 16, color = "error" }))
+                ui.glyph({ name = providerGlyph(entry.id), size = 16, color = "error" }))
         end
         if isVert then
             return ui.column({ gap = 2, align = "center" }, nodes)
@@ -255,7 +255,7 @@ local function chip(entry, flagged, isVert)
     local hasSubmodels = #submodels > 0
 
     local glyph = (showGlyph and not hasSubmodels)
-        and mark({ name = providerGlyph(entry.id), size = 16,
+        and ui.glyph({ name = providerGlyph(entry.id), size = 16,
                        color = flagged and "error" or "on_surface" }) or nil
     local pct = nil
     if showValue or hasSubmodels then
@@ -269,7 +269,7 @@ local function chip(entry, flagged, isVert)
                 local mFill = isCritical(shownMetric) and "error"
                     or severityRole(shownMetric, "primary")
                 local rowChildren = {}
-                local modelGlyph = showGlyph and mark({
+                local modelGlyph = showGlyph and ui.glyph({
                         name = item.glyph or providerGlyph(entry.id),
                         size = 16,
                         color = "on_surface",
