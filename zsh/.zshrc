@@ -233,3 +233,17 @@ if [ -r /usr/share/fzf/key-bindings.zsh ] && [ -r /usr/share/fzf/completion.zsh 
     zle -N fzf-git-hash-widget
     bindkey '^G' fzf-git-hash-widget
 fi
+
+# ---------- Kitty shell integration ----------
+# Kitty's automatic method hands the integration over via ZDOTDIR, which
+# ~/.zshenv overwrites unconditionally, so it never loads. Load it explicitly.
+# Without it nothing resets kitty's keyboard protocol at each prompt: any TUI
+# that exits without popping the protocol leaves Enter arriving as \e[13u, which
+# zsh and sudo silently ignore -- looks exactly like a dead Enter key, and makes
+# sudo fail with "conversation failed" rather than a wrong password.
+if [[ -n "${KITTY_INSTALLATION_DIR:-}" ]]; then
+    export KITTY_SHELL_INTEGRATION="no-cursor"
+    autoload -Uz -- "$KITTY_INSTALLATION_DIR"/shell-integration/zsh/kitty-integration
+    kitty-integration
+    unfunction kitty-integration
+fi
