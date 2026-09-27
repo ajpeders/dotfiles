@@ -61,12 +61,31 @@ sync_dir() {
     print_status "Synced: $name"
 }
 
+# Sync helper for a single file: sync_file remote_src local_dest [extra rsync args...]
+# An existing local file that differs is kept as <local_dest>.bak.
+sync_file() {
+    local remote_src="$1"
+    local local_dest="$2"
+    shift 2
+
+    if ! "$SSH_BIN" "$SYNC_HOST" "[ -f '$remote_src' ]" 2>/dev/null; then
+        print_info "Remote file not found, skipping: $remote_src"
+        return
+    fi
+
+    mkdir -p "$(dirname "$local_dest")"
+    print_info "Syncing $(basename "$local_dest") from $SYNC_HOST:$remote_src..."
+    "$RSYNC_BIN" -avz --backup --suffix=.bak -e "$SSH_BIN" "$@" "$SYNC_HOST:$remote_src" "$local_dest"
+    print_status "Synced: $local_dest"
+}
+
 # Wallpapers
 sync_dir "Pictures/Wallpapers/" "$HOME/Pictures/Wallpapers"
 
-# SSH hosts. The synced drop-ins are inert unless ~/.ssh/config includes them,
-# and ssh_config is first-match-wins, so the Include has to lead the file for
-# the main host's definitions to beat any stale local block.
+# SSH hosts: the main config, plus any config.d drop-ins. The drop-ins are
+# inert unless ~/.ssh/config includes them, and ssh_config is first-match-wins,
+# so the Include has to lead the file for the main host's definitions to beat
+# any stale local block.
 ensure_ssh_include() {
     local cfg="$HOME/.ssh/config"
 
@@ -84,6 +103,9 @@ ensure_ssh_include() {
     print_status "Added 'Include ~/.ssh/config.d/*' to $cfg"
 }
 
+mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh"
+sync_file ".ssh/config" "$HOME/.ssh/config" --chmod=F600
 sync_dir ".ssh/config.d/" "$HOME/.ssh/config.d" --chmod=D700,F600
 ensure_ssh_include
 
