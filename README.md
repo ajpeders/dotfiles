@@ -26,7 +26,7 @@ Then run `p10k configure`.
 bash scripts/update.sh                # Arch: pull, packages, relink, reload
 bash scripts/doctor.sh                # read-only health check
 bash scripts/sync-private.sh user@host  # private files (wallpapers, ssh, rclone, wireguard, gh)
-bash scripts/setup-llm.sh [base-url]  # optional: point opencode/claude-local at another LLM server
+bash scripts/setup-llm.sh [base-url]  # optional: point opencode at another LLM server
 ```
 
 ## Key bindings

@@ -4,8 +4,8 @@
 # Usage: bash scripts/setup-llm.sh [base-url]
 #   e.g. bash scripts/setup-llm.sh http://<host>:11434/v1   # Ollama
 #
-# The URL and the chosen model are written to ~/.local/state/dotfiles/llm.env as
-# LLM_SERVER_URL and LLM_MODEL, and sourced by zsh/.zshrc. That lives under
+# The URL is written to ~/.local/state/dotfiles/llm.env as LLM_SERVER_URL and
+# sourced by zsh/.zshrc. That lives under
 # ~/.local/state (next to dotfiles-mode) rather than ~/.config because on Arch
 # the repo IS ~/.config — anything there would be inside the working tree. The
 # URL is a LAN address that differs per machine and must not reach the public
@@ -128,87 +128,105 @@ if [ "${#MODEL_IDS[@]}" -eq 0 ]; then
 fi
 print_status "Reachable — ${#MODEL_IDS[@]} model(s) available"
 
-# ---------- 3. Pick a model ----------
-
-if [ "${#MODEL_IDS[@]}" -eq 1 ]; then
-    MODEL_ID="${MODEL_IDS[0]}"
-    print_status "Using the only model served: $MODEL_ID"
-else
-    echo ""
-    echo -e "${BOLD}Models served:${NC}"
-    for i in "${!MODEL_IDS[@]}"; do
-        printf '  %2d) %s\n' "$((i + 1))" "${MODEL_IDS[$i]}"
-    done
-    echo ""
-    read -rp "Select a model [1]: " choice
-    choice="${choice:-1}"
-    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt "${#MODEL_IDS[@]}" ]; then
-        print_error "Invalid selection: $choice"
-        exit 1
-    fi
-    MODEL_ID="${MODEL_IDS[$((choice - 1))]}"
-fi
-
-# ---------- 4. Write the env file ----------
+# ---------- 3. Write the env file ----------
 
 mkdir -p "$ENV_DIR" "$SYSTEMD_ENV_DIR"
 cat > "$ENV_FILE" <<EOF
 # Written by scripts/setup-llm.sh — per-machine, intentionally outside the repo.
-# opencode reads LLM_SERVER_URL via {env:...} in opencode/opencode.json;
-# claude-local reads both.
+# opencode reads LLM_SERVER_URL via {env:...} in opencode/opencode.json.
 export LLM_SERVER_URL="$BASE_URL"
-export LLM_MODEL="$MODEL_ID"
 EOF
 print_status "Wrote $ENV_FILE"
 
 cat > "$SYSTEMD_ENV_FILE" <<EOF
 # Written by scripts/setup-llm.sh — per-machine and intentionally gitignored.
 LLM_SERVER_URL=$BASE_URL
-LLM_MODEL=$MODEL_ID
 EOF
 print_status "Wrote $SYSTEMD_ENV_FILE"
 
 # Make menu/keybinding launches use the new endpoint immediately. environment.d
 # remains the durable source for the next login.
 if systemctl --user show-environment >/dev/null 2>&1; then
-    systemctl --user set-environment \
-        "LLM_SERVER_URL=$BASE_URL" \
-        "LLM_MODEL=$MODEL_ID"
+    systemctl --user set-environment "LLM_SERVER_URL=$BASE_URL"
+    # Machines set up before LLM_MODEL was retired still have it in the session.
+    systemctl --user unset-environment LLM_MODEL
     print_status "Updated the current systemd user environment"
 fi
 
-# ---------- 5. Check the model has a catalog entry ----------
+# ---------- 4. Compare the served models with the catalog ----------
 
 # opencode.json is a machine-agnostic catalog: it declares context/output limits
-# per model; the agents' models are fixed in the file, and LLM_MODEL is only read
-# by claude-local. This script deliberately does NOT rewrite it — doing so
-# dirtied the repo on every machine that served a different model.
+# per model; the agents' models are fixed in the file. This script deliberately
+# does NOT rewrite it — doing so dirtied the repo on every machine that served a
+# different model. It only reports the drift, in both directions: an id the
+# catalog lists but the server dropped 404s the moment an agent picks it.
 if [ ! -f "$OPENCODE_CONFIG" ]; then
     print_info "No opencode config at $OPENCODE_CONFIG, skipping catalog check"
 elif ! jq -e . "$OPENCODE_CONFIG" >/dev/null 2>&1; then
     print_error "$OPENCODE_CONFIG is not valid JSON; fix it and re-run"
     exit 1
-elif jq -e --arg p "$PROVIDER" --arg m "$MODEL_ID" \
-        '.provider[$p].models | has($m)' "$OPENCODE_CONFIG" >/dev/null 2>&1; then
-    print_status "Catalog entry present: $PROVIDER/$MODEL_ID"
 else
-    print_info "No catalog entry for \"$MODEL_ID\" in opencode/opencode.json."
-    print_info "It still works; add one to declare its context/output limits."
+    catalog_ids="$(jq -r --arg p "$PROVIDER" \
+        '.provider[$p].models // {} | keys[]' "$OPENCODE_CONFIG")"
+
+    for id in "${MODEL_IDS[@]}"; do
+        if ! echo "$catalog_ids" | grep -qxF "$id"; then
+            print_info "Served but not in the catalog: $id"
+            print_info "  It still works; add an entry to declare its limits."
+        fi
+    done
+
+    while IFS= read -r id; do
+        [ -n "$id" ] || continue
+        printf '%s\n' "${MODEL_IDS[@]}" | grep -qxF "$id" && continue
+        print_info "In the catalog but not served: $id (picking it 404s)"
+    done <<< "$catalog_ids"
 fi
 
-# ---------- 6. Done ----------
+# ---------- 5. Done ----------
 
 echo ""
 echo -e "${GREEN}LLM setup complete.${NC}"
 echo ""
 echo -e "${BOLD}Server:${NC} $BASE_URL"
-echo -e "${BOLD}Model: ${NC} $MODEL_ID"
+echo -e "${BOLD}Models:${NC} ${MODEL_IDS[*]}"
 echo ""
-if [ "${LLM_SERVER_URL:-}" != "$BASE_URL" ] || [ "${LLM_MODEL:-}" != "$MODEL_ID" ]; then
+if [ "${LLM_SERVER_URL:-}" != "$BASE_URL" ]; then
     echo "Start a new shell (or 'source $ENV_FILE') to pick up the new values."
     echo ""
 fi
 
+# opencode runs a detached `serve --service` daemon that outlives every shell and
+# is what actually talks to the server, so a new login alone does not repoint it:
+# until it restarts it keeps the URL it was started with. It respawns on demand,
+# so stopping it here is safe and is the only way the change takes effect today.
+# Match on the process NAME and then inspect its arguments. A bare
+# `pgrep -f 'opencode serve --service'` also matches any shell whose command line
+# merely mentions that string — including the one running this script, which it
+# would then kill.
+opencode_service_pids() {
+    local pid
+    for pid in $(pgrep -x opencode 2>/dev/null); do
+        case "$(ps -o args= -p "$pid" 2>/dev/null)" in
+            *"serve --service"*) printf '%s ' "$pid" ;;
+        esac
+    done
+}
+
+service_pids="$(opencode_service_pids)"
+if [ -n "$service_pids" ]; then
+    # shellcheck disable=SC2086 # deliberately word-split: possibly several pids
+    kill $service_pids 2>/dev/null || true
+    # It shuts down gracefully and takes a moment; wait, so the interactive check
+    # below does not mistake a dying daemon for a session the user has open.
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+        [ -n "$(opencode_service_pids)" ] || break
+        sleep 0.5
+    done
+    print_status "Stopped the opencode service daemon; it respawns with the new URL"
+fi
+
+# Anything still running is an interactive session, which we must not kill.
 if pgrep -x opencode >/dev/null 2>&1; then
     echo "Quit and restart OpenCode so it inherits the updated server environment."
     echo ""

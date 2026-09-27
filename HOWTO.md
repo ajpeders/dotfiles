@@ -87,7 +87,7 @@ Gotchas:
 - `width / scale` and `height / scale` must be whole numbers or cross-monitor focus breaks.
 - A mode lighting up isn't proof it holds: test refresh rates under load (a fullscreen game), not just on the desktop.
 
-## LLM: opencode and claude-local
+## LLM: opencode
 
 Everything defaults to the local Ollama (`qwen3-coder:30b`). Launchers, linked into `~/.local/bin` by the installers:
 
@@ -96,7 +96,6 @@ Everything defaults to the local Ollama (`qwen3-coder:30b`). Launchers, linked i
 | `opencode` | local; build/plan fall back to the cloud chain in `opencode/plugins/model-fallback.js` on error |
 | `opencode-local` | local only, no fallback |
 | `opencode-cloud` | every agent on `openai/gpt-5.6-sol` |
-| `claude-local` | Claude Code against Ollama; `LLM_MODEL` overrides the model |
 
 To use another server, run `bash scripts/setup-llm.sh <base-url>`. It writes `~/.local/state/dotfiles/llm.env` (shells) and the gitignored `environment.d/90-llm-local.conf` (session), which override the defaults in `environment.d/50-llm.conf` and `zsh/.zshrc`. Session changes apply at next login; to test now:
 

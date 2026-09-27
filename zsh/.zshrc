@@ -184,7 +184,7 @@ if (( ${+functions[_zsh_autosuggest_fetch]} )); then
   functions[_zsh_autosuggest_fetch]="${functions[_zsh_autosuggest_fetch_min]}"
 fi
 
-# ~/.local/bin holds the installers' launchers (claude-local, opencode-*).
+# ~/.local/bin holds the installers' launchers (opencode-*).
 # uv's env script adds it where uv is installed; make sure of it everywhere.
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 [[ ":$PATH:" == *":$HOME/.local/bin:"* ]] || export PATH="$HOME/.local/bin:$PATH"
@@ -196,17 +196,15 @@ if ! command -v opencode >/dev/null && [ -d "$HOME/.opencode/bin" ]; then
     export PATH="$HOME/.opencode/bin:$PATH"
 fi
 
-# LLM_SERVER_URL + LLM_MODEL for opencode, written per-machine by
-# scripts/setup-llm.sh. Under ~/.local/state, not ~/.config: on Arch the repo
-# is ~/.config itself.
+# LLM_SERVER_URL for opencode, written per-machine by scripts/setup-llm.sh.
+# Under ~/.local/state, not ~/.config: on Arch the repo is ~/.config itself.
 [ -f "$HOME/.local/state/dotfiles/llm.env" ] && . "$HOME/.local/state/dotfiles/llm.env"
 # opencode.json resolves {env:LLM_SERVER_URL} for the ollama baseURL (its models
-# are fixed in the file); claude-local reads LLM_MODEL. An unset URL would leave
-# an empty baseURL, which only fails at request time.
+# are fixed in the file). An unset URL would leave an empty baseURL, which only
+# fails at request time.
 # Default to the local ollama so a machine with no llm.env just works; running
 # setup-llm.sh is only needed to point at a different host.
 export LLM_SERVER_URL="${LLM_SERVER_URL:-http://localhost:11434/v1}"
-export LLM_MODEL="${LLM_MODEL:-qwen3-coder:30b}"
 
 # ---------------------------------------------------------------------------
 # fzf -- Ctrl-T inserts files, Ctrl-R searches history, Alt-C cd's.
