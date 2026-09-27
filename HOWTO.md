@@ -20,17 +20,51 @@ git remote set-url --add --push $F git@github.com:ajpeders/dotfiles.git
 
 ## Migrate off Omarchy
 
-From a TTY or SSH session (step 2 removes the Omarchy desktop):
+Run on vega 2026-09-26; the order below is what actually worked. Do it from a
+TTY or an SSH session, because step 3 removes the running desktop.
 
 ```bash
-git -C ~/.config pull --ff-only forgejo main           # 1. deletes the tracked Omarchy files
-sudo pacman -Rns $(pacman -Qq | grep '^omarchy')       # 2. read the list before confirming
-grep -n -i omarchy /etc/pacman.conf /etc/pacman.d/*    # 3. remove any repo/key it added
+git -C ~/.config pull --ff-only origin main            # 1. deletes the tracked Omarchy files
+sudo pacman -D --asexplicit gnome-keyring              # 2. see below -- do not skip
+sudo pacman -Rns omarchy omarchy-settings              # 3. read the list before confirming
 bash ~/.config/scripts/install.sh                      # 4. noctalia, ly, hypridle; sddm -> ly
 rm -rf ~/.local/share/omarchy ~/.local/state/omarchy ~/.config/omarchy   # 5. leftovers
+sudo systemctl disable omarchy-wifi-resume-fix.service                   # 6. its script is gone
+sudo rm -f /etc/systemd/system/omarchy-wifi-resume-fix.service
 ```
 
-Reboot, pick **Hyprland** in ly, run `bash scripts/doctor.sh`. Leftovers of the old Omarchy-shell/jetshell experiment are inert and safe to delete: `~/.local/share/omarchy-shell`, `~/.local/bin/omarchy-shell-start`, `~/.local/state/jetshell`.
+Reboot, pick **Hyprland** in ly, run `bash scripts/doctor.sh`.
+
+**Step 2 is the one that bites.** `gnome-keyring` is only a dependency of
+`omarchy`, so `-Rns` takes it — along with `gcr` — and then `hypr/config/autostart.lua`
+cannot start `gnome-keyring-daemon.socket` and `~/.local/share/keyrings` goes
+unread. Marking it explicit first is what keeps it. Use `pacman -D --asexplicit`,
+not `pacman -S --needed --asexplicit`: `--needed` skips an already-installed
+package and the `--asexplicit` remark never happens.
+
+**Keep `omarchy-keyring` and both pacman repos.** 26 installed packages exist
+only in `[omarchy]` / `[omarchy-aarch64]` — `claude-code`, `yay`, `obs-studio`,
+`obsidian-appimage`, `dotnet-runtime-2.1`, `libva-v4l2_request-avd` (hardware
+video decode), `mise-bin`, plus `aether`, `herdr`, `omacut`, `omawrite`,
+`omacalc`, `tensaku`, `ttfx`, `voxtype-bin`, `cliamp`. The repos are an aarch64
+package source, unrelated to the desktop. If you do drop `[omarchy]`
+(`SigLevel = Required`, which is what `omarchy-keyring` signs), it uniquely
+serves only four: `hyprland`, `hyprland-guiutils` and `hyprtoolkit` come from
+`extra` at the same or newer versions, and `claude-code` from the AUR.
+`[omarchy-aarch64]` is `SigLevel = Optional TrustAll` and needs no keyring.
+
+`-Rns` also removes `uwsm`, `sddm`, `plymouth`, `pacman-contrib` and SDDM's X11
+greeter stack (`xorg-server`, `xorg-xauth`, `libxmu`, `xf86-input-libinput`).
+All expected — `xorg-xwayland` is untouched, so X11 apps still work.
+
+Two `/etc` drop-ins are worth keeping, just renaming: the global DNS pointing at
+isis, and the SSH keepalives. Everything else Omarchy put under `/etc` goes with
+the packages. Install the Wi-Fi resume replacement afterwards — see "Wi-Fi does
+not come back after suspend".
+
+Leftovers of the old Omarchy-shell/jetshell experiment are inert and safe to
+delete: `~/.local/share/omarchy-shell`, `~/.local/bin/omarchy-shell-start`,
+`~/.local/state/jetshell`.
 
 ## Add a Hyprland keybind
 
