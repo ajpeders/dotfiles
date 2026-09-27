@@ -121,6 +121,24 @@ sudo systemctl daemon-reload && sudo systemctl enable --now ollama-gate && sudo 
 
 `ollama-gate` limits port 11434 to LAN, tailnet and docker bridges.
 
+## Wi-Fi does not come back after suspend
+
+The Broadcom chip (`brcmfmac` + `brcmfmac_wcc`) sometimes fails to reassociate
+after resume: `wlan0` is still listed but never reconnects. Reloading the driver
+recovers it, so a oneshot unit does that on every resume when NetworkManager has
+not reconnected within 20s. Installed by hand:
+
+```bash
+sudo install -Dm755 etc/wifi-resume-fix /usr/local/bin/wifi-resume-fix
+sudo install -Dm644 etc/wifi-resume-fix.service /etc/systemd/system/wifi-resume-fix.service
+sudo systemctl daemon-reload && sudo systemctl enable wifi-resume-fix.service
+```
+
+Check it fired with `journalctl -t wifi-resume-fix`. This replaces Omarchy's
+`omarchy-wifi-resume-fix`, whose unit stayed enabled after the package was
+removed on 2026-09-26 while its `ExecStart` no longer existed -- so every
+suspend failed a unit and nothing fixed the Wi-Fi.
+
 ## VPN
 
 Two independent VPNs; helpers live in `zsh/.zshrc`.

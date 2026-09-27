@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Reload brcmfmac when Wi-Fi does not come back after resume.
+#
+# The Asahi MacBook's Broadcom chip (brcmfmac + brcmfmac_wcc) sometimes fails to
+# reassociate after suspend: wlan0 is still present but never reconnects, and
+# NetworkManager retries forever against a wedged driver. Give NM a fair chance
+# first, then reload the modules, which does recover it.
+#
+# Replaces omarchy-wifi-resume-fix, which went with the omarchy package on
+# 2026-09-26 and left an enabled unit pointing at a deleted ExecStart.
+# Installed by hand -- see HOWTO.
+set -u
+
+IFACE=wlan0
+GRACE=20
+
+for ((i = 0; i < GRACE; i++)); do
+    state="$(nmcli -t -f DEVICE,STATE device 2>/dev/null | awk -F: -v d="$IFACE" '$1 == d { print $2 }')"
+    [ "$state" = "connected" ] && exit 0
+    sleep 1
+done
+
+logger -t wifi-resume-fix "$IFACE not connected ${GRACE}s after resume; reloading brcmfmac"
+modprobe -r brcmfmac_wcc 2>/dev/null || true
+modprobe -r brcmfmac 2>/dev/null || true
+sleep 1
+modprobe brcmfmac || logger -t wifi-resume-fix "modprobe brcmfmac failed"
+# wcc normally autoloads on the device match; load it explicitly if it did not.
+lsmod | grep -q '^brcmfmac_wcc' || modprobe brcmfmac_wcc 2>/dev/null || true
