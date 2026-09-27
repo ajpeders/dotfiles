@@ -102,6 +102,11 @@ sync_dir ".config/gh/" "$HOME/.config/gh" --chmod=D700,F600
 
 # Librewolf profile (extensions, bookmarks, settings — excluding caches)
 # Local path differs per OS; remote source stays Linux-style.
+#
+# compatibility.ini records the Librewolf version that last opened the profile.
+# Syncing it across hosts on different Librewolf versions makes the lower one
+# refuse to start ("You've launched an older version of Librewolf"), so each
+# host keeps its own. Lock files are per-run state and never worth copying.
 if [[ "$(uname)" == "Darwin" ]]; then
     LIBREWOLF_LOCAL="$HOME/Library/Application Support/librewolf"
 else
@@ -114,6 +119,9 @@ sync_dir ".config/librewolf/" "$LIBREWOLF_LOCAL" \
     --exclude="*/crashes/" \
     --exclude="*/datareporting/" \
     --exclude="*/saved-telemetry-pings/" \
-    --exclude="*/thumbnails/"
+    --exclude="*/thumbnails/" \
+    --exclude="*/compatibility.ini" \
+    --exclude="*/.parentlock" \
+    --exclude="*/lock"
 
 print_status "Done"

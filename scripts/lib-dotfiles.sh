@@ -114,10 +114,20 @@ dotfiles_link_configs() {
     fi
 }
 
-# dotfiles_librewolf_policies -- install librewolf/policies.json if Librewolf
-# is installed and the system copy differs.
+# dotfiles_librewolf_policies -- merge librewolf/policies.json over Librewolf's
+# own bundled policies and install the result, if Librewolf is installed and the
+# system copy differs.
+#
+# Librewolf ships its hardening as distribution/policies.json in the install
+# dir, but Gecko reads exactly ONE policy file: when /etc/librewolf/policies/
+# policies.json exists it is used and the bundled one is never consulted (see
+# JSONPoliciesProvider._getLocalConfigurationFile). Writing the repo file there
+# verbatim therefore silently dropped DisableTelemetry, DisableAppUpdate,
+# DisablePocket, SkipTermsOfUse, SearchEngines and the rest. Merge instead, so
+# the repo only adds its extensions on top.
 dotfiles_librewolf_policies() {
     local src="$REPO_DIR/librewolf/policies.json"
+    local base="/usr/lib/librewolf/distribution/policies.json"
     local dst="/etc/librewolf/policies/policies.json"
 
     if [ ! -f "$src" ]; then
@@ -130,12 +140,56 @@ dotfiles_librewolf_policies() {
         return
     fi
 
-    if [ -f "$dst" ] && cmp -s "$src" "$dst"; then
+    local merged
+    merged="$(mktemp)"
+    # shellcheck disable=SC2064
+    trap "rm -f '$merged'" RETURN
+
+    if ! python3 - "$src" "$base" "$merged" <<'PY'
+import json, sys
+
+src, base, out = sys.argv[1:4]
+
+
+def policies(path):
+    try:
+        with open(path) as fh:
+            return json.load(fh).get("policies", {})
+    except FileNotFoundError:
+        return {}
+
+
+merged = policies(base)
+for name, value in policies(src).items():
+    # ExtensionSettings is a map of addon id -> settings. Replacing the whole
+    # object would drop Librewolf's "*" default and its blocked search addons;
+    # replacing a whole entry would drop per-addon keys the repo omits, such as
+    # private_browsing on uBlock Origin. So merge both levels.
+    if name == "ExtensionSettings" and isinstance(merged.get(name), dict):
+        for addon, settings in value.items():
+            current = merged[name].get(addon)
+            if isinstance(current, dict) and isinstance(settings, dict):
+                merged[name][addon] = {**current, **settings}
+            else:
+                merged[name][addon] = settings
+    else:
+        merged[name] = value
+
+with open(out, "w") as fh:
+    json.dump({"policies": merged}, fh, indent=2, sort_keys=True)
+    fh.write("\n")
+PY
+    then
+        print_error "Could not merge Librewolf policies — leaving $dst alone"
+        return
+    fi
+
+    if [ -f "$dst" ] && cmp -s "$merged" "$dst"; then
         print_status "Librewolf policies already up to date"
         return
     fi
 
     print_info "Installing Librewolf policies to $dst (requires sudo)..."
-    sudo install -Dm644 "$src" "$dst"
+    sudo install -Dm644 "$merged" "$dst"
     print_status "Librewolf policies installed; restart Librewolf to apply"
 }
