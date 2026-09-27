@@ -1,15 +1,14 @@
 #!/bin/bash
-# Point the local LLM coding tools (opencode) at an Ollama / llama.cpp /
-# OpenAI-compatible server, and record the URL per-machine.
+# Point the local LLM coding tools (opencode) at a llama-swap / llama.cpp /
+# Ollama / OpenAI-compatible server, and record the URL per-machine.
 # Usage: bash scripts/setup-llm.sh [base-url]
-#   e.g. bash scripts/setup-llm.sh http://<host>:11434/v1   # Ollama
+#   e.g. bash scripts/setup-llm.sh http://<host>:11434/v1   # llama-swap
 #
 # The URL is written to ~/.local/state/dotfiles/llm.env as LLM_SERVER_URL and
-# sourced by zsh/.zshrc. That lives under
-# ~/.local/state (next to dotfiles-mode) rather than ~/.config because on Arch
-# the repo IS ~/.config — anything there would be inside the working tree. The
-# URL is a LAN address that differs per machine and must not reach the public
-# mirror.
+# sourced by zsh/.zshrc. That lives under ~/.local/state (next to dotfiles-mode)
+# rather than ~/.config because on Arch the repo IS ~/.config — anything there
+# would be inside the working tree. The URL is a LAN address that differs per
+# machine and must not reach the public mirror.
 #
 # Safe to re-run; re-running just re-probes and rewrites the same file.
 
