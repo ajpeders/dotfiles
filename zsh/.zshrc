@@ -247,3 +247,31 @@ if [[ -n "${KITTY_INSTALLATION_DIR:-}" ]]; then
     kitty-integration
     unfunction kitty-integration
 fi
+
+# ---------- Password prompts under kitty's keyboard protocol ----------
+# Programs that read a password straight from the tty (sudo, ssh, su, passwd)
+# do a plain canonical read and wait for a newline. When kitty's enhanced
+# keyboard protocol is active -- which any TUI can enable, Claude Code included,
+# and which leaks into commands launched from inside one -- Enter is reported as
+# \e[13u instead of \n. The read never terminates, so sudo times out and PAM
+# logs "conversation failed" / "authentication failure" rather than anything
+# about the password. zsh's own line editor speaks the protocol, which is why
+# `read` works in the same terminal and it looks like sudo alone is broken.
+#
+# CSI > 0 u pushes a flags=0 (legacy) keyboard mode; CSI < u pops back to
+# whatever was active, so the surrounding TUI keeps its own mode.
+if [[ -n "${KITTY_WINDOW_ID:-}" ]]; then
+    _kitty_legacy_keys_run() {
+        local cmd="$1"; shift
+        [[ -t 0 && -t 1 ]] || { command "$cmd" "$@"; return $?; }
+        printf '\033[>0u'
+        command "$cmd" "$@"
+        local ret=$?
+        printf '\033[<u'
+        return $ret
+    }
+    for _kk_cmd in sudo ssh su passwd; do
+        eval "${_kk_cmd}() { _kitty_legacy_keys_run ${_kk_cmd} \"\$@\"; }"
+    done
+    unset _kk_cmd
+fi
