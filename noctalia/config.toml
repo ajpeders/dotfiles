@@ -15,9 +15,9 @@ control_center_placement = "attached"   # near-click only works when attached
 open_near_click_control_center = true  # bar click opens under the widget (far right)
 
 [theme]
-mode    = "dark"
-source  = "builtin"
-builtin = "Ayu"
+mode             = "dark"
+source           = "wallpaper"       # palette follows the current wallpaper
+wallpaper_scheme = "m3-tonal-spot"   # Material You default; m3-content stays closer to the image
 
 [theme.templates]
 enable_builtin_templates = true
