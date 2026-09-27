@@ -11,7 +11,6 @@ local extras = tostring(noctalia.getConfig("extras") or "countdown")
 local visualization = tostring(noctalia.getConfig("visualization") or "gauge")
 local showValue = noctalia.getConfig("show_value") ~= false
 local showGlyph = noctalia.getConfig("show_glyph") ~= false
-local showBoth = noctalia.getConfig("show_both") == true
 local glyphAfter = tostring(noctalia.getConfig("glyph_position") or "before") == "after"
 local limit = math.max(1, math.min(4, tonumber(noctalia.getConfig("provider_limit")) or 1))
 local showName = noctalia.getConfig("show_name") == true
@@ -323,30 +322,11 @@ local function chip(entry, flagged, isVert)
                 and ui.column({ gap = 3, align = "center" }, parts)
                 or ui.row({ gap = 7, align = "center" }, parts)
         else
-            -- show_both: session and weekly side by side, each tinted by its
-            -- own severity; falls back to the headline when only one exists.
-            local mShort, mWeekly = nil, nil
-            if showBoth then mShort, mWeekly = dualMetrics(entry.metrics) end
-            if mShort ~= nil and mWeekly ~= nil then
-                local function reading(m)
-                    return ui.label({
-                        text = string.format("%d%%", tonumber(m.percent) or 0),
-                        color = severityRole(m, "on_surface"),
-                        maxLines = 1,
-                    })
-                end
-                pct = ui.row({ gap = 4, align = "center" }, {
-                    reading(mShort),
-                    ui.label({ text = "·", color = "on_surface_variant" }),
-                    reading(mWeekly),
-                })
-            else
-                pct = ui.label({
-                    text = text,
-                    color = tint,
-                    maxLines = 1,
-                })
-            end
+            pct = ui.label({
+                text = text,
+                color = tint,
+                maxLines = 1,
+            })
         end
     end
 
