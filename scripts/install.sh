@@ -308,7 +308,8 @@ phase_services() {
     enable_system_service NetworkManager
     enable_system_service avahi-daemon
     # Tailscale: the unit is enough to bring the tunnel up at boot; the node
-    # still needs a one-time `sudo tailscale up` to authenticate.
+    # still needs a one-time `sudo tailscale up --operator=$USER` to authenticate
+    # (operator lets the noctalia Tailscale plugin run up/down/set unprivileged).
     enable_system_service tailscaled
 
     if [ "$HEADLESS" -eq 1 ]; then

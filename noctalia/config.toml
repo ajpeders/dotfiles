@@ -58,7 +58,7 @@ enabled = false
 # first start. GUI enables/disables land in settings.toml's [plugins] and win.
 # alex/home-tiles lives in ./plugins/ (control-center DNS tile).
 [plugins]
-enabled = ["nightwatch75/dns-switcher", "felipeartur/ai-usagebar", "alex/home-tiles"]
+enabled = ["nightwatch75/dns-switcher", "felipeartur/ai-usagebar", "davemhammer/tailscale", "alex/home-tiles"]
 
 # Source list as the GUI writes it (built-ins included), plus the local one.
 [[plugins.source]]
@@ -87,7 +87,7 @@ padding            = 10
 widget_spacing     = 6
 start  = ["workspaces", "audio-vis", "media"]
 center = ["clock"]
-end    = ["group:tray", "volume", "sysmon", "brightness", "battery", "ai-usage", "notifications", "control-center"]
+end    = ["group:tray", "volume", "sysmon", "brightness", "battery", "tailscale", "ai-usage", "notifications", "control-center"]
 
 # Tray collapses to a chevron; hovering it unfolds the icons to the LEFT
 # (accordion group, reveal direction "start"). Right-click an icon > Pin is
@@ -127,6 +127,15 @@ custom_1 = "isis = 100.106.42.30"   # home server's resolver over Tailscale
 [widget.dns]
 type       = "nightwatch75/dns-switcher:dns-switcher"
 show_label = false                  # icon only; left-click panel shows the active provider
+
+# Tailscale: online/total peers on the bar; click for connect/exit-node/peer
+# panel, `/ts` in the launcher. up/down/set need `tailscale set --operator=$USER`.
+[widget.tailscale]
+type        = "davemhammer/tailscale:status"
+show_counts = true
+
+[plugin_settings."davemhammer/tailscale"]
+ssh_user = "alex"
 
 # AI plan usage (Claude, OpenAI, Copilot, OpenCode Go, ...) via the
 # `ai-usagebar` CLI; providers/credentials live in ~/.config/ai-usagebar/.
