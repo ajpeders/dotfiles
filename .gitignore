@@ -67,7 +67,7 @@ opencode/service.json
 !librewolf/
 !librewolf/policies.json
 
-# Session env defaults (LLM_SERVER_URL/LLM_MODEL for opencode);
+# Session env defaults (LLM_SERVER_URL for opencode);
 # per-machine overrides stay out, same as llm.env.
 !environment.d/
 !environment.d/*.conf
