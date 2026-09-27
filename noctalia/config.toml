@@ -148,6 +148,7 @@ vendor         = "auto"
 visualization  = "none"            # no gauge bars
 extras         = "none"            # no reset countdown; hover/panel still show it
 provider_limit = 1
+show_both      = true               # session · weekly instead of only the busiest
 
 [widget.clock]
 format = "{:%a %b %-d}  {:%-I:%M:%S %p}"

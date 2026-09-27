@@ -90,6 +90,10 @@
         "gauge": "Quota bar",
         "none": "Nothing"
       }
+    },
+    "show_both": {
+      "description": "Session and weekly percentages side by side instead of only the busiest one.",
+      "label": "Show both windows"
     }
   },
   "ui": {
