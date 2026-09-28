@@ -73,24 +73,6 @@ sync_dir() {
     print_status "Synced: $name"
 }
 
-# Sync helper for a single file: sync_file remote_src local_dest [extra rsync args...]
-# An existing local file that differs is kept as <local_dest>.bak.
-sync_file() {
-    local remote_src="$1"
-    local local_dest="$2"
-    shift 2
-
-    if ! "$SSH_BIN" "$SYNC_HOST" "[ -f '$remote_src' ]" 2>/dev/null; then
-        print_info "Remote file not found, skipping: $remote_src"
-        return
-    fi
-
-    mkdir -p "$(dirname "$local_dest")"
-    print_info "Syncing $(basename "$local_dest") from $SYNC_HOST:$remote_src..."
-    "$RSYNC_BIN" -avz --backup --suffix=.bak -e "$SSH_BIN" "$@" "$SYNC_HOST:$remote_src" "$local_dest"
-    print_status "Synced: $local_dest"
-}
-
 # Wallpapers
 sync_dir "Pictures/Wallpapers/" "$HOME/Pictures/Wallpapers"
 

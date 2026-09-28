@@ -46,6 +46,7 @@ outer.right = 8
 outer.top = 8
 outer.bottom = 8
 
+# ctrl = Control key (swapped via Karabiner: ⌘↔⇧, so this is your text-editing "Command" muscle memory)
 # ====== Window rules ======
 [[on-window-detected]]
 if.app-id = 'org.mozilla.librewolf'
@@ -73,84 +74,82 @@ run = ['layout tiling']
 # Terminal
 # -d ~ is required: AeroSpace is launched by launchd, whose working directory is
 # /, and exec-and-forget inherits it. Without this, every new terminal opens in /.
-alt-enter = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no -d ~'
-alt-t = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no -d ~'
+ctrl-enter = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no -d ~'
+ctrl-t = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no -d ~'
 
 # Browser
-# MOZ_DISABLE_SAFE_MODE_KEY=1 stops LibreWolf from interpreting the held Option
-# key (from alt-e) as the Troubleshoot Mode trigger.
-alt-e = 'exec-and-forget env MOZ_DISABLE_SAFE_MODE_KEY=1 /Applications/LibreWolf.app/Contents/MacOS/librewolf --new-window about:blank'
+ctrl-e = 'exec-and-forget /Applications/LibreWolf.app/Contents/MacOS/librewolf --new-window about:blank'
 
 # btop
-alt-b = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no btop'
+ctrl-b = 'exec-and-forget /opt/homebrew/bin/kitty --single-instance=no btop'
 
 # Close window
-alt-q = 'close'
+ctrl-q = 'close'
 
 # Fullscreen
-alt-f = 'fullscreen'
+ctrl-f = 'fullscreen'
 
 # Float / tiling toggle
-alt-shift-f = 'layout floating tiling'
+ctrl-shift-f = 'layout floating tiling'
 
 # Toggle split direction (Hyprland's SUPER+J togglesplit)
-alt-j = 'layout tiles horizontal vertical'
+ctrl-j = 'layout tiles horizontal vertical'
 
 # Force the whole workspace back to tiles. Recovery for a workspace that ends up
 # in accordion, where windows stack on top of each other and nothing looks
-# tiled — alt-j only retargets the focused node, so it cannot undo that.
-alt-shift-j = 'layout tiles --root'
+# tiled — ctrl-j only retargets the focused node, so it cannot undo that.
+ctrl-shift-j = 'layout tiles --root'
 
 # ====== Focus ======
-alt-left = 'focus left'
-alt-right = 'focus right'
-alt-up = 'focus up'
-alt-down = 'focus down'
+ctrl-left = 'focus left'
+ctrl-right = 'focus right'
+ctrl-up = 'focus up'
+ctrl-down = 'focus down'
 
 # ====== Move Windows ======
-alt-shift-left = 'move left'
-alt-shift-right = 'move right'
-alt-shift-up = 'move up'
-alt-shift-down = 'move down'
+ctrl-shift-left = 'move left'
+ctrl-shift-right = 'move right'
+ctrl-shift-up = 'move up'
+ctrl-shift-down = 'move down'
 
 # ====== Resize Windows ======
-alt-ctrl-left = 'resize width -50'
-alt-ctrl-right = 'resize width +50'
-alt-ctrl-up = 'resize height -50'
-alt-ctrl-down = 'resize height +50'
+ctrl-alt-left = 'resize width -50'
+ctrl-alt-right = 'resize width +50'
+ctrl-alt-up = 'resize height -50'
+ctrl-alt-down = 'resize height +50'
 
 # ====== Workspaces ======
-alt-1 = 'workspace 1'
-alt-2 = 'workspace 2'
-alt-3 = 'workspace 3'
-alt-4 = 'workspace 4'
-alt-5 = 'workspace 5'
-alt-6 = 'workspace 6'
-alt-7 = 'workspace 7'
-alt-8 = 'workspace 8'
-alt-9 = 'workspace 9'
-alt-0 = 'workspace 10'
+ctrl-1 = 'workspace 1'
+ctrl-2 = 'workspace 2'
+ctrl-3 = 'workspace 3'
+ctrl-4 = 'workspace 4'
+ctrl-5 = 'workspace 5'
+ctrl-6 = 'workspace 6'
+ctrl-7 = 'workspace 7'
+ctrl-8 = 'workspace 8'
+ctrl-9 = 'workspace 9'
+ctrl-0 = 'workspace 10'
 
 # Move window to workspace
-alt-shift-1 = 'move-node-to-workspace 1'
-alt-shift-2 = 'move-node-to-workspace 2'
-alt-shift-3 = 'move-node-to-workspace 3'
-alt-shift-4 = 'move-node-to-workspace 4'
-alt-shift-5 = 'move-node-to-workspace 5'
-alt-shift-6 = 'move-node-to-workspace 6'
-alt-shift-7 = 'move-node-to-workspace 7'
-alt-shift-8 = 'move-node-to-workspace 8'
-alt-shift-9 = 'move-node-to-workspace 9'
-alt-shift-0 = 'move-node-to-workspace 10'
+ctrl-shift-1 = 'move-node-to-workspace 1'
+ctrl-shift-2 = 'move-node-to-workspace 2'
+ctrl-shift-3 = 'move-node-to-workspace 3'
+ctrl-shift-4 = 'move-node-to-workspace 4'
+ctrl-shift-5 = 'move-node-to-workspace 5'
+ctrl-shift-6 = 'move-node-to-workspace 6'
+ctrl-shift-7 = 'move-node-to-workspace 7'
+ctrl-shift-8 = 'move-node-to-workspace 8'
+ctrl-shift-9 = 'move-node-to-workspace 9'
+ctrl-shift-0 = 'move-node-to-workspace 10'
 
 # Monitor focus (like Super+Tab)
-alt-tab = 'focus-monitor next'
+ctrl-tab = 'focus-monitor next'
 
 # Move workspace to monitor
-alt-shift-tab = 'move-workspace-to-monitor next'
+ctrl-shift-tab = 'move-workspace-to-monitor next'
 
 # Balance window sizes
-alt-shift-b = 'balance-sizes'
+ctrl-shift-b = 'balance-sizes'
 
 # Reload config
-alt-shift-r = 'reload-config'
+ctrl-shift-r = 'reload-config'
