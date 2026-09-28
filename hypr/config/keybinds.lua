@@ -37,7 +37,7 @@ hl.bind(mod .. " + CTRL + A",  hl.dsp.exec_cmd(ipc .. " caffeine-enable"))
 
 -- ====== Brightness (laptop) ======
 -- SUPER+B opens a submap: Up/Down or +/- = screen, Left/Right = keyboard
--- backlight, Esc/Enter/B exits. SUPER+K cycles the keyboard backlight 0->100->0.
+-- backlight, Esc/Enter/B exits. SUPER+SHIFT+K cycles up only (0→20→40→60→80→100→0).
 local kbd = "brightnessctl --device=kbd_backlight set"
 hl.define_submap("brightness", function()
     hl.bind("up",    hl.dsp.exec_cmd(ipc .. " brightness-up"), { repeating = true })
@@ -52,7 +52,7 @@ hl.define_submap("brightness", function()
     hl.bind(mod .. " + b",  hl.dsp.submap("reset"))
 end)
 hl.bind(mod .. " + B", hl.dsp.submap("brightness"))
-hl.bind(mod .. " + K", hl.dsp.exec_cmd("~/.config/hypr/scripts/kbd-backlight-cycle.sh"))
+hl.bind(mod .. " + SHIFT + K", hl.dsp.exec_cmd("~/.config/hypr/scripts/kbd-backlight-cycle.sh"))
 
 -- ====== Screenshots ======
 hl.bind(mod .. " + P",          hl.dsp.exec_cmd("grim " .. shot))
