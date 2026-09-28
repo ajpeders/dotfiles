@@ -1,28 +1,25 @@
 #!/usr/bin/env bash
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃           Keyboard backlight cycle (SUPER + K)               ┃
+# ┃           Keyboard backlight cycle (SUPER + K, B)            ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-# Each press steps the keyboard backlight; it rises 0 -> 100% then falls
-# 100 -> 0% (a triangle), reversing direction at each end.
-# Direction is remembered across presses in a runtime state file.
+# Each press steps the keyboard backlight up by STEP%.
+# Wraps: 0 → 20 → 40 → 60 → 80 → 100 → 0 → …
 set -eu
 
 DEV=kbd_backlight
 STEP=20   # percent per press
-STATE="${XDG_RUNTIME_DIR:-/tmp}/kbd-backlight-dir"
 
 max=$(brightnessctl -d "$DEV" max)
 cur=$(brightnessctl -d "$DEV" get)
 pct=$(( cur * 100 / max ))
 
-dir=$(cat "$STATE" 2>/dev/null || echo up)
-
-if [ "$dir" = "up" ]; then
-    next=$(( pct + STEP ))
-    if [ "$next" -ge 100 ]; then next=100; echo down > "$STATE"; fi
+next=$(( (pct + STEP) % 100 ))
+# 100 % → 0 % when pct was 80 → 100 (100 % mod 100 = 0)
+# but we want 80 → 100, then 100 → 0. Fix:
+if [ "$pct" -ge 80 ]; then
+    next=0
 else
-    next=$(( pct - STEP ))
-    if [ "$next" -le 0 ]; then next=0; echo up > "$STATE"; fi
+    next=$(( pct + STEP ))
 fi
 
 brightnessctl -d "$DEV" set "${next}%" -q
