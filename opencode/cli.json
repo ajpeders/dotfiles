@@ -4,6 +4,7 @@
     "name": "system"
   },
   "keybinds": {
-    "app.exit": "ctrl+d,<leader>q"
+    "app.exit": "ctrl+d,<leader>q",
+    "prompt.editor": "<leader>e"
   }
 }

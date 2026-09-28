@@ -51,20 +51,43 @@ print_phase "Phase 1: Pull Latest Changes ($PLATFORM)"
 
 cd "$REPO_DIR"
 
-# Check for uncommitted changes — warn but don't stash.
+# Check for uncommitted changes — stash, pull, then restore.
+STASHED=false
 if ! git diff --quiet || ! git diff --cached --quiet; then
     print_info "Uncommitted changes present:"
     git status --short
     read -rp "Pull anyway? [y/N] " confirm
-    [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        git stash push -m "dotfiles-update: auto-stash"
+        STASHED=true
+        print_info "Stashed — pulling"
+    else
+        echo "Aborted."
+        exit 0
+    fi
 fi
 
 # Pull — abort immediately on any conflict.
 if ! git pull --rebase origin "$(git branch --show-current)"; then
+    # If we stashed, restore it so the user can work with their changes.
+    if "$STASHED"; then
+        git stash pop
+    fi
     print_error "Merge conflict — aborting. Resolve with:"
     echo "  git rebase --continue   (after resolving)"
     echo "  git rebase --abort      (to restore pre-pull state)"
     exit 1
+fi
+
+# Restore stashed changes.
+if "$STASHED"; then
+    if ! git stash pop; then
+        print_error "Stash conflict — please resolve manually:"
+        echo "  git status"
+        echo "  git stash drop"
+        exit 1
+    fi
+    print_info "Restored stashed changes"
 fi
 
 # Show what was pulled.
@@ -156,6 +179,25 @@ print_status "Dotfiles in sync"
 # ── Environment checks ──────────────────────────────────────────────
 
 print_phase "Phase 3: Environment Checks"
+
+# Load the user's shell config so env vars like EDITOR are available.
+# Rather than sourcing (which pulls in OMZ, plugins, etc.), extract
+# EDITOR from the user's config files.
+if [ -z "${EDITOR:-}" ]; then
+    for _cfg in "$ZDOTDIR/.zshenv" "$HOME/.config/zsh/.zshenv" \
+                 "$ZDOTDIR/.zshrc" "$HOME/.config/zsh/.zshrc" \
+                 "$HOME/.zshenv" "$HOME/.zshrc" \
+                 "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile"; do
+        if [ -r "$_cfg" ]; then
+            _editor="$(grep -m1 '^export EDITOR=' "$_cfg" | sed 's/^export EDITOR=//')"
+            if [ -n "$_editor" ]; then
+                export EDITOR="$_editor"
+                break
+            fi
+        fi
+    done
+    unset _cfg _editor
+fi
 
 if [ -z "${EDITOR:-}" ]; then
     print_error "\$EDITOR is not set — OpenCode's external editor (Ctrl+X E) won't work"

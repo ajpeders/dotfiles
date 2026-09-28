@@ -276,6 +276,14 @@ phase_shell() {
         print_status "powerlevel10k installed"
     fi
 
+    # Editor for OpenCode's external editor prompt (Ctrl+X E)
+    if ! grep -q 'export EDITOR=' "$HOME/.zshrc" 2>/dev/null; then
+        printf '\n# Editor for OpenCode external editor (Ctrl+X E)\nexport EDITOR=nvim\n' >> "$HOME/.zshrc"
+        print_status "Added EDITOR=nvim to ~/.zshrc"
+    else
+        print_status "EDITOR already set in ~/.zshrc"
+    fi
+
 }
 
 phase_services() {
