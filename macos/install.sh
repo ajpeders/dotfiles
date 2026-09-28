@@ -129,7 +129,6 @@ phase_dotfiles() {
     link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
     link "$REPO_DIR/scripts/hq" "$HOME/.local/bin/hq"
     link "$REPO_DIR/scripts/opencode-hybrid" "$HOME/.local/bin/opencode-hybrid"
-    link "$REPO_DIR/scripts/claude-local" "$HOME/.local/bin/claude-local"
 
     # ZDOTDIR so zsh reads ~/.config/zsh/.zshrc
     if [ ! -f "$HOME/.zshenv" ]; then

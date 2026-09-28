@@ -131,8 +131,6 @@ Everything defaults to the local server (`qwen3.6:35b-a3b`). Launchers, linked i
 | `opencode-local` | local only, no fallback |
 | `opencode-cloud` | every agent on `openai/gpt-6-sol`, no fallback |
 | `opencode-hybrid` | cloud for primary work; local for title, explore, and scout |
-| `claude-local` | Claude Code against Ollama; `LLM_MODEL` overrides the model |
-
 Point it at the homelab llm-router (`bash scripts/setup-llm.sh http://<homelab>:8080/v1`), not a single llama-swap host: the router queues and picks whichever machine has the model loaded, so opencode and Hermes don't evict each other's models. `scripts/update.sh` re-checks the configured URL every sync (`setup-llm.sh --check`).
 
 To use another server, run `bash scripts/setup-llm.sh <base-url>`. It writes `~/.local/state/dotfiles/llm.env` (shells) and the gitignored `environment.d/90-llm-local.conf` (session), which override the defaults in `environment.d/50-llm.conf` and `zsh/.zshrc`. Session changes apply at next login; to test now:

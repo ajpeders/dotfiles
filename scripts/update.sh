@@ -159,7 +159,6 @@ case "$PLATFORM" in
         link_dotfile "$REPO_DIR/scripts/opencode-cloud"   "$HOME/.local/bin/opencode-cloud"
         link_dotfile "$REPO_DIR/scripts/hq"               "$HOME/.local/bin/hq"
         link_dotfile "$REPO_DIR/scripts/opencode-hybrid"  "$HOME/.local/bin/opencode-hybrid"
-        link_dotfile "$REPO_DIR/scripts/claude-local"     "$HOME/.local/bin/claude-local"
 
         # ZDOTDIR
         if [ ! -f "$HOME/.zshenv" ]; then
