@@ -13,13 +13,7 @@ max=$(brightnessctl -d "$DEV" max)
 cur=$(brightnessctl -d "$DEV" get)
 pct=$(( cur * 100 / max ))
 
-next=$(( (pct + STEP) % 100 ))
-# 100 % → 0 % when pct was 80 → 100 (100 % mod 100 = 0)
-# but we want 80 → 100, then 100 → 0. Fix:
-if [ "$pct" -ge 80 ]; then
-    next=0
-else
-    next=$(( pct + STEP ))
-fi
+next=$(( pct + STEP ))
+[ "$next" -gt 100 ] && next=0
 
 brightnessctl -d "$DEV" set "${next}%" -q
