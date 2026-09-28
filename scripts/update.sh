@@ -25,7 +25,7 @@ print_error()  { echo -e "${RED}[✗]${NC} $1"; }
 print_info()   { echo -e "${YELLOW}[i]${NC} $1"; }
 print_phase()  { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
-HEADLESS=""
+HEADLESS=0
 for arg in "$@"; do
     case "$arg" in
         --headless) HEADLESS=1 ;;
@@ -153,23 +153,38 @@ esac
 
 print_status "Dotfiles in sync"
 
+# ── Environment checks ──────────────────────────────────────────────
+
+print_phase "Phase 3: Environment Checks"
+
+if [ -z "${EDITOR:-}" ]; then
+    print_error "\$EDITOR is not set — OpenCode's external editor (Ctrl+X E) won't work"
+    print_info "Add 'export EDITOR=nvim' to your shell config (~/.zshrc, ~/.zshenv, etc.)"
+else
+    if command -v "$EDITOR" >/dev/null 2>&1; then
+        print_status "\$EDITOR=$EDITOR is set and available"
+    else
+        print_error "\$EDITOR=$EDITOR is set but binary not found"
+        print_info "Install $EDITOR or update \$EDITOR in your shell config"
+    fi
+fi
+
 # ── Platform-specific post-steps ────────────────────────────────────
 
 case "$PLATFORM" in
     linux)
         # Browser policies (Linux only)
         if [ "$HEADLESS" -ne 1 ] && command -v python3 >/dev/null 2>&1; then
-            print_phase "Phase 3: Browser Policies"
+            print_phase "Phase 4: Browser Policies"
             dotfiles_librewolf_policies
         fi
 
         # Live reload (Linux only)
         if [ "$HEADLESS" -ne 1 ] && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
-            print_phase "Phase 4: Live Reload (Hyprland)"
+            print_phase "Phase 5: Live Reload (Hyprland)"
             if command -v hyprctl >/dev/null 2>&1; then
                 if hyprctl reload >/dev/null 2>&1; then
                     print_status "Hyprland reloaded"
-                    local cfg_errors
                     cfg_errors="$(hyprctl configerrors 2>/dev/null || true)"
                     if [ -n "${cfg_errors//[[:space:]]/}" ]; then
                         print_error "Hyprland reported config errors:"
@@ -189,7 +204,7 @@ case "$PLATFORM" in
     macos)
         # Reload AeroSpace (macOS only)
         if command -v aerospace >/dev/null 2>&1; then
-            print_phase "Phase 3: Reload AeroSpace"
+            print_phase "Phase 4: Reload AeroSpace"
             if aerospace reload-config >/dev/null 2>&1; then
                 print_status "AeroSpace config reloaded"
             else
