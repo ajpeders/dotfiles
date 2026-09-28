@@ -127,9 +127,11 @@ Everything defaults to the local server (`qwen3.6:35b-a3b`). Launchers, linked i
 
 | Command | Models |
 |---|---|
-| `opencode` | local; build/plan fall back to the cloud chain in `opencode/plugins/model-fallback.js` on error |
+| `opencode` | local by default, no automatic fallback (shared background service) |
 | `opencode-local` | local only, no fallback |
-| `opencode-cloud` | every agent on `openai/gpt-5.6-sol` |
+| `opencode-cloud` | every agent on `openai/gpt-6-sol`, no fallback |
+| `opencode-hybrid` | cloud for primary work; local for title, explore, and scout |
+| `claude-local` | Claude Code against Ollama; `LLM_MODEL` overrides the model |
 
 Point it at the homelab llm-router (`bash scripts/setup-llm.sh http://<homelab>:8080/v1`), not a single llama-swap host: the router queues and picks whichever machine has the model loaded, so opencode and Hermes don't evict each other's models. `scripts/update.sh` re-checks the configured URL every sync (`setup-llm.sh --check`).
 
@@ -141,6 +143,7 @@ opencode debug config
 ```
 
 Keep every agent on one model: each llama-swap host runs `--parallel 1`, so a second model means swaps.
+The launchers use private servers so their model and plugin settings do not leak into the shared service.
 
 ## LLM: hand work to Hermes
 

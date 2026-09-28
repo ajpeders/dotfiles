@@ -2,5 +2,5 @@
 set -euo pipefail
 
 config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
-export OPENCODE_CONFIG_CONTENT="$(<"$config_dir/profiles/local.json")"
+export OPENCODE_CONFIG_CONTENT="$(<"$config_dir/profiles/hybrid.json")"
 exec opencode --standalone "$@"

@@ -2,7 +2,9 @@
 # Sync private files (wallpapers, SSH hosts, etc.) from a remote server.
 # Usage: bash scripts/sync-private.sh [user@host]
 # Run after scripts/install.sh on a fresh machine, or anytime to update private files.
-# If no argument is provided, prompts for the SSH connection string.
+# If no argument is provided, tries luna on the LAN, then over Tailscale, and
+# only prompts if neither answers. (Raw addresses, not the luna-alex alias: on a
+# fresh machine the alias doesn't exist until this script has synced it.)
 
 set -euo pipefail
 
@@ -15,15 +17,8 @@ print_status() { echo -e "${GREEN}[✓]${NC} $1"; }
 print_error() { echo -e "${RED}[✗]${NC} $1"; }
 print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 
-if [ $# -ge 1 ]; then
-    SYNC_HOST="$1"
-else
-    read -rp "SSH connection (user@host): " SYNC_HOST
-    if [ -z "$SYNC_HOST" ]; then
-        print_error "No host provided"
-        exit 1
-    fi
-fi
+DEFAULT_HOSTS=("alex@192.168.0.40" "alex@100.84.247.20")  # luna: LAN, Tailscale
+SYNC_HOST="${1:-}"
 
 if ! command -v rsync >/dev/null 2>&1; then
     print_error "rsync not found; install it first"
@@ -33,6 +28,23 @@ fi
 # Use absolute paths to bypass any ssh wrapper (e.g. kitty's ssh kitten)
 SSH_BIN="$(command -v /usr/bin/ssh || command -v ssh)"
 RSYNC_BIN="$(command -v rsync)"
+
+if [ -z "$SYNC_HOST" ]; then
+    for candidate in "${DEFAULT_HOSTS[@]}"; do
+        print_info "Trying $candidate..."
+        if "$SSH_BIN" -o ConnectTimeout=3 -o BatchMode=yes "$candidate" true 2>/dev/null; then
+            SYNC_HOST="$candidate"
+            break
+        fi
+    done
+fi
+if [ -z "$SYNC_HOST" ]; then
+    read -rp "SSH connection (user@host): " SYNC_HOST
+    if [ -z "$SYNC_HOST" ]; then
+        print_error "No host provided"
+        exit 1
+    fi
+fi
 
 # Test SSH connectivity
 print_info "Testing SSH connection to $SYNC_HOST..."
@@ -82,10 +94,12 @@ sync_file() {
 # Wallpapers
 sync_dir "Pictures/Wallpapers/" "$HOME/Pictures/Wallpapers"
 
-# SSH hosts: the main config, plus any config.d drop-ins. The drop-ins are
-# inert unless ~/.ssh/config includes them, and ssh_config is first-match-wins,
-# so the Include has to lead the file for the main host's definitions to beat
-# any stale local block.
+# SSH hosts: shared host definitions live in luna's ~/.ssh/config.d/ (with
+# Tailscale fallback). Each machine's own ~/.ssh/config is never overwritten,
+# since isis and the Macs use per-machine keys there. The drop-ins are inert
+# unless ~/.ssh/config includes them, and ssh_config is first-match-wins, so the
+# Include has to lead the file for the shared definitions to beat any stale
+# local block.
 ensure_ssh_include() {
     local cfg="$HOME/.ssh/config"
 
@@ -105,7 +119,6 @@ ensure_ssh_include() {
 
 mkdir -p "$HOME/.ssh"
 chmod 700 "$HOME/.ssh"
-sync_file ".ssh/config" "$HOME/.ssh/config" --chmod=F600
 sync_dir ".ssh/config.d/" "$HOME/.ssh/config.d" --chmod=D700,F600
 ensure_ssh_include
 

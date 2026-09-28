@@ -1,0 +1,47 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "openai/gpt-6-sol",
+  "agents": {
+    "title": {
+      "model": "openai/gpt-6-sol"
+    },
+    "build": {
+      "model": "openai/gpt-6-sol"
+    },
+    "plan": {
+      "model": "openai/gpt-6-sol"
+    },
+    "general": {
+      "model": "openai/gpt-6-sol"
+    },
+    "explore": {
+      "model": "openai/gpt-6-sol"
+    },
+    "scout": {
+      "model": "openai/gpt-6-sol"
+    },
+    "review": {
+      "model": "openai/gpt-6-sol"
+    },
+    "docs-writer": {
+      "model": "openai/gpt-6-sol"
+    },
+    "debug": {
+      "model": "openai/gpt-6-sol"
+    }
+  },
+  "experimental": {
+    "policies": [
+      {
+        "action": "provider.use",
+        "resource": "*",
+        "effect": "deny"
+      },
+      {
+        "action": "provider.use",
+        "resource": "openai",
+        "effect": "allow"
+      }
+    ]
+  }
+}
