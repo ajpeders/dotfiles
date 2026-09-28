@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Ensure noctalia plugins are enabled in settings.toml (GUI overwrites this file).
+# Run via systemd ExecStartPost= so it patches settings after config loads but
+# before the bar renders. Idempotent: exits 0 if already correct.
+
+set -euo pipefail
+
+SETTINGS="$HOME/.local/state/noctalia/settings.toml"
+[ -f "$SETTINGS" ] || exit 0
+
+# Desired plugin list (author/plugin format)
+PLUGINS=(
+  "nightwatch75/dns-switcher"
+  "alex/ai-usagebar"
+  "alex/home-tiles"
+  "alex/tailscale"
+)
+
+# Read current enabled list from settings.toml
+current=$(sed -n '/^\[plugins\]/,/^\[/p' "$SETTINGS" | sed -n 's/^enabled = \[\(.*\)\]/\1/p' | tr -d '"' | tr -d ' ' | tr ',' '\n')
+
+# Compare (sorted, deduplicated)
+current_sorted=$(echo "$current" | sort)
+desired_sorted=$(printf '%s\n' "${PLUGINS[@]}" | sort)
+
+if [ "$current_sorted" = "$desired_sorted" ]; then
+  exit 0
+fi
+
+# Patch settings.toml: replace the enabled line under [plugins]
+python3 -c "
+import re, sys
+path = sys.argv[1]
+plugins = sys.argv[2:]
+enabled = ', '.join(f'\"{p}\"' for p in plugins)
+with open(path, 'r') as f:
+    content = f.read()
+content = re.sub(
+    r'(^\[plugins\]\n)enabled = \[.*?\]',
+    r'\1enabled = [' + enabled + ']',
+    content,
+    flags=re.MULTILINE
+)
+with open(path, 'w') as f:
+    f.write(content)
+" "$SETTINGS" "${PLUGINS[@]}"
+
+echo "noctalia-plugins: updated enabled list to: ${PLUGINS[*]}"

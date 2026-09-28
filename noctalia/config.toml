@@ -56,10 +56,11 @@ enabled = false
 
 # Community plugins, fetched from github.com/noctalia-dev/community-plugins on
 # first start. GUI enables/disables land in settings.toml's [plugins] and win.
-# alex/* live in ./plugins/: home-tiles (control-center DNS tile), tailscale
-# (davemhammer/tailscale vendored and restyled to theme colours).
+# alex/* live in ./plugins/: home-tiles (control-center DNS tile); tailscale and
+# ai-usagebar (davemhammer/tailscale, felipeartur/ai-usagebar vendored and
+# restyled to match the built-in bar widgets).
 [plugins]
-enabled = ["nightwatch75/dns-switcher", "felipeartur/ai-usagebar", "alex/home-tiles", "alex/tailscale"]
+enabled = ["nightwatch75/dns-switcher", "alex/ai-usagebar", "alex/home-tiles", "alex/tailscale"]
 
 # Source list as the GUI writes it (built-ins included), plus the local one.
 [[plugins.source]]
@@ -75,7 +76,7 @@ location = "https://github.com/noctalia-dev/community-plugins"
 [[plugins.source]]
 name     = "local"
 kind     = "path"
-location = "~/.config/noctalia/plugins"
+location = "/home/alex/.config/noctalia/plugins"
 
 [bar.main]
 position           = "top"
@@ -142,11 +143,11 @@ ssh_user = "alex"
 # `ai-usagebar` CLI; providers/credentials live in ~/.config/ai-usagebar/.
 # Left-click: panel; right-click: refresh. "auto" shows the busiest provider.
 [widget.ai-usage]
-type           = "felipeartur/ai-usagebar:bar"
+type           = "alex/ai-usagebar:bar"
 vendor         = "auto"
 visualization  = "none"            # no gauge bars
 extras         = "none"            # no reset countdown; hover/panel still show it
-provider_limit = 1
+provider_limit = 2
 
 [widget.clock]
 format = "{:%a %b %-d}  {:%-I:%M:%S %p}"
