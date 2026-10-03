@@ -1,5 +1,5 @@
 #!/bin/bash
-# Shared helpers for scripts/install.sh, update.sh and install-debian.sh.
+# Shared helpers for scripts/install.sh and update.sh.
 # Sourced, never run directly.
 
 # Prevent direct execution.
