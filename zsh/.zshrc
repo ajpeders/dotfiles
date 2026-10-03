@@ -29,6 +29,10 @@ _fzf_tab="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fzf-tab/fzf-tab.plugin.
 [ -r "$_fzf_tab" ] && source "$_fzf_tab"
 unset _fzf_tab
 
+# zoxide — smarter cd: `z <fuzzy>` jumps to a frecent directory, `zi` picks
+# via fzf. Guarded so a machine without zoxide still starts.
+command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
+
 # To customize prompt, run `p10k configure` or edit $ZDOTDIR/.p10k.zsh.
 [[ ! -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] || source ${ZDOTDIR:-$HOME}/.p10k.zsh
 # Route ssh through the kitty kitten only when we're actually inside a kitty
@@ -46,7 +50,9 @@ unset _fzf_tab
 # calling each other.
 _ssh_run() {
     if [[ -n "${KITTY_WINDOW_ID:-}" ]]; then
-        kitten ssh "$@"
+        # Keep Kitty's keyboard protocol in legacy mode for password prompts,
+        # without replacing the ssh() reconnect/disarm wrapper below.
+        _kitty_legacy_keys_run kitten ssh "$@"
     else
         command ssh "$@"
     fi
@@ -271,7 +277,9 @@ if [[ -n "${KITTY_WINDOW_ID:-}" ]]; then
         printf '\033[<u'
         return $ret
     }
-    for _kk_cmd in sudo ssh su passwd; do
+    # ssh is handled in _ssh_run above; overriding ssh() here would bypass its
+    # reconnect and terminal-mode cleanup behavior entirely.
+    for _kk_cmd in sudo su passwd; do
         eval "${_kk_cmd}() { _kitty_legacy_keys_run ${_kk_cmd} \"\$@\"; }"
     done
     unset _kk_cmd
