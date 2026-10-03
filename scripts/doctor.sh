@@ -127,7 +127,9 @@ fi
 
 section "Hyprland config"
 
-if ! command -v hyprctl >/dev/null 2>&1; then
+if [ "$mode_value" = "headless" ]; then
+    info "Headless mode; Hyprland config not required."
+elif ! command -v hyprctl >/dev/null 2>&1; then
     info "hyprctl unavailable; skipping live checks."
 elif [ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
     info "Not inside a Hyprland session; skipping live checks."
@@ -143,9 +145,9 @@ else
 fi
 
 entry="$HOME/.config/hypr/hyprland.lua"
-if [ -r "$entry" ]; then
+if [ "$mode_value" != "headless" ] && [ -r "$entry" ]; then
     ok "Hyprland entry point exists: $entry"
-else
+elif [ "$mode_value" != "headless" ]; then
     err "Hyprland entry point missing: $entry"
     note_error
 fi
@@ -157,7 +159,9 @@ fi
 section "Terminal theme includes"
 
 kitty_conf="$HOME/.config/kitty/kitty.conf"
-if [ -r "$kitty_conf" ]; then
+if [ "$mode_value" = "headless" ]; then
+    info "Headless mode; kitty theme not required."
+elif [ -r "$kitty_conf" ]; then
     ok "kitty.conf exists."
     if grep -qE '^include[[:space:]]+themes/noctalia\.conf' "$kitty_conf"; then
         noctalia_kitty="$HOME/.config/kitty/themes/noctalia.conf"
