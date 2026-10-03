@@ -11,7 +11,7 @@
     <array>
         <string>/bin/sh</string>
         <string>-c</string>
-        <string>exec "$HOME/dotfiles/macos/mount-share.sh"</string>
+        <string>exec "$HOME/.config/mount-share.sh"</string>
     </array>
 
     <key>RunAtLoad</key>

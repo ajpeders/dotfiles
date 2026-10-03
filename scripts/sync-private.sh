@@ -2,9 +2,7 @@
 # Sync private files (wallpapers, SSH hosts, etc.) from a remote server.
 # Usage: bash scripts/sync-private.sh [user@host]
 # Run after scripts/install.sh on a fresh machine, or anytime to update private files.
-# If no argument is provided, tries luna on the LAN, then over Tailscale, and
-# only prompts if neither answers. (Raw addresses, not the luna-alex alias: on a
-# fresh machine the alias doesn't exist until this script has synced it.)
+# Pass a host or set DOTFILES_SYNC_HOST; otherwise prompt for one.
 
 set -euo pipefail
 
@@ -17,8 +15,7 @@ print_status() { echo -e "${GREEN}[✓]${NC} $1"; }
 print_error() { echo -e "${RED}[✗]${NC} $1"; }
 print_info() { echo -e "${YELLOW}[i]${NC} $1"; }
 
-DEFAULT_HOSTS=("alex@192.168.0.40" "alex@100.84.247.20")  # luna: LAN, Tailscale
-SYNC_HOST="${1:-}"
+SYNC_HOST="${1:-${DOTFILES_SYNC_HOST:-}}"
 
 if ! command -v rsync >/dev/null 2>&1; then
     print_error "rsync not found; install it first"
@@ -29,15 +26,6 @@ fi
 SSH_BIN="$(command -v /usr/bin/ssh || command -v ssh)"
 RSYNC_BIN="$(command -v rsync)"
 
-if [ -z "$SYNC_HOST" ]; then
-    for candidate in "${DEFAULT_HOSTS[@]}"; do
-        print_info "Trying $candidate..."
-        if "$SSH_BIN" -o ConnectTimeout=3 -o BatchMode=yes "$candidate" true 2>/dev/null; then
-            SYNC_HOST="$candidate"
-            break
-        fi
-    done
-fi
 if [ -z "$SYNC_HOST" ]; then
     read -rp "SSH connection (user@host): " SYNC_HOST
     if [ -z "$SYNC_HOST" ]; then
@@ -76,9 +64,9 @@ sync_dir() {
 # Wallpapers
 sync_dir "Pictures/Wallpapers/" "$HOME/Pictures/Wallpapers"
 
-# SSH hosts: shared host definitions live in luna's ~/.ssh/config.d/ (with
+# SSH hosts: shared host definitions live on the source's ~/.ssh/config.d/ (with
 # Tailscale fallback). Each machine's own ~/.ssh/config is never overwritten,
-# since isis and the Macs use per-machine keys there. The drop-ins are inert
+# since each machine may use different keys there. The drop-ins are inert
 # unless ~/.ssh/config includes them, and ssh_config is first-match-wins, so the
 # Include has to lead the file for the shared definitions to beat any stale
 # local block.

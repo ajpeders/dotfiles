@@ -58,7 +58,7 @@ greeter stack (`xorg-server`, `xorg-xauth`, `libxmu`, `xf86-input-libinput`).
 All expected — `xorg-xwayland` is untouched, so X11 apps still work.
 
 Two `/etc` drop-ins are worth keeping, just renaming: the global DNS pointing at
-isis, and the SSH keepalives. Everything else Omarchy put under `/etc` goes with
+the home resolver, and the SSH keepalives. Everything else Omarchy put under `/etc` goes with
 the packages. Install the Wi-Fi resume replacement afterwards — see "Wi-Fi does
 not come back after suspend".
 
@@ -131,6 +131,7 @@ Everything defaults to the local server (`qwen3.6:35b-a3b`). Launchers, linked i
 | `opencode-local` | local only, no fallback |
 | `opencode-cloud` | every agent on `openai/gpt-6-sol`, no fallback |
 | `opencode-hybrid` | cloud for primary work; local for title, explore, and scout |
+
 Point it at the homelab llm-router (`bash scripts/setup-llm.sh http://<homelab>:8080/v1`), not a single llama-swap host: the router queues and picks whichever machine has the model loaded, so opencode and Hermes don't evict each other's models. `scripts/update.sh` re-checks the configured URL every sync (`setup-llm.sh --check`).
 
 To use another server, run `bash scripts/setup-llm.sh <base-url>`. It writes `~/.local/state/dotfiles/llm.env` (shells) and the gitignored `environment.d/90-llm-local.conf` (session), which override the defaults in `environment.d/50-llm.conf` and `zsh/.zshrc`. Session changes apply at next login; to test now:
@@ -145,7 +146,9 @@ The launchers use private servers so their model and plugin settings do not leak
 
 ## LLM: hand work to Hermes
 
-`hq` (linked into `~/.local/bin`) files a task on Hermes's kanban board over ssh, following its `task-intake` skill: project = the current git repo (or `-p`), worker model `qwen3.6:35b-a3b`, commits on a branch without pushing, alerts on ntfy.
+`hq` (linked into `~/.local/bin`) files a task on Hermes's kanban board over ssh, following its `task-intake` skill: project = the current git repo (or `-p`), worker model `qwen3.6:35b-a3b`, commits on a branch without pushing; ntfy alerts are optional.
+
+Copy `scripts/hq.env.example` to `~/.local/state/dotfiles/hq.env` and set the SSH alias and remote workspace. The optional ntfy channel enables alerts; environment variables override this file.
 
 ```bash
 hq "Backfill tests for the parser"          # from inside the repo
@@ -160,16 +163,25 @@ Per-project overrides: copy a prompt from `opencode/prompts/` into the project's
 
 ### Ollama server setup
 
-The server config in `etc/` is installed by hand:
+The `etc/*.example` files are safe, local-only starting points. Copy them to
+per-machine files outside the repo and edit the model path and trusted subnet
+rules before installing. Keep Ollama bound to localhost unless the firewall
+gate is configured and enabled for that machine. Existing installations need
+no change; do not replace a working gate with the default-deny example while
+other machines depend on remote access.
 
 ```bash
-sudo install -Dm644 etc/ollama-override.conf /etc/systemd/system/ollama.service.d/override.conf
-sudo install -Dm644 etc/ollama-gate.nft /etc/ollama-gate.nft
+mkdir -p ~/.local/state/dotfiles
+cp etc/ollama-override.conf.example ~/.local/state/dotfiles/ollama-override.conf
+cp etc/ollama-gate.nft.example ~/.local/state/dotfiles/ollama-gate.nft
+# Edit the two copies for this machine, then review them before installing.
+sudo install -Dm644 ~/.local/state/dotfiles/ollama-override.conf /etc/systemd/system/ollama.service.d/override.conf
+sudo install -Dm644 ~/.local/state/dotfiles/ollama-gate.nft /etc/ollama-gate.nft
 sudo install -Dm644 etc/ollama-gate.service /etc/systemd/system/ollama-gate.service
 sudo systemctl daemon-reload && sudo systemctl enable --now ollama-gate && sudo systemctl restart ollama
 ```
 
-`ollama-gate` limits port 11434 to LAN, tailnet and docker bridges.
+`ollama-gate` limits port 11434 to the subnets you explicitly allow.
 
 ## Wi-Fi does not come back after suspend
 
@@ -212,7 +224,7 @@ install -Dm600 /dev/stdin ~/.config/wireguard/<short-name>.conf   # paste, Ctrl-
 
 ## macOS: SMB share on login
 
-`macos/install.sh` seeds the Keychain entry and loads the `com.alex.mount.share` LaunchAgent, which runs `macos/mount-share.sh` at login and every 5 min. Optional: `ln -s /Volumes/share ~/share`. Manual trigger:
+Optional: copy `macos/smb.env.example` to `~/.config/dotfiles/smb.env`, set `SMB_HOST`, `SMB_USER`, and `SMB_SHARE`, then run `macos/install.sh`. The installer seeds the Keychain entry and loads the `com.alex.mount.share` LaunchAgent, which runs `macos/mount-share.sh` at login and every 5 min. Without the config file, no SMB setup runs. Optional: `ln -s /Volumes/<share> ~/share`. Manual trigger:
 
 ```bash
 launchctl kickstart -k gui/$(id -u)/com.alex.mount.share

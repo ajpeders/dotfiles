@@ -76,7 +76,7 @@ location = "https://github.com/noctalia-dev/community-plugins"
 [[plugins.source]]
 name     = "local"
 kind     = "path"
-location = "/home/alex/.config/noctalia/plugins"
+location = "~/.config/noctalia/plugins"
 
 [bar.main]
 position           = "top"
@@ -123,9 +123,6 @@ color_2 = "secondary"
 
 # Community port of the v4 DNS Switcher (needs dig/nslookup from `bind`).
 # Left-click: provider panel; right-click: back to ISP default; scroll: cycle.
-[plugin_settings."nightwatch75/dns-switcher"]
-custom_1 = "isis = 100.106.42.30"   # home server's resolver over Tailscale
-
 [widget.dns]
 type       = "nightwatch75/dns-switcher:dns-switcher"
 show_label = false                  # icon only; left-click panel shows the active provider
@@ -135,9 +132,6 @@ show_label = false                  # icon only; left-click panel shows the acti
 [widget.tailscale]
 type        = "alex/tailscale:status"
 show_counts = true
-
-[plugin_settings."alex/tailscale"]
-ssh_user = "alex"
 
 # AI plan usage (Claude, OpenAI, Copilot, OpenCode Go, ...) via the
 # `ai-usagebar` CLI; providers/credentials live in ~/.config/ai-usagebar/.

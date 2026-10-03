@@ -1,9 +1,9 @@
 # See https://git-scm.com/docs/git-config
 # Read natively from ~/.config/git/config on every platform; nothing links it.
 
-[user]
-	name = alex
-	email = alexjpeders@gmail.com
+# Per-machine identity; create ~/.gitconfig.local with [user] name and email.
+[include]
+	path = ~/.gitconfig.local
 [alias]
 	co = checkout
 	br = branch

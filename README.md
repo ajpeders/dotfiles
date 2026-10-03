@@ -7,18 +7,22 @@ See [ARCHITECTURE](ARCHITECTURE.md) for how it fits together, [HOWTO](HOWTO.md) 
 ## Install
 
 ```bash
-# Linux: clone into ~/.config, then one of
-git clone ssh://git@git.thelunadog.com:2222/alex/dotfiles.git ~/.config
+# Arch: clone into ~/.config, then choose desktop or headless
+git clone <your-dotfiles-repo-url> ~/.config
 bash ~/.config/scripts/install.sh              # Arch desktop
 bash ~/.config/scripts/install.sh --headless   # Arch, CLI + sshd only
-bash ~/.config/scripts/install-debian.sh       # Debian / Raspberry Pi (headless)
 
 # macOS
-git clone ssh://git@git.thelunadog.com:2222/alex/dotfiles.git ~/dotfiles
+git clone <your-dotfiles-repo-url> ~/dotfiles
 bash ~/dotfiles/macos/install.sh
 ```
 
 Then run `p10k configure`.
+
+To unlink only repo-managed symlinks, run `bash scripts/uninstall.sh` on Arch or
+`bash macos/uninstall.sh` on macOS. These do not undo package/service changes,
+restore installer backups, or remove `~/.zshenv`; the Arch repo at `~/.config`
+also remains in place. Re-run the matching installer to restore links.
 
 ## Keep in sync
 
@@ -28,6 +32,13 @@ bash scripts/doctor.sh                # read-only health check
 bash scripts/sync-private.sh user@host  # private files (wallpapers, ssh, rclone, wireguard, gh)
 bash scripts/setup-llm.sh [base-url]  # optional: point opencode at another LLM server
 ```
+
+For repeated private syncs, set `DOTFILES_SYNC_HOST=user@host` in your shell;
+without it, `sync-private.sh` prompts rather than assuming a personal server.
+Configure your own DNS provider and Tailscale SSH user in Noctalia's settings
+on each machine (the defaults do not assume a home network).
+Set your Git identity in `~/.gitconfig.local` (`git config --file ~/.gitconfig.local
+user.name ...` and `user.email ...`); it is included by the shared Git config.
 
 ## Key bindings
 

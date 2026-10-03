@@ -19,6 +19,7 @@ print_phase() { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+SMB_CONFIG="$HOME/.config/dotfiles/smb.env"
 
 phase_preflight() {
     print_phase "Phase 1: Preflight"
@@ -39,7 +40,7 @@ phase_preflight() {
     echo "  - Install Homebrew if missing"
     echo "  - Install AeroSpace (tiling WM), kitty and Tailscale"
     echo "  - Symlink macOS configs into ~/.config and ~/Library/LaunchAgents"
-    echo "  - Print follow-up instructions for SMB Keychain seeding"
+    echo "  - Optionally configure an SMB mount if $SMB_CONFIG exists"
     echo ""
     read -rp "Continue? [y/N] " confirm
     [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
@@ -111,7 +112,10 @@ phase_dotfiles() {
 
     # macOS-only
     link "$SCRIPT_DIR/aerospace" "$HOME/.config/aerospace"
-    link "$SCRIPT_DIR/com.alex.mount.share.plist" "$HOME/Library/LaunchAgents/com.alex.mount.share.plist"
+    if [ -r "$SMB_CONFIG" ]; then
+        link "$SCRIPT_DIR/mount-share.sh" "$HOME/.config/mount-share.sh"
+        link "$SCRIPT_DIR/com.alex.mount.share.plist" "$HOME/Library/LaunchAgents/com.alex.mount.share.plist"
+    fi
     link "$SCRIPT_DIR/com.alex.tailscale.plist" "$HOME/Library/LaunchAgents/com.alex.tailscale.plist"
 
     # Cross-platform configs from the repo root
@@ -184,20 +188,30 @@ LIST
 phase_keychain() {
     print_phase "Phase 6: Keychain (SMB password)"
 
-    if /usr/bin/security find-internet-password -a ween -s share.thelunadog.com >/dev/null 2>&1; then
-        print_status "SMB keychain entry already exists for ween@share.thelunadog.com"
+    if [ ! -r "$SMB_CONFIG" ]; then
+        print_info "No SMB config; skipping share setup"
+        return
+    fi
+    # shellcheck source=/dev/null
+    . "$SMB_CONFIG"
+    : "${SMB_HOST:?Set SMB_HOST in $SMB_CONFIG}"
+    : "${SMB_USER:?Set SMB_USER in $SMB_CONFIG}"
+    : "${SMB_SHARE:?Set SMB_SHARE in $SMB_CONFIG}"
+
+    if /usr/bin/security find-internet-password -a "$SMB_USER" -s "$SMB_HOST" >/dev/null 2>&1; then
+        print_status "SMB keychain entry already exists for $SMB_USER@$SMB_HOST"
         return
     fi
 
-    print_info "No keychain entry found for ween@share.thelunadog.com."
+    print_info "No keychain entry found for $SMB_USER@$SMB_HOST."
     read -rp "Seed it now? You'll be prompted for the SMB password. [y/N] " confirm
     if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
         print_info "Skipped. Seed later with:"
-        echo "    /usr/bin/security add-internet-password -a ween -s share.thelunadog.com -r 'smb ' -w"
+        printf '    /usr/bin/security add-internet-password -a %q -s %q -r '\''smb '\'' -w\n' "$SMB_USER" "$SMB_HOST"
         return
     fi
 
-    if /usr/bin/security add-internet-password -a ween -s share.thelunadog.com -r 'smb ' -w; then
+    if /usr/bin/security add-internet-password -a "$SMB_USER" -s "$SMB_HOST" -r 'smb ' -w; then
         print_status "Keychain entry added"
     else
         print_error "security command failed; run it manually after install"
@@ -224,7 +238,9 @@ phase_launchagents() {
         print_status "Loaded: $label"
     }
 
-    load_agent com.alex.mount.share
+    if [ -r "$SMB_CONFIG" ]; then
+        load_agent com.alex.mount.share
+    fi
 
     # Tailscale's standalone build ships TailscaleStartOnLogin=0 and registers no
     # login item, so this agent is what actually brings it up at login.
@@ -241,29 +257,26 @@ phase_reminders() {
     echo ""
     echo -e "${GREEN}Installation complete.${NC} Manual follow-ups:"
     echo ""
-    echo -e "${BOLD}1. Grant kitty Full Disk Access${NC}"
-    echo "   System Settings → Privacy & Security → Full Disk Access → add kitty.app"
-    echo "   (Required to read /Volumes/share from the terminal.)"
-    echo ""
-    echo -e "${BOLD}2. Trigger SMB mount${NC}"
-    echo "   launchctl kickstart -k gui/\$(id -u)/com.alex.mount.share"
-    echo ""
-    echo -e "${BOLD}3. (Optional) symlink the share to home${NC}"
-    echo "   ln -s /Volumes/share ~/share"
-    echo ""
-    echo -e "${BOLD}4. Start AeroSpace${NC}"
+    if [ -r "$SMB_CONFIG" ]; then
+        echo -e "${BOLD}SMB share:${NC} Grant kitty Full Disk Access to read network volumes."
+        echo "   Trigger mount: launchctl kickstart -k gui/\$(id -u)/com.alex.mount.share"
+        echo ""
+    fi
+    echo -e "${BOLD}1. Start AeroSpace${NC}"
     echo "   open -a AeroSpace"
     echo ""
-    echo -e "${BOLD}5. Sign in to Tailscale${NC}"
+    echo -e "${BOLD}2. Sign in to Tailscale${NC}"
     echo "   Tailscale starts at login via com.alex.tailscale; on a fresh machine"
     echo "   authenticate once with: tailscale up"
     echo ""
-    echo -e "${BOLD}6. Connect WireGuard${NC}"
-    echo "   Open the WireGuard app and import ~/.config/wireguard/alex.conf"
+    echo -e "${BOLD}3. Connect WireGuard (optional)${NC}"
+    echo "   Open the WireGuard app and import a config from ~/.config/wireguard/"
     echo "   (or drag-and-drop the .conf onto the app)."
     echo ""
-    echo -e "${BOLD}Note:${NC} If you skipped the Keychain phase, seed it later with:"
-    echo "   /usr/bin/security add-internet-password -a ween -s share.thelunadog.com -r 'smb ' -w"
+    if [ -r "$SMB_CONFIG" ]; then
+        echo -e "${BOLD}Note:${NC} If you skipped the Keychain phase, seed it later with:"
+        printf '   /usr/bin/security add-internet-password -a %q -s %q -r '\''smb '\'' -w\n' "$SMB_USER" "$SMB_HOST"
+    fi
     echo ""
 }
 

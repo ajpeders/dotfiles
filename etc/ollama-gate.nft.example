@@ -1,0 +1,13 @@
+#!/usr/bin/nft -f
+# Localhost only by default. Add your own trusted subnets before exposing Ollama.
+destroy table inet ollama_gate
+table inet ollama_gate {
+  chain input {
+    type filter hook input priority filter - 10
+    policy accept
+
+    tcp dport 11434 iif lo accept
+    # Example: tcp dport 11434 ip saddr 192.0.2.0/24 accept
+    tcp dport 11434 counter drop
+  }
+}

@@ -1,5 +1,5 @@
 [Unit]
-Description=Restrict Ollama (11434) to LAN, tailnet, docker bridges and wg-isis
+Description=Restrict Ollama (11434) to configured trusted networks
 Wants=network-pre.target
 Before=network-pre.target
 Before=ollama.service docker.service

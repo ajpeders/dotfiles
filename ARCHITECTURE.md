@@ -2,7 +2,7 @@
 
 ## Overview
 
-The git repo is `~/.config` itself. `scripts/install.sh` bootstraps a machine (packages, links, shell, services); `scripts/update.sh` resyncs it; `scripts/doctor.sh` checks it read-only. Scripts resolve the repo root as `$REPO_DIR` (one level up). macOS clones elsewhere and `macos/install.sh` symlinks into `~/.config`.
+The git repo is `~/.config` itself. `scripts/install.sh` bootstraps a machine (packages, links, shell, services); `scripts/update.sh` resyncs it; `scripts/doctor.sh` checks it read-only; `scripts/uninstall.sh` removes only the links it made. Scripts resolve the repo root as `$REPO_DIR` (one level up). macOS clones elsewhere and `macos/install.sh` symlinks into `~/.config`.
 
 ```
 Hyprland (compositor)
@@ -35,4 +35,4 @@ One Noctalia palette (`builtin = "Ayu"` in `noctalia/config.toml`) renders templ
 - **One desktop stack.** A second stack (Omarchy) behind runtime detection cost more than it gave and was removed on 2026-09-26; recover from `b0b8471^` if ever needed.
 - **ly** as display manager — minimal TUI.
 - **Global git hook.** `git/config` sets `core.hooksPath` to `git/hooks/`, whose `prepare-commit-msg` strips every `Co-Authored-By:` and `Claude-*:` trailer. GitHub HTTPS auth goes through `gh auth git-credential`.
-- **Local LLM first.** opencode agents default to Ollama (`qwen3.6:35b-a3b`); the server's systemd drop-in and firewall gate live in `etc/` and are installed by hand (HOWTO).
+- **Local LLM first.** opencode agents default to Ollama (`qwen3.6:35b-a3b`); `etc/` ships local-only examples of the server's systemd drop-in and firewall gate; per-machine copies live in `~/.local/state/dotfiles/` and are installed by hand (HOWTO).

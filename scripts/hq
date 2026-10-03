@@ -13,12 +13,25 @@
 # Follows the task-intake skill on the Hermes host: tenant = project directory under
 # the shared workspace, worker commits on a branch and never pushes, and completion or
 # block alerts go to ntfy. A project with no workspace directory goes to `inbox`.
-# The host is the ssh alias in $HERMES_SSH_HOST (default isis-alex).
+# Set HERMES_SSH_HOST and HERMES_WORKSPACE in ~/.local/state/dotfiles/hq.env
+# (or the environment). HERMES_NOTIFY_CHAT_ID enables ntfy subscription.
 set -euo pipefail
 
-HOST="${HERMES_SSH_HOST:-isis-alex}"
-WS=/tmp/hermes-ws-alex
-MODEL=qwen3.6:35b-a3b
+# Per-machine settings live outside the repo; environment variables win.
+if [ -r "$HOME/.local/state/dotfiles/hq.env" ]; then
+    _host="${HERMES_SSH_HOST:-}" _workspace="${HERMES_WORKSPACE:-}"
+    _model="${HERMES_MODEL:-}" _chat="${HERMES_NOTIFY_CHAT_ID:-}"
+    # shellcheck source=/dev/null
+    . "$HOME/.local/state/dotfiles/hq.env"
+    HERMES_SSH_HOST="${_host:-${HERMES_SSH_HOST:-}}"
+    HERMES_WORKSPACE="${_workspace:-${HERMES_WORKSPACE:-}}"
+    HERMES_MODEL="${_model:-${HERMES_MODEL:-}}"
+    HERMES_NOTIFY_CHAT_ID="${_chat:-${HERMES_NOTIFY_CHAT_ID:-}}"
+    unset _host _workspace _model _chat
+fi
+HOST="${HERMES_SSH_HOST:-}"
+WS="${HERMES_WORKSPACE:-}"
+MODEL="${HERMES_MODEL:-qwen3.6:35b-a3b}"
 RUNTIME=1h
 PROJECT=""
 STATUS=()
@@ -35,6 +48,14 @@ remote() {
 
 case "${1:-}" in
     ""|-h|--help) usage; exit 0 ;;
+esac
+
+if [ -z "$HOST" ] || [ -z "$WS" ]; then
+    echo "hq: set HERMES_SSH_HOST and HERMES_WORKSPACE (see scripts/hq.env.example)" >&2
+    exit 1
+fi
+
+case "${1:-}" in
     ls|list)
         if [ -n "${2:-}" ]; then remote list --tenant "$2"; else remote list; fi
         exit ;;
@@ -97,7 +118,9 @@ if [ -z "$id" ]; then
 fi
 
 # Chat-filed tasks auto-subscribe; CLI-filed ones need it done explicitly.
-remote notify-subscribe --platform ntfy --chat-id homelab-alerts --chat-type channel "$id" >/dev/null \
-    || echo "hq: filed, but subscribing to ntfy alerts failed" >&2
+if [ -n "${HERMES_NOTIFY_CHAT_ID:-}" ]; then
+    remote notify-subscribe --platform ntfy --chat-id "$HERMES_NOTIFY_CHAT_ID" --chat-type channel "$id" >/dev/null \
+        || echo "hq: filed, but subscribing to ntfy alerts failed" >&2
+fi
 
 echo "#$id [$PROJECT] $TITLE"
