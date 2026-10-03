@@ -5,6 +5,8 @@
   },
   "keybinds": {
     "app.exit": "ctrl+d,<leader>q",
-    "prompt.editor": "<leader>e"
+    "prompt.editor": "<leader>e",
+    "prompt.clear": "none",
+    "session.interrupt": "ctrl+c"
   }
 }
