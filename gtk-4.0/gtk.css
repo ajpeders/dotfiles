@@ -1,6 +1,5 @@
 /* Palette is rendered by Noctalia 5's GTK template (gitignored). Only the
  * rules below are hand-written; they use the libadwaita colour names. */
-@import url("noctalia.css");
 
 window,
 dialog,
@@ -52,3 +51,5 @@ selection {
     background-color: @theme_selected_bg_color;
     color: @theme_selected_fg_color;
 }
+
+@import url("noctalia.css");
