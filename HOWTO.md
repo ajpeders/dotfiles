@@ -9,13 +9,13 @@ bash ~/.config/scripts/doctor.sh   # read-only check afterwards
 
 `update.sh` remembers headless vs full from `~/.local/state/dotfiles-mode`; pass `--full` or `--headless` to override.
 
-**Remotes:** Forgejo is primary and pushes to GitHub too, so a plain `git push` updates both. One-time setup per clone:
+**Remotes:** keep one remote as primary and let it push to a mirror too, so a plain `git push` updates both. One-time setup per clone (`F` = the primary remote's name):
 
 ```bash
-F=$(git remote -v | awk '/thelunadog.*fetch/{print $1; exit}')
+F=origin
 git config branch.main.remote $F
 git remote set-url --push $F "$(git remote get-url $F)"
-git remote set-url --add --push $F git@github.com:ajpeders/dotfiles.git
+git remote set-url --add --push $F <mirror-url>
 ```
 
 ## Migrate off Omarchy

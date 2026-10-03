@@ -149,16 +149,23 @@ alias lc='eza -la --icons --group-directories-first'
 # --- VPN ---------------------------------------------------------------------
 # Two independent VPNs, neither enabled at boot; bring up whichever you need.
 #
-# 1. WireGuard -> home wg-easy server. Full-tunnel (0.0.0.0/0) and it pushes its
-#    own DNS into systemd-resolved, so it's disruptive to leave running.
-#    Configs are git-ignored in ~/.config/wireguard/; awg-quick takes the
-#    interface name from the filename, so keep those names <=15 chars.
-#      alex - original client (10.8.0.2), has the AmneziaWG obfuscation params
-#      isis - reissued 2026-08-20 (10.8.0.16), plain WireGuard, no obfuscation
-#    Pass a name to pick one (`vpn-up isis`), or set VPN_DEFAULT.
-VPN_DEFAULT=alex
-vpn-up()   { sudo awg-quick up   ~/.config/wireguard/"${1:-$VPN_DEFAULT}".conf }
-vpn-down() { sudo awg-quick down ~/.config/wireguard/"${1:-$VPN_DEFAULT}".conf }
+# 1. WireGuard (AmneziaWG client, which also runs plain WireGuard configs).
+#    Full-tunnel and it pushes its own DNS into systemd-resolved, so it's
+#    disruptive to leave running. Configs are git-ignored in
+#    ~/.config/wireguard/; awg-quick takes the interface name from the
+#    filename, so keep those names <=15 chars. Pass a name to pick one
+#    (`vpn-up work`), set VPN_DEFAULT, or with a single .conf just `vpn-up`.
+_vpn_conf() {
+  local name="${1:-${VPN_DEFAULT:-}}"
+  if [[ -z "$name" ]]; then
+    local confs=(~/.config/wireguard/*.conf(N))
+    (( $#confs == 1 )) || { echo "vpn: pass a name or set VPN_DEFAULT (see vpn-list)" >&2; return 1 }
+    name="${confs[1]:t:r}"
+  fi
+  print -r -- ~/.config/wireguard/"$name".conf
+}
+vpn-up()   { local c; c=$(_vpn_conf "${1:-}") || return; sudo awg-quick up   "$c" }
+vpn-down() { local c; c=$(_vpn_conf "${1:-}") || return; sudo awg-quick down "$c" }
 alias vpn-status='sudo awg show'
 alias vpn-list='print -l ~/.config/wireguard/*.conf(N:t:r)'
 

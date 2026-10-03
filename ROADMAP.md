@@ -15,5 +15,5 @@ Hyprland + Noctalia 5 is the only Linux stack (Omarchy removed 2026-09-26). Past
 
 - Desktop widgets via Noctalia
 - Gaming mode toggle (disable shell animations, notifications)
-- Finish de-personalising the repo: `rbw/config.json` (vault URL, email), the VPN notes in `zsh/.zshrc`, and the Forgejo remote lookup in HOWTO. Noctalia has no env interpolation, but merges every `*.toml` in its dir for per-machine overrides.
+- Last personal bits in the repo: `rbw/config.json` and `rbw/pinentry-rbw` (vault URL, email, absolute pinentry path) plus the rbw HOWTO section. Options: untrack and move to `sync-private.sh`, or template them with a `*.example`. Noctalia has no env interpolation, but merges every `*.toml` in its dir for per-machine overrides.
 - Upstream a `[[shortcut]]` to `nightwatch75/dns-switcher`, then drop `noctalia/plugins/home-tiles`

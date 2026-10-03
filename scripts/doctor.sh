@@ -181,6 +181,18 @@ fi
 # Working tree
 # ---------------------------------------------------------------------------
 
+section "Git identity"
+
+# git/config includes ~/.gitconfig.local instead of carrying a [user] block.
+if command -v git >/dev/null 2>&1; then
+    if [ -n "$(git -C "$REPO_DIR" config user.email 2>/dev/null)" ]; then
+        ok "git user.email set."
+    else
+        err "git user.email unset; create ~/.gitconfig.local with [user] name/email (README)."
+        note_error
+    fi
+fi
+
 section "Working tree"
 
 if command -v git >/dev/null 2>&1 && [ -d "$REPO_DIR/.git" ]; then
