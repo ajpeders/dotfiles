@@ -6,7 +6,7 @@ Hyprland + Noctalia 5 is the only Linux stack (Omarchy removed 2026-09-26). Past
 
 ## Next
 
-- [ ] **DOT-01 — Re-enable SIP on the MacBook Air** (ready, 1 pts)
+- [ ] **DOT-01 — Re-enable SIP on the MacBook Air** (human: needs the MacBook Air in Recovery, 1 pts)
   - **Why:** SIP was partly disabled for yabai, which never worked on Apple Silicon + Sequoia.
   - **Start here:** MacBook Air Recovery mode.
   - **Do:** Boot Recovery, run `csrutil enable`; after reboot, run `sudo nvram -d boot-args`.
