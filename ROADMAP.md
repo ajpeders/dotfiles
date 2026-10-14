@@ -16,7 +16,7 @@ Hyprland + Noctalia 5 is the only Linux stack (Omarchy removed 2026-09-26). Past
   - **Start here:** `hypr/scripts/capture-monitor.sh`, `hypr/config/monitors.lua`.
   - **Do:** Run `capture-monitor.sh` on the Air to capture eDP-1, add the output to `monitors.lua`.
   - **Done when:** The Air's display is explicitly configured in monitors.lua and Hyprland respects its geometry.
-- [ ] **DOT-03 — Test `scripts/install.sh` on a fresh system** (ready, 2 pts)
+- [ ] **DOT-03 — Test `scripts/install.sh` on a fresh system** (human: needs a fresh machine, 2 pts)
   - **Why:** `install.sh` hasn't been validated on a clean install — it needs a fresh-system smoke test.
   - **Start here:** `scripts/install.sh`, a fresh VM or spare machine.
   - **Do:** Run `install.sh` on a fresh system and verify all dotfiles are installed correctly.
