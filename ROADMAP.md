@@ -11,7 +11,7 @@ Hyprland + Noctalia 5 is the only Linux stack (Omarchy removed 2026-09-26). Past
   - **Start here:** MacBook Air Recovery mode.
   - **Do:** Boot Recovery, run `csrutil enable`; after reboot, run `sudo nvram -d boot-args`.
   - **Done when:** SIP is fully enabled (verify with `csrutil status` in macOS).
-- [ ] **DOT-02 — Capture MacBook Air's built-in panel (eDP-1) into monitors.lua** (ready, 2 pts)
+- [ ] **DOT-02 — Capture MacBook Air's built-in panel (eDP-1) into monitors.lua** (human: run on the MacBook Air, 2 pts)
   - **Why:** The Air's built-in panel currently hits the catch-all; it needs a proper entry in `hypr/config/monitors.lua`.
   - **Start here:** `hypr/scripts/capture-monitor.sh`, `hypr/config/monitors.lua`.
   - **Do:** Run `capture-monitor.sh` on the Air to capture eDP-1, add the output to `monitors.lua`.
