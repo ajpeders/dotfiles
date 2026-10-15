@@ -3,7 +3,7 @@
 # Usage: bash scripts/doctor.sh
 #
 # Checks:
-#   - Noctalia is installed and no Omarchy package is left behind
+#   - Quickshell is installed and no Omarchy package is left behind
 #   - Exactly one display manager (ly) is enabled on a graphical host
 #   - Hyprland config loads without errors
 #   - Terminal theme includes resolve (kitty)
@@ -65,10 +65,10 @@ if ! command -v pacman >/dev/null 2>&1; then
 elif [ "$mode_value" = "headless" ]; then
     info "Headless mode; no desktop stack expected."
 else
-    if pacman -Qq noctalia >/dev/null 2>&1; then
-        ok "noctalia is installed."
+    if pacman -Qq quickshell >/dev/null 2>&1; then
+        ok "quickshell is installed."
     else
-        err "noctalia is not installed; run scripts/install.sh."
+        err "quickshell is not installed; run scripts/install.sh."
         note_error
     fi
     # Leftovers from the retired Omarchy stack (see HOWTO.md).
@@ -163,12 +163,12 @@ if [ "$mode_value" = "headless" ]; then
     info "Headless mode; kitty theme not required."
 elif [ -r "$kitty_conf" ]; then
     ok "kitty.conf exists."
-    if grep -qE '^include[[:space:]]+themes/noctalia\.conf' "$kitty_conf"; then
-        noctalia_kitty="$HOME/.config/kitty/themes/noctalia.conf"
-        if [ -r "$noctalia_kitty" ]; then
-            ok "  Noctalia kitty theme resolves."
+    if grep -qE '^include[[:space:]]+themes/quickshell\.conf' "$kitty_conf"; then
+        quickshell_kitty="$HOME/.config/kitty/themes/quickshell.conf"
+        if [ -r "$quickshell_kitty" ]; then
+            ok "  Quickshell kitty theme resolves."
         else
-            err "  Noctalia kitty include missing file: $noctalia_kitty"
+            err "  Quickshell kitty include missing file: $quickshell_kitty"
             note_error
         fi
     fi

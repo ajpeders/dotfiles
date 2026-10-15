@@ -129,8 +129,14 @@ phase_dotfiles() {
 
     # Launchers
     mkdir -p "$HOME/.local/bin"
+    if [ -L "$HOME/.local/bin/opencode-cloud" ] &&
+       [ "$(readlink "$HOME/.local/bin/opencode-cloud")" = "$REPO_DIR/scripts/opencode-cloud" ]; then
+        unlink "$HOME/.local/bin/opencode-cloud"
+    fi
     link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
-    link "$REPO_DIR/scripts/opencode-cloud" "$HOME/.local/bin/opencode-cloud"
+    link "$REPO_DIR/scripts/opencode-codex" "$HOME/.local/bin/opencode-codex"
+    link "$REPO_DIR/scripts/opencode-deep" "$HOME/.local/bin/opencode-deep"
+    link "$REPO_DIR/scripts/opencode-claude" "$HOME/.local/bin/opencode-claude"
     link "$REPO_DIR/scripts/hq" "$HOME/.local/bin/hq"
     link "$REPO_DIR/scripts/opencode-hybrid" "$HOME/.local/bin/opencode-hybrid"
 

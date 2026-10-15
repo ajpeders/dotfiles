@@ -1,6 +1,6 @@
 # dotfiles
 
-Cross-platform dotfiles: Hyprland + Noctalia 5 on Arch, AeroSpace on macOS, shared shell and TUI configs. On Arch the repo *is* `~/.config`.
+Cross-platform dotfiles: Hyprland + Quickshell on Arch, AeroSpace on macOS, shared shell and TUI configs. On Arch the repo *is* `~/.config`.
 
 See [ARCHITECTURE](ARCHITECTURE.md) for how it fits together, [HOWTO](HOWTO.md) for tasks, [ROADMAP](ROADMAP.md) for what's next.
 
@@ -35,8 +35,8 @@ bash scripts/setup-llm.sh [base-url]  # optional: point opencode at another LLM 
 
 For repeated private syncs, set `DOTFILES_SYNC_HOST=user@host` in your shell;
 without it, `sync-private.sh` prompts rather than assuming a personal server.
-Configure your own DNS provider and Tailscale SSH user in Noctalia's settings
-on each machine (the defaults do not assume a home network).
+Configure your own DNS provider and Tailscale SSH user on each machine (the
+defaults do not assume a home network).
 Set your Git identity in `~/.gitconfig.local` (`git config --file ~/.gitconfig.local
 user.name ...` and `user.email ...`); it is included by the shared Git config.
 
@@ -61,4 +61,4 @@ Mac uses `Alt` where Linux uses `Super`.
 | `Super + Shift + arrows` | `Alt + Shift + arrows` | Move window |
 | `Super + Ctrl + arrows` | `Alt + Ctrl + arrows` | Resize |
 
-Hyprland only: launcher `Space`, clipboard `V`, notifications `N`, settings `,`, control center `A`, lock `L`, session `O`, restart shell `Shift+R`, caffeine `Shift+A`, brightness submap `B`, keyboard backlight `Shift+K`, screenshots `P` / `Shift+P` / `Ctrl+P`, scratchpad `=` / `-`, exit `Shift+Q`. Full list: `hypr/config/keybinds.lua`.
+Hyprland only: launcher `Space`, notifications `N`, lock `L`, brightness submap `B`, keyboard backlight `Shift+K`, screenshots `P` / `Shift+P` / `Ctrl+P`, scratchpad `=` / `-`, exit `Shift+Q`. Full list: `hypr/config/keybinds.lua`.

@@ -155,8 +155,14 @@ case "$PLATFORM" in
         link_dotfile "$REPO_DIR/nvim"   "$HOME/.config/nvim"
 
         # Launchers
+        if [ -L "$HOME/.local/bin/opencode-cloud" ] &&
+           [ "$(readlink "$HOME/.local/bin/opencode-cloud")" = "$REPO_DIR/scripts/opencode-cloud" ]; then
+            unlink "$HOME/.local/bin/opencode-cloud"
+        fi
         link_dotfile "$REPO_DIR/scripts/opencode-local"   "$HOME/.local/bin/opencode-local"
-        link_dotfile "$REPO_DIR/scripts/opencode-cloud"   "$HOME/.local/bin/opencode-cloud"
+        link_dotfile "$REPO_DIR/scripts/opencode-codex"   "$HOME/.local/bin/opencode-codex"
+        link_dotfile "$REPO_DIR/scripts/opencode-deep"    "$HOME/.local/bin/opencode-deep"
+        link_dotfile "$REPO_DIR/scripts/opencode-claude"  "$HOME/.local/bin/opencode-claude"
         link_dotfile "$REPO_DIR/scripts/hq"               "$HOME/.local/bin/hq"
         link_dotfile "$REPO_DIR/scripts/opencode-hybrid"  "$HOME/.local/bin/opencode-hybrid"
 

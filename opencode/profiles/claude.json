@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "anthropic/claude-opus-5-5",
+  "agents": {
+    "title": { "model": "anthropic/claude-opus-5-5" },
+    "build": { "model": "anthropic/claude-opus-5-5" },
+    "plan": { "model": "anthropic/claude-opus-5-5" },
+    "general": { "model": "anthropic/claude-opus-5-5" },
+    "explore": { "model": "anthropic/claude-opus-5-5" },
+    "scout": { "model": "anthropic/claude-opus-5-5" },
+    "review": { "model": "anthropic/claude-opus-5-5" },
+    "docs-writer": { "model": "anthropic/claude-opus-5-5" },
+    "debug": { "model": "anthropic/claude-opus-5-5" }
+  },
+  "experimental": {
+    "policies": [
+      { "action": "provider.use", "resource": "*", "effect": "deny" },
+      { "action": "provider.use", "resource": "anthropic", "effect": "allow" }
+    ]
+  }
+}

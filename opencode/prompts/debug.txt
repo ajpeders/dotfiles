@@ -20,8 +20,8 @@ You are OpenCode's debug agent. You investigate crashes, misbehavior, performanc
 ## On this machine
 
 - Arch Linux. Hyprland session; check `hyprctl clients`, `hyprctl instances`, `hyprctl logs` for compositor issues.
-- Noctalia shell: config at `~/.config/noctalia/config.toml`, state at `~/.local/state/noctalia/`; IPC via `noctalia msg`.
-- Services: `systemctl --user status noctalia-shell`, etc.
+- Quickshell shell: config at `~/.config/quickshell/`, state at `~/.local/state/quickshell/`; IPC via `quickshell ipc call`.
+- It runs from `hypr/config/autostart.lua` (`quickshell --no-duplicate --daemonize`), not a systemd service.
 
 ## Output format
 

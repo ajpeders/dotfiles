@@ -89,7 +89,7 @@ playerctl
 # Brightness control
 brightnessctl
 
-# Power management (battery stats + power profiles in Noctalia via UPower)
+# Power management (battery stats + power profiles via UPower)
 upower
 power-profiles-daemon
 
@@ -121,10 +121,9 @@ realesrgan-ncnn-vulkan
 # Music player (terminal, Winamp-style; Plex creds via `cliamp setup`)
 cliamp
 
-# Desktop shell (v5, native C++; the v4 noctalia-shell/noctalia-qs pair is legacy)
-noctalia
-# Noctalia plugin deps: dig/nslookup for dns-switcher, the CLI behind ai-usagebar
-bind
+# Desktop shell
+quickshell
+# AI plan usage CLI (Quickshell's AIUsage widget reads `ai-usagebar usage --json`)
 ai-usagebar-bin
 
 # Full JetBrains Mono Nerd package.

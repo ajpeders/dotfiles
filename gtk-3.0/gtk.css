@@ -1,4 +1,4 @@
-/* Palette is rendered by Noctalia 5's GTK template (gitignored). Only the
+/* Palette comes from quickshell.css (a frozen copy; see ROADMAP). Only the
  * rules below are hand-written; they use the libadwaita colour names. */
 
 * {
@@ -64,4 +64,4 @@ selection {
     color: @theme_selected_fg_color;
 }
 
-@import url("noctalia.css");
+@import url("quickshell.css");

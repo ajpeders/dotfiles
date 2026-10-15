@@ -1,5 +1,5 @@
 # Colors come from the vendored flavor (yazi/flavors/, pinned in package.toml;
-# update with `ya pkg upgrade`). Noctalia has no yazi template.
+# update with `ya pkg upgrade`). Quickshell has no yazi template.
 [flavor]
 dark = "catppuccin-mocha"
 light = "catppuccin-mocha"

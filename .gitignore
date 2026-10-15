@@ -22,14 +22,16 @@
 !hypr/**
 !kitty/
 !kitty/**
+!fontconfig/
+!fontconfig/**
 !gtk-3.0/
 !gtk-3.0/**
 !gtk-4.0/
 !gtk-4.0/**
 !zsh/
 !zsh/**
-!noctalia/
-!noctalia/**
+!quickshell/
+!quickshell/**
 !yazi/
 !yazi/**
 !macos/
@@ -61,9 +63,6 @@ opencode/service.json
 !rbw/pinentry-rbw
 
 # Single files inside otherwise-ignored dirs
-!systemd/
-!systemd/user/
-!systemd/user/noctalia-shell.service
 !librewolf/
 !librewolf/policies.json
 
@@ -77,11 +76,11 @@ environment.d/90-llm-local.conf
 # points at hypridle-ac.conf or hypridle-battery.conf depending on power source)
 hypr/hypridle.conf
 
-# Rendered by Noctalia v5 theme templates on every palette change
-hypr/noctalia.lua
-kitty/themes/noctalia.conf
-gtk-3.0/noctalia.css
-gtk-4.0/noctalia.css
+# Rendered by Quickshell at runtime. kitty is rendered today; the GTK palettes
+# are frozen copies (see ROADMAP) until Quickshell renders them too.
+kitty/themes/quickshell.conf
+gtk-3.0/quickshell.css
+gtk-4.0/quickshell.css
 
 # Zsh runtime files
 zsh/.zcompdump*

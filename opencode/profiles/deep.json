@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "deepseek/deepseek-flash",
+  "agents": {
+    "title": { "model": "deepseek/deepseek-flash" },
+    "build": { "model": "deepseek/deepseek-flash" },
+    "plan": { "model": "deepseek/deepseek-flash" },
+    "general": { "model": "deepseek/deepseek-flash" },
+    "explore": { "model": "deepseek/deepseek-flash" },
+    "scout": { "model": "deepseek/deepseek-flash" },
+    "review": { "model": "deepseek/deepseek-flash" },
+    "docs-writer": { "model": "deepseek/deepseek-flash" },
+    "debug": { "model": "deepseek/deepseek-flash" }
+  },
+  "experimental": {
+    "policies": [
+      { "action": "provider.use", "resource": "*", "effect": "deny" },
+      { "action": "provider.use", "resource": "deepseek", "effect": "allow" }
+    ]
+  }
+}

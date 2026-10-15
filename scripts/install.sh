@@ -80,6 +80,7 @@ phase_preflight() {
         echo "  - Set the system default target to multi-user.target (no graphical login)"
     else
         echo "  - Install packages from packages.txt"
+        echo "  - Install NVIDIA drivers if an NVIDIA GPU is present"
         echo "  - Create picture and local application directories"
         echo "  - Link repo-managed dotfiles into ~/.config when needed"
         echo "  - Configure zsh, oh-my-zsh, plugins, and powerlevel10k"
@@ -188,6 +189,37 @@ phase_packages() {
     else
         print_status "All packages installed"
     fi
+}
+
+phase_nvidia() {
+    [ "$HEADLESS" -eq 0 ] || return
+
+    local device kernel
+    local has_nvidia=0
+    for device in /sys/bus/pci/devices/*; do
+        if [ "$(cat "$device/vendor")" = "0x10de" ] &&
+           [[ "$(cat "$device/class")" = 0x03* ]]; then
+            has_nvidia=1
+            break
+        fi
+    done
+    [ "$has_nvidia" -eq 1 ] || return
+
+    print_phase "NVIDIA drivers"
+    local packages=(nvidia-open-dkms nvidia-utils)
+    # DKMS needs headers for every installed stock Arch kernel, not just the
+    # kernel currently running (e.g. linux and linux-zen on the same machine).
+    for kernel in linux linux-zen linux-lts linux-hardened; do
+        if pacman -Qq "$kernel" >/dev/null 2>&1; then
+            packages+=("${kernel}-headers")
+        fi
+    done
+    if pacman -Qq steam >/dev/null 2>&1; then
+        packages+=(lib32-nvidia-utils)
+    fi
+
+    sudo pacman -S --needed --noconfirm "${packages[@]}"
+    print_status "NVIDIA drivers installed; reboot to switch from nouveau"
 }
 
 phase_directories() {
@@ -317,7 +349,7 @@ phase_services() {
     enable_system_service avahi-daemon
     # Tailscale: the unit is enough to bring the tunnel up at boot; the node
     # still needs a one-time `sudo tailscale up --operator=$USER` to authenticate
-    # (operator lets the noctalia Tailscale plugin run up/down/set unprivileged).
+    # (operator lets non-root clients run up/down/set unprivileged).
     enable_system_service tailscaled
 
     if [ "$HEADLESS" -eq 1 ]; then
@@ -427,6 +459,7 @@ phase_reminders() {
 phase_preflight
 phase_paru
 phase_packages
+phase_nvidia
 phase_directories
 phase_dotfiles
 phase_shell

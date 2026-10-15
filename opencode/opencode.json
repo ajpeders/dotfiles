@@ -385,12 +385,6 @@
     }
   },
   "providers": {
-    "anthropic": {
-      "settings": {
-        "baseURL": "http://127.0.0.1:3456",
-        "apiKey": "dummy"
-      }
-    },
     "ollama": {
       "name": "llama-swap (LLM_SERVER_URL)",
       "models": {

@@ -27,7 +27,7 @@ TTY or an SSH session, because step 3 removes the running desktop.
 git -C ~/.config pull --ff-only origin main            # 1. deletes the tracked Omarchy files
 sudo pacman -D --asexplicit gnome-keyring              # 2. see below -- do not skip
 sudo pacman -Rns omarchy omarchy-settings              # 3. read the list before confirming
-bash ~/.config/scripts/install.sh                      # 4. noctalia, ly, hypridle; sddm -> ly
+bash ~/.config/scripts/install.sh                      # 4. quickshell, ly, hypridle; sddm -> ly
 rm -rf ~/.local/share/omarchy ~/.local/state/omarchy ~/.config/omarchy   # 5. leftovers
 sudo systemctl disable omarchy-wifi-resume-fix.service                   # 6. its script is gone
 sudo rm -f /etc/systemd/system/omarchy-wifi-resume-fix.service
@@ -68,39 +68,34 @@ delete: `~/.local/share/omarchy-shell`, `~/.local/bin/omarchy-shell-start`,
 
 ## Add a Hyprland keybind
 
-Edit `hypr/config/keybinds.lua`; it defines `mod` and an `ipc` string for Noctalia:
+Edit `hypr/config/keybinds.lua`; it defines `mod` and the shell IPC command:
 
 ```lua
-hl.bind(mod .. " + X", hl.dsp.exec_cmd(ipc .. " <command>"))
+hl.bind(mod .. " + X", hl.dsp.exec_cmd("quickshell ipc call <target> <fn>"))
 ```
 
 Then `hyprctl reload && hyprctl configerrors` (a reload succeeds even with errors).
 
-## Noctalia
+## Quickshell
 
 ```bash
-noctalia msg --help                          # all IPC commands
-noctalia msg wallpaper-set ~/Pictures/Wallpapers/image.jpg
-noctalia msg color-scheme-set builtin Kanagawa
-systemctl --user restart noctalia-shell      # or Super+Shift+R
-noctalia config validate
+quickshell ipc call launcher toggle          # app launcher
+quickshell ipc call notifications toggle     # notification center
+quickshell ipc call theme set wallpaper      # white | black | wallpaper
+quickshell ipc call theme get
 ```
 
-Config is `noctalia/config.toml`; anything changed in the settings GUI goes to `~/.local/state/noctalia/settings.toml` and wins. If a value seems ignored, look there.
+The shell is `quickshell/` in this repo; Quickshell watches its QML, so edits reload live. `hypr/config/autostart.lua` starts it (`quickshell --no-duplicate --daemonize`).
 
-Theme templates (`builtin_ids`) render `hypr/noctalia.lua`, `kitty/themes/noctalia.conf`, `gtk-{3,4}.0/noctalia.css` and the btop theme, all gitignored.
-
-- Template output directories must already exist; Noctalia won't create them and logs nothing (hence `kitty/themes/.gitkeep`).
-- Re-selecting the same scheme doesn't re-render: `noctalia msg templates-apply`.
-- Border colours load inside a `pcall`, so a failure shows as default borders, not in `configerrors`.
+Quickshell renders `kitty/themes/quickshell.conf` on startup and on theme changes (`quickshell/sync-kitty-theme.sh`, driven by `Theme.qml`). The GTK palettes (`gtk-{3,4}.0/quickshell.css`) are frozen copies until Quickshell renders them too -- see ROADMAP.
 
 ## Stop the screen locking mid-game or mid-video
 
-hypridle (`hypr/hypridle-{ac,battery}.conf`) locks after 5 min on AC, 2 min on battery. Gamepad input doesn't count as activity, so `hypr/config/windowrules.lua` sets `idle_inhibit = "fullscreen"`: anything fullscreen blocks the lock. For a windowed app, toggle caffeine (`Super+Shift+A`).
+hypridle (`hypr/hypridle-{ac,battery}.conf`) locks after 5 min on AC, 2 min on battery. Gamepad input doesn't count as activity, so `hypr/config/windowrules.lua` sets `idle_inhibit = "fullscreen"`: anything fullscreen blocks the lock. For a windowed app, block idle with `systemd-inhibit` (a caffeine toggle is a ROADMAP item; the old `Super+Shift+A` is gone).
 
 ```bash
 hyprctl clients -j | jq '.[] | select(.fullscreen > 0) | .inhibitingIdle'
-systemd-inhibit --list    # caffeine shows as "Caffeine"
+systemd-inhibit --list    # see active inhibitors
 ```
 
 ## Configure monitors
@@ -129,7 +124,9 @@ Everything defaults to the local server (`qwen3.6:35b-a3b`). Launchers, linked i
 |---|---|
 | `opencode` | local by default, no automatic fallback (shared background service) |
 | `opencode-local` | local only, no fallback |
-| `opencode-cloud` | every agent on `openai/gpt-6-sol`, no fallback |
+| `opencode-codex` | every agent on `openai/gpt-6-sol`, no fallback |
+| `opencode-deep` | every agent on `deepseek/deepseek-flash` (V4.1 Flash), no fallback |
+| `opencode-claude` | every agent on `anthropic/claude-opus-5-5` (direct Anthropic), no fallback |
 | `opencode-hybrid` | cloud for primary work; local for title, explore, and scout |
 
 Point it at the homelab llm-router (`bash scripts/setup-llm.sh http://<homelab>:8080/v1`), not a single llama-swap host: the router queues and picks whichever machine has the model loaded, so opencode and Hermes don't evict each other's models. `scripts/update.sh` re-checks the configured URL every sync (`setup-llm.sh --check`).
@@ -143,6 +140,7 @@ opencode debug config
 
 Keep every agent on one model: each llama-swap host runs `--parallel 1`, so a second model means swaps.
 The launchers use private servers so their model and plugin settings do not leak into the shared service.
+Connect the DeepSeek and Anthropic accounts with `/connect` before using their launchers.
 
 ## LLM: hand work to Hermes
 

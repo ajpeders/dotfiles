@@ -1,8 +1,8 @@
 -- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 -- ┃                   Hyprland Configuration (Lua)              ┃
 -- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
--- Migrated from hyprland.conf (hyprlang). Border colours come from
--- hypr/noctalia.lua, rendered by Noctalia 5's theme template (see the end).
+-- Migrated from hyprland.conf (hyprlang). Border colours are set in
+-- config/decorations.lua.
 --
 -- Monitors are hand-written in config/monitors.lua, keyed by EDID
 -- description rather than connector name so one file serves every
@@ -36,10 +36,3 @@ hl.workspace_rule({ workspace = "7",  default_name = "server" })
 hl.workspace_rule({ workspace = "8",  default_name = "work" })
 hl.workspace_rule({ workspace = "9",  default_name = "game" })
 hl.workspace_rule({ workspace = "10", default_name = "config" })
-
--- For Noctalia Color templates
--- Noctalia's built-in "hyprland" template renders hypr/noctalia.lua (gitignored)
--- from the active palette. Loaded last so the border colours win. Guarded so a
--- fresh machine boots before Noctalia has rendered it once.
-local ok, noctalia = pcall(function() return require("noctalia") end)
-if ok and noctalia then noctalia.apply_theme() end

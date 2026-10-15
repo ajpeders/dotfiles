@@ -30,3 +30,35 @@ hl.config({
         },
     },
 })
+
+-- Border and group colours. Noctalia rendered these from the wallpaper into
+-- hypr/noctalia.lua; frozen here when Noctalia was removed. ROADMAP: have
+-- Quickshell render them again.
+hl.config({
+    general = {
+        col = {
+            active_border   = "rgb(cdc7a5)",
+            inactive_border = "rgb(141311)",
+        },
+    },
+    group = {
+        col = {
+            border_active          = "rgb(cbc6b6)",
+            border_inactive        = "rgb(141311)",
+            border_locked_active   = "rgb(ffb4ab)",
+            border_locked_inactive = "rgb(141311)",
+        },
+        groupbar = {
+            col = {
+                active          = "rgb(cbc6b6)",
+                inactive        = "rgb(141311)",
+                locked_active   = "rgb(ffb4ab)",
+                locked_inactive = "rgb(141311)",
+            },
+            text_color                 = "rgb(323125)",
+            text_color_inactive        = "rgb(e6e2dd)",
+            text_color_locked_active   = "rgb(690005)",
+            text_color_locked_inactive = "rgb(e6e2dd)",
+        },
+    },
+})

@@ -34,7 +34,7 @@ unlink_if_managed "$SCRIPT_DIR/mount-share.sh" "$HOME/.config/mount-share.sh"
 for dir in kitty yazi zsh tmux opencode git nvim; do
     unlink_if_managed "$REPO_DIR/$dir" "$HOME/.config/$dir"
 done
-for launcher in opencode-local opencode-cloud opencode-hybrid hq; do
+for launcher in opencode-local opencode-cloud opencode-codex opencode-deep opencode-claude opencode-hybrid hq; do
     unlink_if_managed "$REPO_DIR/scripts/$launcher" "$HOME/.local/bin/$launcher"
 done
 

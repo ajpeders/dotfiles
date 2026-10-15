@@ -2,7 +2,7 @@
 
 ## Status
 
-Hyprland + Noctalia 5 is the only Linux stack (Omarchy removed 2026-09-26). Past work is in `git log`.
+Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026-10-15). The shell is this repo's Quickshell config. Past work is in `git log`.
 
 ## Next
 
@@ -26,10 +26,25 @@ Hyprland + Noctalia 5 is the only Linux stack (Omarchy removed 2026-09-26). Past
   - **Start here:** `xdg-mime` handler config, Kitty/OpenCode link launch code, Hyprland workspace rules.
   - **Do:** Investigate the launch path and browser window placement; try an alternative handler that opens links in a new window on the current workspace.
   - **Done when:** Clicking a link in Kitty/OpenCode opens it in a new LibreWolf window on the current Hyprland workspace.
+- [x] Add Quickshell themes: white, black, or wallpaper-matched colors (switch via `quickshell ipc call theme set <mode>`).
+
+## Quickshell
+
+- [ ] **Dock** — app dock with icons, workspace filtering, hover previews
+- [ ] **Notification center** — dunst/notify-desktop integration
+- [ ] **Lock screen** — time, password prompt, wake gesture
+- [ ] **Media player widget** — MPRIS integration (Spotify, etc.)
+- [ ] **Settings popup** — brightness, volume, theme cycling, network, bluetooth
+- [ ] **System tray popover** — expandable menus for wifi, audio, battery
+- [ ] **Clipboard history** — `Super + V` (was Noctalia's clipboard panel)
+- [ ] **Session / power menu** — `Super + O` (lock, logout, reboot, shutdown)
+- [ ] **Caffeine toggle** — `Super + Shift + A` / `Super + Ctrl + A` idle inhibitor
+- [ ] **Brightness / volume OSD** — on-screen feedback (the keys now drive `brightnessctl` / `wpctl` directly)
+- [ ] **Tailscale and DNS widgets** — replaced the removed Noctalia plugins
+- [ ] **Render GTK/btop/qt6ct palettes from Quickshell** — only kitty is generated today; the GTK palettes are frozen copies
 
 ## Ideas
 
-- Desktop widgets via Noctalia
+- Desktop widgets
 - Gaming mode toggle (disable shell animations, notifications)
-- Last personal bits in the repo: `rbw/config.json` and `rbw/pinentry-rbw` (vault URL, email, absolute pinentry path) plus the rbw HOWTO section. Options: untrack and move to `sync-private.sh`, or template them with a `*.example`. Noctalia has no env interpolation, but merges every `*.toml` in its dir for per-machine overrides.
-- Upstream a `[[shortcut]]` to `nightwatch75/dns-switcher`, then drop `noctalia/plugins/home-tiles`
+- Last personal bits in the repo: `rbw/config.json` and `rbw/pinentry-rbw` (vault URL, email, absolute pinentry path) plus the rbw HOWTO section. Options: untrack and move to `sync-private.sh`, or template them with a `*.example`.
