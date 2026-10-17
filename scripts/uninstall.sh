@@ -24,8 +24,14 @@ unlink_if_managed() {
 for dir in "${DOTFILES_CLI_DIRS[@]}" "${DOTFILES_DESKTOP_DIRS[@]}"; do
     unlink_if_managed "$REPO_DIR/$dir" "$HOME/.config/$dir"
 done
-for launcher in opencode-local opencode-cloud opencode-codex opencode-ds opencode-claude opencode-hybrid opencode-or opencode-mm hq; do
-    unlink_if_managed "$REPO_DIR/scripts/$launcher" "$HOME/.local/bin/$launcher"
+# Mirror the installer's launcher list: everything matching scripts/opencode-*,
+# plus scripts/hq and scripts/jetshell. Iterate from disk so the unlink set
+# tracks new launchers without editing this file.
+for launcher in "$REPO_DIR/scripts"/opencode-* "$REPO_DIR/scripts"/hq "$REPO_DIR/scripts"/jetshell; do
+    if [ ! -e "$launcher" ]; then
+        continue
+    fi
+    unlink_if_managed "$launcher" "$HOME/.local/bin/$(basename "$launcher")"
 done
 
 print_info "Kept packages, enabled services, ~/.zshenv, backups and $REPO_DIR."

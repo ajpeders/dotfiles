@@ -95,13 +95,20 @@ dotfiles_link_configs() {
         fi
     done
 
-    if [ -L "$HOME/.local/bin/opencode-cloud" ] &&
-       [ "$(readlink "$HOME/.local/bin/opencode-cloud")" = "$REPO_DIR/scripts/opencode-cloud" ]; then
-        unlink "$HOME/.local/bin/opencode-cloud"
-    fi
-
-    for launcher in opencode-local opencode-codex opencode-ds opencode-claude opencode-hybrid opencode-or opencode-mm hq jetshell; do
-        _dotfiles_link "$REPO_DIR/scripts/$launcher" "$HOME/.local/bin/$launcher"
+    # Derive the launcher list from disk so new scripts/opencode-* (and any
+    # future sibling like hq/jetshell) are picked up automatically without
+    # touching this loop. Add each launcher to a separate manifest list if it
+    # ever needs to be excluded by name; otherwise anything executable under
+    # scripts/ that is *not* dotfiles.sh, install.sh, update.sh,
+    # uninstall.sh, doctor.sh, sync-private.sh, or setup-llm.sh gets linked.
+    local launcher
+    for launcher in "$REPO_DIR/scripts"/opencode-* "$REPO_DIR/scripts"/hq "$REPO_DIR/scripts"/jetshell; do
+        # The shell leaves the pattern literal when no matches; guard against
+        # that so we don't try to link the string "*opencode-*".
+        if [ ! -e "$launcher" ]; then
+            continue
+        fi
+        _dotfiles_link "$launcher" "$HOME/.local/bin/$(basename "$launcher")"
     done
 
     if [ ! -f "$HOME/.zshenv" ]; then
