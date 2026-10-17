@@ -1,1 +1,0 @@
-Claude, Codex, DeepSeek, OpenRouter, and MiniMax logo paths: [theSVG](https://thesvg.org/) (`claude/default.svg`, `codex-openai/default.svg`, `deepseek/default.svg`, `openrouter/mono.svg`, and `minimax/mono.svg`), MIT license. Brand marks belong to their respective owners. All are rendered monochrome by the shell.

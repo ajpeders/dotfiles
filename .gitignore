@@ -30,8 +30,8 @@
 !gtk-4.0/**
 !zsh/
 !zsh/**
-!jetshell/
-!jetshell/**
+# jetshell/ lives at ~/code/jetshell now; ~/.config/jetshell is a symlink to
+# that repo and the dotfiles repo does not track the shell's source.
 !yazi/
 !yazi/**
 !macos/

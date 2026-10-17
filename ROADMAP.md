@@ -28,6 +28,29 @@ Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026
   - **Done when:** Clicking a link in Kitty/OpenCode opens it in a new LibreWolf window on the current Hyprland workspace.
 - [x] Add Quickshell themes: white, black or red (switch via `jetshell ipc call theme set <mode>` or `Super + T`; wallpaper-matched mode removed 2026-10-17).
 
+## Split jetshell into its own repo
+
+- [ ] **JSH-01 — Create the jetshell repo, squash-import the tree** (ready, 2 pts)
+  - **Why:** `~/.config/jetshell/` and the parent dotfiles repo currently share history, so the shell cannot be installed or reviewed independently. A squash into a new repo at `~/code/jetshell` is the minimum to unblock everything below.
+  - **Start here:** `~/.config/jetshell/`, `~/code/jetshell/`, `git-filter-repo` and a fresh remote.
+  - **Do:** `git init ~/code/jetshell`, copy `jetshell/*` in (skip `__pycache__` per the parent `.gitignore`), single `chore: import from dotfiles (squash)` commit. Replace `~/.config/jetshell` with a symlink to `~/code/jetshell`. Add a one-line `~/.config/jetshell`-symlink note to HOWTO's JetShell section so a fresh clone of the dotfiles repo alone doesn't leave a dead symlink.
+  - **Done when:** A fresh `git -C ~/code/jetshell log` shows one commit with the full tree, and `readlink ~/.config/jetshell` points at the new repo. `install.sh` / `update.sh` / `doctor.sh` still pass unchanged.
+- [ ] **JSH-02 — Update parent repo docs to reflect the split** (blocked on JSH-01, 1 pt)
+  - **Why:** `ARCHITECTURE.md`, `HOWTO.md` (JetShell section) and `ROADMAP.md` (this section) still describe jetshell as part of the dotfiles repo. The facts are right (the symlink sits where the directory used to be) but the install steps reference a path that no longer exists without the symlink.
+  - **Start here:** `ARCHITECTURE.md`, `HOWTO.md`, `ROADMAP.md`.
+  - **Do:** Edit the JetShell paragraph in `ARCHITECTURE.md` to mention the symlink and the new repo. Add a short "fresh install" subsection to HOWTO that documents the clone order (dotfiles first, then `~/code/jetshell`, then `ln -s`). Mark the previous text as historical.
+  - **Done when:** Reading each doc, the install order is unambiguous and points at the right repos.
+- [ ] **JSH-03 — Stop hardcoding the path in the launcher and the systemd unit** (blocked on JSH-01, 2 pts)
+  - **Why:** `scripts/jetshell` pins `${XDG_CONFIG_HOME:-$HOME/.config}/jetshell` and `systemd/user/jetshell.service` pins `--path %h/.config/jetshell`. Both are fine while the symlink exists, and broken the moment someone clones just the shell repo. The current symlink approach papers over this; the abstraction needs to exist before a second consumer shows up.
+  - **Start here:** `scripts/jetshell`, `systemd/user/jetshell.service`, Quickshell's `--path` docs.
+  - **Do:** Add a `--path` / `JETSHELL_PATH` override to the launcher so a non-symlinked install works. Switch the unit's `ExecStart` to read the path from an env file (`EnvironmentFile=%h/.config/jetshell/path.conf`) or a drop-in; keep the existing default for compatibility.
+  - **Done when:** Both the launcher and the unit accept an overridden path, and the existing dotfiles-repo install still behaves identically without an override.
+- [ ] **JSH-04 — Decide whether the dotfiles repo ever tracks the new repo** (blocked on JSH-01, 1 pt)
+  - **Why:** A symlink keeps the parent repo unaware of the shell's history, which is the point of the split, but a doc-only pointer would survive a fresh clone better than a dead symlink.
+  - **Start here:** `scripts/install.sh`, `scripts/doctor.sh`, parent `ARCHITECTURE.md`.
+  - **Do:** Pick one of: (a) leave it as a symlink and document it, (b) add the new repo as a git submodule with an `install.sh` step, (c) add it as a subtree. The recommendation is (a) for now; (b) only if a second consumer actually appears.
+  - **Done when:** The decision is written down next to the JSH-01 entry and the right one is implemented.
+
 ## JetShell
 
 - [ ] **Dock** — app dock with icons, workspace filtering, hover previews
