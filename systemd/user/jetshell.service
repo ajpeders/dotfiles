@@ -1,0 +1,13 @@
+[Unit]
+Description=JetShell (Quickshell desktop shell)
+Documentation=https://quickshell.org/docs/
+# Keep retrying rather than giving up: a broken QML edit crash-loops until the
+# file is fixed, and the shell returns on its own after a compositor hiccup.
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+# --path is required: Quickshell only auto-discovers ~/.config/quickshell/.
+ExecStart=/usr/bin/quickshell --no-duplicate --path %h/.config/jetshell
+Restart=on-failure
+RestartSec=2

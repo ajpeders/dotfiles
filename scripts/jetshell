@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# jetshell — this repo's Quickshell shell under a short name. Quickshell only
+# auto-discovers ~/.config/quickshell/, and the config lives in jetshell/, so the
+# path is pinned here. Mirrors --path in systemd/user/jetshell.service.
+# --no-duplicate so a stray launch can't start a second shell; it is a no-op for
+# subcommands (`ipc call`, `log`, `list`).
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/jetshell"
+
+usage() {
+    cat <<'EOF'
+jetshell — this repo's Quickshell shell (config: ~/.config/jetshell/).
+
+Wraps `quickshell -p ~/.config/jetshell`. The shell is a systemd user unit, so it
+is normally already running; a bare `jetshell` shows this help instead of starting
+a second copy.
+
+Service:
+  systemctl --user restart jetshell.service     # reload after breaking the QML
+  systemctl --user status jetshell.service
+  journalctl --user -u jetshell.service -f
+
+Panels:
+  jetshell ipc call launcher toggle             # app launcher
+  jetshell ipc call notifications toggle        # notification center
+
+Theme and wallpaper:
+  jetshell ipc call theme get                   # -> white | black | wallpaper
+  jetshell ipc call theme set black             # white | black | wallpaper
+  jetshell ipc call theme cycle                 # white -> black -> wallpaper
+  jetshell ipc call theme getWallpaper
+  jetshell ipc call theme setWallpaper ~/Pictures/Wallpapers/upscaled_maoguin.png
+
+Info:
+  jetshell ipc call metrics get                 # CPU / RAM
+  jetshell ipc call metrics gpu                 # per-GPU VRAM
+  jetshell list                                 # running instances
+  jetshell log                                  # shell log
+
+Anything else passes straight through to quickshell (upstream: quickshell --help).
+EOF
+}
+
+case "${1:-}" in
+    ""|help|-h|--help) usage; exit 0 ;;
+esac
+
+exec /usr/bin/quickshell -p "$config_dir" --no-duplicate "$@"

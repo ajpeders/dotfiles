@@ -20,8 +20,9 @@ You are OpenCode's debug agent. You investigate crashes, misbehavior, performanc
 ## On this machine
 
 - Arch Linux. Hyprland session; check `hyprctl clients`, `hyprctl instances`, `hyprctl logs` for compositor issues.
-- Quickshell shell: config at `~/.config/quickshell/`, state at `~/.local/state/quickshell/`; IPC via `quickshell ipc call`.
-- It runs from `hypr/config/autostart.lua` (`quickshell --no-duplicate --daemonize`), not a systemd service.
+- JetShell (Quickshell) shell: config at `~/.config/jetshell/`, state at `~/.local/state/quickshell/`; IPC via `jetshell ipc call`.
+- From a terminal use the `jetshell` launcher (linked into `~/.local/bin`); it pins the non-standard config path with `-p`. Keybinds use `jetshell` too -- `hypr/config/environment.lua` prepends `~/.local/bin` to Hyprland's PATH, which omits it by default.
+- It runs as the systemd user unit `jetshell.service` (`Restart=on-failure`), started from `hypr/config/autostart.lua`; logs via `journalctl --user -u jetshell.service`.
 
 ## Output format
 

@@ -143,8 +143,19 @@ ssh() {
     )
 }
 
-alias ls='eza --icons'
-alias lc='eza -la --icons --group-directories-first'
+# icat — prefer kitty's image kitten inside a kitty window (real image
+# rendering via the graphics protocol); fall back to the AUR `icat` (ANSI
+# 256-color block renderer) elsewhere, e.g. a TTY or another terminal.
+icat() {
+    if [[ -n "${KITTY_WINDOW_ID:-}" ]]; then
+        command kitty +kitten icat "$@"
+    else
+        command icat "$@"
+    fi
+}
+
+alias ls='eza --icons=auto'
+alias lc='eza -la --icons=auto --group-directories-first'
 
 # --- VPN ---------------------------------------------------------------------
 # Two independent VPNs, neither enabled at boot; bring up whichever you need.
@@ -182,9 +193,6 @@ ts-down() {
 }
 alias ts-status='tailscale status'
 
-# Default cliamp to the Plex provider on launch
-alias cliamp='cliamp --provider plex'
-
 unset zle_bracketed_paste
 
 # Only fetch autosuggestions after 2+ characters to avoid freeze on single keys
@@ -204,6 +212,7 @@ fi
 # uv's env script adds it where uv is installed; make sure of it everywhere.
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 [[ ":$PATH:" == *":$HOME/.local/bin:"* ]] || export PATH="$HOME/.local/bin:$PATH"
+[[ ":$PATH:" == *":$HOME/bin:"* ]] || export PATH="$HOME/bin:$PATH"
 
 # opencode — packaged on Arch (pacman) and macOS (brew), so this only
 # matters where upstream's installer put it in ~/.opencode/bin (Debian).

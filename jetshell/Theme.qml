@@ -10,11 +10,12 @@ Singleton {
     readonly property string fontFamily: barFont.name
     readonly property string regularFontFamily: regularFont.name
     property string wallpaper: "file://" + Quickshell.env("HOME") + "/Pictures/Wallpapers/upscaled_maoguin.png"
-    readonly property color base: mode === "black" ? "#171717"
-                                  : mode === "wallpaper" && palette.colors.length ? palette.colors[0] : "#ddd6cf"
+    readonly property color base: mode === "black" ? "#080808"
+                                  : mode === "wallpaper" && palette.colors.length ? palette.colors[0] : "#e6e2de"
     readonly property color background: mode === "white" ? base : Qt.rgba(base.r, base.g, base.b, 0.93)
     readonly property color foreground: mode === "black" ? "#ffffff"
         : mode === "white" ? "#111111" : luminance(base) > 0.179 ? "#111111" : "#ffffff"
+    readonly property color panelBorder: mode === "white" ? "#918981" : foreground
 
     onModeChanged: kittySync.restart()
     onBaseChanged: kittySync.restart()
@@ -73,6 +74,11 @@ Singleton {
         target: "theme"
         function set(value: string): void { theme.setMode(value) }
         function get(): string { return theme.mode }
+        function cycle(): void { theme.cycle() }
+        function setWallpaper(value: string): void {
+            theme.setWallpaper(value.startsWith("file://") ? value : "file://" + value)
+        }
+        function getWallpaper(): string { return theme.wallpaper }
     }
 
     ColorQuantizer {

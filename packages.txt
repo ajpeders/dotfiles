@@ -69,6 +69,7 @@ kitty
 
 # Clipboard
 wl-clipboard
+cliphist
 
 # Audio control
 pipewire
@@ -79,9 +80,11 @@ wireplumber
 bluez
 bluez-utils
 
-# Screenshots
+# Screenshots and screen recording
 grim
 slurp
+swappy
+gpu-screen-recorder
 
 # Media controls
 playerctl
@@ -118,8 +121,8 @@ localsend-go
 # Image upscaling
 realesrgan-ncnn-vulkan
 
-# Music player (terminal, Winamp-style; Plex creds via `cliamp setup`)
-cliamp
+# Apple Music player (terminal, Winamp-style). -git tracks main.
+climat-git
 
 # Desktop shell
 quickshell

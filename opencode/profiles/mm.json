@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "minimax-coding-plan/MiniMax-M3",
+  "agents": {
+    "title": { "model": "minimax-coding-plan/MiniMax-M3" },
+    "build": { "model": "minimax-coding-plan/MiniMax-M3" },
+    "plan": { "model": "minimax-coding-plan/MiniMax-M3" },
+    "general": { "model": "minimax-coding-plan/MiniMax-M3" },
+    "explore": { "model": "minimax-coding-plan/MiniMax-M3" },
+    "scout": { "model": "minimax-coding-plan/MiniMax-M3" },
+    "review": { "model": "minimax-coding-plan/MiniMax-M3" },
+    "docs-writer": { "model": "minimax-coding-plan/MiniMax-M3" },
+    "debug": { "model": "minimax-coding-plan/MiniMax-M3" }
+  },
+  "experimental": {
+    "policies": [
+      { "action": "provider.use", "resource": "*", "effect": "deny" },
+      { "action": "provider.use", "resource": "minimax-coding-plan", "effect": "allow" }
+    ]
+  }
+}

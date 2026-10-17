@@ -2,7 +2,7 @@
 
 ## Status
 
-Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026-10-15). The shell is this repo's Quickshell config. Past work is in `git log`.
+Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026-10-15). The shell is JetShell, this repo's Quickshell config. Past work is in `git log`.
 
 ## Next
 
@@ -26,9 +26,9 @@ Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026
   - **Start here:** `xdg-mime` handler config, Kitty/OpenCode link launch code, Hyprland workspace rules.
   - **Do:** Investigate the launch path and browser window placement; try an alternative handler that opens links in a new window on the current workspace.
   - **Done when:** Clicking a link in Kitty/OpenCode opens it in a new LibreWolf window on the current Hyprland workspace.
-- [x] Add Quickshell themes: white, black, or wallpaper-matched colors (switch via `quickshell ipc call theme set <mode>`).
+- [x] Add Quickshell themes: white, black, or wallpaper-matched colors (switch via `jetshell ipc call theme set <mode>`).
 
-## Quickshell
+## JetShell
 
 - [ ] **Dock** — app dock with icons, workspace filtering, hover previews
 - [ ] **Notification center** — dunst/notify-desktop integration
@@ -36,12 +36,13 @@ Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026
 - [ ] **Media player widget** — MPRIS integration (Spotify, etc.)
 - [ ] **Settings popup** — brightness, volume, theme cycling, network, bluetooth
 - [ ] **System tray popover** — expandable menus for wifi, audio, battery
-- [ ] **Clipboard history** — `Super + V` (was Noctalia's clipboard panel)
+- [x] **Clipboard history** — `Super + Ctrl + V` (JetShell panel over cliphist; was Noctalia's clipboard panel)
 - [ ] **Session / power menu** — `Super + O` (lock, logout, reboot, shutdown)
 - [ ] **Caffeine toggle** — `Super + Shift + A` / `Super + Ctrl + A` idle inhibitor
 - [ ] **Brightness / volume OSD** — on-screen feedback (the keys now drive `brightnessctl` / `wpctl` directly)
 - [ ] **Tailscale and DNS widgets** — replaced the removed Noctalia plugins
 - [ ] **Render GTK/btop/qt6ct palettes from Quickshell** — only kitty is generated today; the GTK palettes are frozen copies
+- [ ] **MiniMax usage indicator** — the widget is data-driven, so MiniMax appears with no code change once the credential works; blocked because ai-usagebar's MiniMax vendor reads only `/v1/token_plan/remains`, which needs an active Token Plan, and the opencode key has none (`/v1/api/openplatform/charge/token_plan/usage` → `total_purchased: 0`). Unblocks by buying/assigning a Token Plan, or by putting the plan's team Subscription Key in `~/.config/ai-usagebar/config.toml` (`[minimax] api_key`). Entry is currently left armed there, so it starts reporting by itself.
 
 ## Ideas
 

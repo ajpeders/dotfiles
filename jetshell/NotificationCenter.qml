@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
 import Quickshell.Hyprland
+import Quickshell.Services.Notifications
 
 PanelWindow {
     id: center
@@ -42,10 +43,10 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        radius: 12
+        radius: 0
         color: Theme.background
         border.width: 1
-        border.color: Theme.foreground
+        border.color: Theme.panelBorder
         opacity: 0.92
 
         Column {
@@ -64,7 +65,7 @@ PanelWindow {
                     color: Theme.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: 18
-                    font.bold: true
+                    font.bold: false
                 }
 
                 Item { Layout.fillWidth: true }
@@ -110,7 +111,7 @@ PanelWindow {
                     required property var modelData
                     width: parent.width
                     height: center.itemHeight
-                    radius: 8
+                    radius: 0
                     color: modelData.urgency === NotificationUrgency.Critical
                             ? Qt.rgba(Theme.foreground.r, Theme.foreground.g, Theme.foreground.b, 0.08)
                             : "transparent"
@@ -143,7 +144,7 @@ PanelWindow {
                                 color: Theme.foreground
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 14
-                                font.bold: true
+                                font.bold: false
                                 elide: Text.ElideRight
                                 width: parent.width
                             }
@@ -169,9 +170,10 @@ PanelWindow {
                                 Repeater {
                                     model: modelData.actions
                                     Rectangle {
+                                        required property var modelData
                                         width: actionLabel.implicitWidth + 16
                                         height: 26
-                                        radius: 4
+                                        radius: 0
                                         color: "transparent"
                                         border.width: 1
                                         border.color: Theme.foreground
@@ -180,7 +182,7 @@ PanelWindow {
                                         Text {
                                             id: actionLabel
                                             anchors.centerIn: parent
-                                            text: modelData.label.replace("action.", "")
+                                            text: modelData.text
                                             color: Theme.foreground
                                             font.family: Theme.regularFontFamily
                                             font.pixelSize: 11

@@ -21,7 +21,7 @@ Item {
         opacity: indicator.adapter && indicator.adapter.enabled ? 1 : 0.5
         font.family: Theme.fontFamily
         font.pixelSize: 20
-        font.bold: true
+        font.bold: false
     }
 
     MouseArea {
@@ -45,7 +45,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             color: Theme.background
-            border.color: "#000000"
+            border.color: Theme.mode === "white" ? Theme.panelBorder : "#000000"
             border.width: 1
 
             Column {
@@ -63,7 +63,7 @@ Item {
                     color: Theme.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: 18
-                    font.bold: true
+                    font.bold: false
                 }
 
                 Rectangle {
@@ -120,7 +120,7 @@ Item {
                                 color: Theme.foreground
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 16
-                                font.bold: true
+                                font.bold: false
                             }
                             Text {
                                 text: BluetoothDeviceState.toString(modelData.state)

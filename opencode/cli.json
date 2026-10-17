@@ -8,5 +8,9 @@
     "prompt.editor": "<leader>e",
     "prompt.clear": "none",
     "session.interrupt": "ctrl+c"
-  }
+  },
+  "session": {
+    "verbosity": "high"
+  },
+  "animations": true
 }

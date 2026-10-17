@@ -21,7 +21,7 @@ print_phase()  { echo -e "\n${BOLD}== $1 ==${NC}"; }
 
 # Config dirs linked into ~/.config; desktop ones on full Arch installs only.
 DOTFILES_CLI_DIRS=(zsh yazi git tmux nvim opencode)
-DOTFILES_DESKTOP_DIRS=(hypr kitty gtk-3.0 gtk-4.0 quickshell)
+DOTFILES_DESKTOP_DIRS=(hypr kitty gtk-3.0 gtk-4.0 jetshell)
 
 DOTFILES_LOCK_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 DOTFILES_LOCK_PATH="$DOTFILES_LOCK_DIR/dotfiles.lock"
@@ -100,7 +100,7 @@ dotfiles_link_configs() {
         unlink "$HOME/.local/bin/opencode-cloud"
     fi
 
-    for launcher in opencode-local opencode-codex opencode-deep opencode-claude opencode-hybrid hq; do
+    for launcher in opencode-local opencode-codex opencode-ds opencode-claude opencode-hybrid opencode-or opencode-mm hq jetshell; do
         _dotfiles_link "$REPO_DIR/scripts/$launcher" "$HOME/.local/bin/$launcher"
     done
 

@@ -1,6 +1,7 @@
 //@ pragma UseQApplication
 
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -13,6 +14,10 @@ ShellRoot {
 
     NotificationCenter {
         id: notificationCenter
+    }
+
+    ClipboardPanel {
+        id: clipboard
     }
 
     IpcHandler {
@@ -28,6 +33,14 @@ ShellRoot {
         function toggle(): void {
             if (notificationCenter.visible) notificationCenter.close()
             else notificationCenter.open()
+        }
+    }
+
+    IpcHandler {
+        target: "clipboard"
+        function toggle(): void {
+            if (clipboard.visible) clipboard.close()
+            else clipboard.open()
         }
     }
 
@@ -52,6 +65,8 @@ ShellRoot {
                 source: Theme.wallpaper
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
+                layer.enabled: Theme.mode === "white"
+                layer.effect: MultiEffect { saturation: -1.0 }
             }
         }
     }
@@ -64,4 +79,6 @@ ShellRoot {
             screen: modelData
         }
     }
+
+    VolumeOsd {}
 }

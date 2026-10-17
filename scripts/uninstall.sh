@@ -24,7 +24,7 @@ unlink_if_managed() {
 for dir in "${DOTFILES_CLI_DIRS[@]}" "${DOTFILES_DESKTOP_DIRS[@]}"; do
     unlink_if_managed "$REPO_DIR/$dir" "$HOME/.config/$dir"
 done
-for launcher in opencode-local opencode-cloud opencode-codex opencode-deep opencode-claude opencode-hybrid hq; do
+for launcher in opencode-local opencode-cloud opencode-codex opencode-ds opencode-claude opencode-hybrid opencode-or opencode-mm hq; do
     unlink_if_managed "$REPO_DIR/scripts/$launcher" "$HOME/.local/bin/$launcher"
 done
 

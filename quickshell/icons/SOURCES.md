@@ -1,1 +1,0 @@
-Claude, Codex, and DeepSeek logo paths: [theSVG](https://thesvg.org/) (`claude/default.svg`, `codex-openai/default.svg`, and `deepseek/default.svg`), MIT license. Brand marks belong to their respective owners. All are rendered monochrome by the shell.

@@ -30,8 +30,8 @@
 !gtk-4.0/**
 !zsh/
 !zsh/**
-!quickshell/
-!quickshell/**
+!jetshell/
+!jetshell/**
 !yazi/
 !yazi/**
 !macos/
@@ -65,6 +65,11 @@ opencode/service.json
 # Single files inside otherwise-ignored dirs
 !librewolf/
 !librewolf/policies.json
+
+# The shell's systemd user unit. Everything else in systemd/ is per-machine.
+!systemd/
+!systemd/user/
+!systemd/user/jetshell.service
 
 # Session env defaults (LLM_SERVER_URL for opencode);
 # per-machine overrides stay out, same as llm.env.

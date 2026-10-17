@@ -103,7 +103,7 @@ PanelWindow {
         radius: 0
         color: Theme.background
         border.width: 4
-        border.color: Theme.foreground
+        border.color: Theme.panelBorder
 
         Column {
             anchors.fill: parent

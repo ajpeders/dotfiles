@@ -135,8 +135,10 @@ phase_dotfiles() {
     fi
     link "$REPO_DIR/scripts/opencode-local" "$HOME/.local/bin/opencode-local"
     link "$REPO_DIR/scripts/opencode-codex" "$HOME/.local/bin/opencode-codex"
-    link "$REPO_DIR/scripts/opencode-deep" "$HOME/.local/bin/opencode-deep"
+    link "$REPO_DIR/scripts/opencode-ds" "$HOME/.local/bin/opencode-ds"
     link "$REPO_DIR/scripts/opencode-claude" "$HOME/.local/bin/opencode-claude"
+    link "$REPO_DIR/scripts/opencode-or" "$HOME/.local/bin/opencode-or"
+    link "$REPO_DIR/scripts/opencode-mm" "$HOME/.local/bin/opencode-mm"
     link "$REPO_DIR/scripts/hq" "$HOME/.local/bin/hq"
     link "$REPO_DIR/scripts/opencode-hybrid" "$HOME/.local/bin/opencode-hybrid"
 

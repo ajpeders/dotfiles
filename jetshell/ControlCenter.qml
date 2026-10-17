@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell
 import Quickshell.Bluetooth
+import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Qt.labs.folderlistmodel
 
@@ -16,6 +17,32 @@ Item {
     readonly property var pairedDevices: adapter ? adapter.devices.values.filter(device => device.paired) : []
     readonly property var nearbyDevices: adapter ? adapter.devices.values.filter(device => !device.paired) : []
     property var scanningAdapter: null
+    property string dnsPreset: ""
+    readonly property var dnsPresets: [
+        { id: "lan", name: "LAN", servers: "192.168.0.176" },
+        { id: "router", name: "Router", servers: "DHCP" },
+        { id: "cloudflare", name: "Cloudflare", servers: "1.1.1.1" }
+    ]
+    readonly property string dnsName: {
+        const preset = dnsPresets.find(p => p.id === dnsPreset)
+        return preset ? preset.name : dnsPreset === "custom" ? "Custom" : "…"
+    }
+    property var tailscale: null
+    readonly property var tailscalePeers: tailscale && tailscale.Peer
+        ? Object.values(tailscale.Peer).sort((a, b) => a.DNSName.localeCompare(b.DNSName)) : []
+    readonly property bool tailscaleUp: !!tailscale && tailscale.BackendState === "Running"
+    function peerName(peer) { return peer.DNSName.split(".")[0] || peer.HostName }
+    function runTailscale(args) {
+        if (tailscaleAction.running) return
+        tailscaleAction.command = ["tailscale"].concat(args)
+        tailscaleAction.running = true
+    }
+    function setDns(preset) {
+        if (dnsSet.running) return
+        dnsPreset = ""
+        dnsSet.command = ["bash", Quickshell.shellPath("dns.sh"), "set", preset]
+        dnsSet.running = true
+    }
     function startSearch() {
         if (!adapter || !adapter.enabled) return
         scanningAdapter = adapter
@@ -38,26 +65,26 @@ Item {
     height: 30
 
     Item {
-        id: gearIcon
+        id: slidersIcon
         anchors.centerIn: parent
         width: 22
-        height: 22
+        height: 18
 
-        // Hand-drawn 11x11 pixel-art gear. Rendered on a 2px grid with square
-        // corners so it stays crisp and matches the Tamzen pixel theme.
+        // Hand-drawn 11x9 pixel-art faders: three horizontal sliders with evenly
+        // spaced rails and a small two-cell handle centered on each rail, at a
+        // different position per row. Rendered on a 2px grid with square corners
+        // so it stays crisp and matches the Tamzen pixel theme.
         readonly property var pixels: {
             const rows = [
-                "....###....",
-                "....###....",
-                "..#######..",
+                "..##.......",
                 ".#########.",
-                "####...####",
-                "####...####",
-                "####...####",
+                "..##.......",
+                ".......##..",
                 ".#########.",
-                "..#######..",
-                "....###....",
-                "....###...."
+                ".......##..",
+                "....##.....",
+                ".#########.",
+                "....##....."
             ]
             const cells = []
             for (let y = 0; y < rows.length; ++y)
@@ -67,7 +94,7 @@ Item {
         }
 
         Repeater {
-            model: gearIcon.pixels
+            model: slidersIcon.pixels
 
             Rectangle {
                 required property var modelData
@@ -96,6 +123,10 @@ Item {
         visible: controlCenter.selection.activePanel === "control-center"
         onVisibleChanged: {
             if (!visible) controlCenter.currentTopic = ""
+            else {
+                dnsGet.running = true
+                tailscaleStatus.running = true
+            }
         }
         implicitWidth: controlCenter.currentTopic === "Audio" ? 560 : 360
         implicitHeight: Math.min(content.implicitHeight + 24, 600)
@@ -104,7 +135,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             color: Theme.background
-            border.color: Theme.foreground
+            border.color: Theme.panelBorder
             border.width: 1
         }
 
@@ -164,6 +195,21 @@ Item {
                     ControlButton {
                         width: parent.width
                         height: 40
+                        text: "DNS · " + (dnsSet.running ? "Switching…" : controlCenter.dnsName)
+                        onClicked: controlCenter.currentTopic = "DNS"
+                    }
+
+                    ControlButton {
+                        width: parent.width
+                        height: 40
+                        text: "Tailscale · " + (!controlCenter.tailscale ? "…"
+                              : controlCenter.tailscaleUp ? "Connected" : controlCenter.tailscale.BackendState)
+                        onClicked: controlCenter.currentTopic = "Tailscale"
+                    }
+
+                    ControlButton {
+                        width: parent.width
+                        height: 40
                         text: "Theme · " + (Theme.mode === "black" ? "Dark"
                               : Theme.mode === "white" ? "Light" : "Wallpaper")
                         onClicked: Theme.cycle()
@@ -174,6 +220,73 @@ Item {
                         height: 40
                         text: "▣  Wallpaper"
                         onClicked: controlCenter.currentTopic = "Wallpaper"
+                    }
+                }
+
+                Repeater {
+                    model: controlCenter.currentTopic === "DNS" ? controlCenter.dnsPresets : []
+                    ControlButton {
+                        required property var modelData
+                        width: content.width
+                        enabled: !dnsSet.running
+                        text: (modelData.id === controlCenter.dnsPreset ? "✓ " : "") + modelData.name + " · " + modelData.servers
+                        onClicked: controlCenter.setDns(modelData.id)
+                    }
+                }
+
+                ControlButton {
+                    width: parent.width
+                    visible: controlCenter.currentTopic === "Tailscale"
+                    enabled: !!controlCenter.tailscale && !tailscaleAction.running
+                    text: tailscaleAction.running ? "Working…" : controlCenter.tailscaleUp ? "Disconnect" : "Connect"
+                    onClicked: controlCenter.runTailscale([controlCenter.tailscaleUp ? "down" : "up"])
+                }
+
+                Text {
+                    width: parent.width
+                    visible: controlCenter.currentTopic === "Tailscale" && tailscaleAction.error !== ""
+                    text: tailscaleAction.error
+                    wrapMode: Text.WordWrap
+                    color: Theme.foreground
+                    font.family: Theme.regularFontFamily
+                    font.pixelSize: 14
+                }
+
+                Heading {
+                    visible: controlCenter.currentTopic === "Tailscale" && controlCenter.tailscaleUp
+                    text: "Exit node"
+                }
+
+                Repeater {
+                    model: controlCenter.currentTopic === "Tailscale" && controlCenter.tailscaleUp
+                           ? [null].concat(controlCenter.tailscalePeers.filter(peer => peer.ExitNodeOption)) : []
+                    ControlButton {
+                        required property var modelData
+                        readonly property bool active: modelData ? modelData.ExitNode
+                            : !controlCenter.tailscalePeers.some(peer => peer.ExitNode)
+                        width: content.width
+                        enabled: !tailscaleAction.running && (!modelData || modelData.Online)
+                        text: (active ? "✓ " : "") + (modelData ? controlCenter.peerName(modelData) : "None")
+                        onClicked: controlCenter.runTailscale(["set", "--exit-node="
+                                                               + (modelData ? modelData.TailscaleIPs[0] : "")])
+                    }
+                }
+
+                Heading {
+                    visible: controlCenter.currentTopic === "Tailscale" && controlCenter.tailscaleUp
+                    text: "Devices · click to copy IP"
+                }
+
+                Repeater {
+                    model: controlCenter.currentTopic === "Tailscale" && controlCenter.tailscaleUp
+                           ? [controlCenter.tailscale.Self].concat(controlCenter.tailscalePeers) : []
+                    ControlButton {
+                        required property var modelData
+                        width: content.width
+                        opacity: modelData.Online ? 1 : 0.5
+                        text: (modelData.Online ? "● " : "○ ") + controlCenter.peerName(modelData)
+                              + " · " + modelData.TailscaleIPs[0]
+                        onClicked: Quickshell.execDetached(["wl-copy", modelData.TailscaleIPs[0]])
                     }
                 }
 
@@ -205,7 +318,7 @@ Item {
                         required property string fileName
                         width: content.width
                         height: 68
-                        radius: 4
+                        radius: 0
                         color: Qt.rgba(Theme.foreground.r, Theme.foreground.g, Theme.foreground.b,
                                        choiceMouse.containsMouse ? 0.18 : 0.08)
 
@@ -263,7 +376,10 @@ Item {
                                 enabled: !!audioColumn.node && !!audioColumn.node.audio
                                 text: !enabled ? "No device" : audioColumn.node.audio.muted
                                       ? "Unmute" : "Mute · " + Math.round(audioColumn.node.audio.volume * 100) + "%"
-                                onClicked: audioColumn.node.audio.muted = !audioColumn.node.audio.muted
+                                onClicked: {
+                                    VolumeOsdState.suppress()
+                                    audioColumn.node.audio.muted = !audioColumn.node.audio.muted
+                                }
                             }
 
                             Slider {
@@ -272,7 +388,10 @@ Item {
                                 to: 1
                                 enabled: !!audioColumn.node && !!audioColumn.node.audio
                                 value: enabled ? audioColumn.node.audio.volume : 0
-                                onMoved: audioColumn.node.audio.volume = value
+                                onMoved: {
+                                    VolumeOsdState.suppress()
+                                    audioColumn.node.audio.volume = value
+                                }
                                 palette.highlight: Theme.foreground
                             }
 
@@ -284,6 +403,7 @@ Item {
                                     text: (modelData === audioColumn.node ? "✓ " : "")
                                           + (modelData.description || modelData.name)
                                     onClicked: {
+                                        VolumeOsdState.suppress()
                                         if (audioColumn.isInput) Pipewire.preferredDefaultAudioSource = modelData
                                         else Pipewire.preferredDefaultAudioSink = modelData
                                     }
@@ -407,6 +527,47 @@ Item {
         objects: controlCenter.outputs.concat(controlCenter.inputs)
     }
 
+    Process {
+        id: dnsGet
+        command: ["bash", Quickshell.shellPath("dns.sh"), "get"]
+        stdout: StdioCollector {
+            onStreamFinished: controlCenter.dnsPreset = text.trim()
+        }
+    }
+
+    Process {
+        id: tailscaleStatus
+        command: ["tailscale", "status", "--json"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try { controlCenter.tailscale = JSON.parse(text) }
+                catch (e) { controlCenter.tailscale = { BackendState: "Unavailable" } }
+            }
+        }
+    }
+
+    Process {
+        id: tailscaleAction
+        property string error: ""
+        onStarted: error = ""
+        stderr: StdioCollector {
+            onStreamFinished: tailscaleAction.error = text.trim()
+        }
+        onExited: tailscaleStatus.running = true
+    }
+
+    Timer {
+        interval: 5000
+        repeat: true
+        running: panel.visible && controlCenter.currentTopic === "Tailscale"
+        onTriggered: tailscaleStatus.running = true
+    }
+
+    Process {
+        id: dnsSet
+        onExited: dnsGet.running = true
+    }
+
     Timer {
         id: searchTimer
         interval: 30000
@@ -417,7 +578,7 @@ Item {
         color: Theme.foreground
         font.family: Theme.fontFamily
         font.pixelSize: 18
-        font.bold: true
+        font.bold: false
         wrapMode: Text.WordWrap
     }
 
@@ -425,7 +586,9 @@ Item {
         property alias text: buttonLabel.text
         signal clicked()
         height: Math.max(32, buttonLabel.implicitHeight + 12)
-        radius: 4
+        radius: 0
+        border.width: 1
+        border.color: Theme.panelBorder
         color: Qt.rgba(Theme.foreground.r, Theme.foreground.g, Theme.foreground.b,
                        buttonMouse.containsMouse ? 0.18 : 0.08)
         opacity: enabled ? 1 : 0.5

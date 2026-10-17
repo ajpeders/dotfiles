@@ -161,10 +161,13 @@ case "$PLATFORM" in
         fi
         link_dotfile "$REPO_DIR/scripts/opencode-local"   "$HOME/.local/bin/opencode-local"
         link_dotfile "$REPO_DIR/scripts/opencode-codex"   "$HOME/.local/bin/opencode-codex"
-        link_dotfile "$REPO_DIR/scripts/opencode-deep"    "$HOME/.local/bin/opencode-deep"
+        link_dotfile "$REPO_DIR/scripts/opencode-ds"      "$HOME/.local/bin/opencode-ds"
         link_dotfile "$REPO_DIR/scripts/opencode-claude"  "$HOME/.local/bin/opencode-claude"
+        link_dotfile "$REPO_DIR/scripts/opencode-or"      "$HOME/.local/bin/opencode-or"
+        link_dotfile "$REPO_DIR/scripts/opencode-mm"      "$HOME/.local/bin/opencode-mm"
         link_dotfile "$REPO_DIR/scripts/hq"               "$HOME/.local/bin/hq"
         link_dotfile "$REPO_DIR/scripts/opencode-hybrid"  "$HOME/.local/bin/opencode-hybrid"
+        link_dotfile "$REPO_DIR/scripts/jetshell"         "$HOME/.local/bin/jetshell"
 
         # ZDOTDIR
         if [ ! -f "$HOME/.zshenv" ]; then

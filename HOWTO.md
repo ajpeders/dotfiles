@@ -46,7 +46,7 @@ package and the `--asexplicit` remark never happens.
 only in `[omarchy]` / `[omarchy-aarch64]` — `claude-code`, `yay`, `obs-studio`,
 `obsidian-appimage`, `dotnet-runtime-2.1`, `libva-v4l2_request-avd` (hardware
 video decode), `mise-bin`, plus `aether`, `herdr`, `omacut`, `omawrite`,
-`omacalc`, `tensaku`, `ttfx`, `voxtype-bin`, `cliamp`. The repos are an aarch64
+`omacalc`, `tensaku`, `ttfx`, `voxtype-bin`. The repos are an aarch64
 package source, unrelated to the desktop. If you do drop `[omarchy]`
 (`SigLevel = Required`, which is what `omarchy-keyring` signs), it uniquely
 serves only four: `hyprland`, `hyprland-guiutils` and `hyprtoolkit` come from
@@ -71,23 +71,101 @@ delete: `~/.local/share/omarchy-shell`, `~/.local/bin/omarchy-shell-start`,
 Edit `hypr/config/keybinds.lua`; it defines `mod` and the shell IPC command:
 
 ```lua
-hl.bind(mod .. " + X", hl.dsp.exec_cmd("quickshell ipc call <target> <fn>"))
+hl.bind(mod .. " + X", hl.dsp.exec_cmd("jetshell ipc call <target> <fn>"))
 ```
 
 Then `hyprctl reload && hyprctl configerrors` (a reload succeeds even with errors).
 
-## Quickshell
+## JetShell
+
+The shell (JetShell, a Quickshell config) runs under systemd (`systemd/user/jetshell.service`,
+`Restart=on-failure`), started at session start by `hypr/config/autostart.lua`. Manage it with
+`systemctl --user`:
 
 ```bash
-quickshell ipc call launcher toggle          # app launcher
-quickshell ipc call notifications toggle     # notification center
-quickshell ipc call theme set wallpaper      # white | black | wallpaper
-quickshell ipc call theme get
+systemctl --user restart jetshell.service     # reload after breaking the QML
+systemctl --user stop jetshell.service
+systemctl --user start jetshell.service
+systemctl --user status jetshell.service
+journalctl --user -u jetshell.service -f      # live log
+jetshell log                                  # same log, straight from the shell
+jetshell list                                 # running instances
 ```
 
-The shell is `quickshell/` in this repo; Quickshell watches its QML, so edits reload live. `hypr/config/autostart.lua` starts it (`quickshell --no-duplicate --daemonize`).
+Quickshell watches its own QML, so edits under `jetshell/` reload live -- restart only
+when the config failed to parse. The unit retries forever, so a bad edit crash-loops until
+the file is valid again and the shell returns on its own.
 
-Quickshell renders `kitty/themes/quickshell.conf` on startup and on theme changes (`quickshell/sync-kitty-theme.sh`, driven by `Theme.qml`). The GTK palettes (`gtk-{3,4}.0/quickshell.css`) are frozen copies until Quickshell renders them too -- see ROADMAP.
+The config lives at `~/.config/jetshell/`, which is not where Quickshell looks by default
+(`~/.config/quickshell/`), so the path is always passed explicitly -- `--path` in
+`systemd/user/jetshell.service`, and `-p` inside the `jetshell` launcher (`scripts/jetshell`,
+linked into `~/.local/bin`), which is just `quickshell -p ~/.config/jetshell "$@"`.
+
+Talk to the running shell over IPC. From a terminal, use `jetshell` (`jetshell help`
+lists all of it; a bare `jetshell` prints the same instead of starting a second shell):
+
+```bash
+jetshell ipc call launcher toggle                    # app launcher
+jetshell ipc call notifications toggle               # notification center
+jetshell ipc call clipboard toggle                   # clipboard history
+jetshell ipc call theme get                          # -> white | black | wallpaper
+jetshell ipc call theme set black                    # white | black | wallpaper
+jetshell ipc call theme cycle                        # white -> black -> wallpaper
+jetshell ipc call theme getWallpaper
+jetshell ipc call theme setWallpaper ~/Pictures/Wallpapers/upscaled_maoguin.png
+jetshell ipc call metrics get                        # CPU / RAM summary
+jetshell ipc call metrics gpu                        # per-GPU VRAM
+jetshell list                                        # running instances
+jetshell log                                         # shell log
+```
+
+Keybinds use `jetshell` too. That only works because `hypr/config/environment.lua` prepends
+`~/.local/bin` to Hyprland's own `PATH`, which excludes it by default (login shells add it).
+The line is idempotent -- Hyprland re-reads that file on every reload, so it drops any copies
+of the entry before re-adding one. Outside the Hyprland session entirely, pass
+`-p ~/.config/jetshell` to `quickshell` yourself.
+
+`setWallpaper` takes an absolute path (a `file://` URL works too) and persists with the
+theme choice under `~/.local/state/quickshell/`. The control center's Theme/Wallpaper
+buttons call the same functions. Keybinds live in `hypr/config/keybinds.lua`.
+
+Quickshell renders `kitty/themes/quickshell.conf` on startup and on theme changes (`jetshell/sync-kitty-theme.sh`, driven by `Theme.qml`). The GTK palettes (`gtk-{3,4}.0/quickshell.css`) are frozen copies until Quickshell renders them too -- see ROADMAP.
+
+## Use the clipboard history
+
+`Super + Ctrl + V` opens a picker over the last clipboard entries; type to filter, `Enter`
+puts the entry back on the clipboard, `Shift+Delete` drops it, `Esc` closes. Nothing is pasted
+for you -- paste with `Super + V` (or plain Ctrl+V) afterwards.
+
+Recording is done by `cliphist`, watched by `systemd/user/cliphist.service`
+(`wl-paste --watch cliphist store`; started from `hypr/config/autostart.lua` after the env
+import, so it has `WAYLAND_DISPLAY`). The panel (`jetshell/ClipboardPanel.qml`) only reads the
+list, so it costs nothing while closed.
+
+```bash
+systemctl --user status cliphist.service
+cliphist list | head                                  # newest first, "<id>\t<text>"
+cliphist decode <id> | wl-copy                        # what the panel runs on Enter
+cliphist wipe                                         # clear the whole history
+```
+
+History is plaintext, in `~/.cache/cliphist/db` -- anything you copy, passwords and API keys
+included, lands there until it ages out or you wipe it. Clear it after pasting a secret:
+
+```bash
+cliphist wipe && rm -f ~/.cache/cliphist/db
+```
+
+## Switch DNS
+
+Control center → DNS picks LAN (`192.168.0.176`, then the router), Router (DHCP) or Cloudflare. `jetshell/dns.sh` rewrites `ipv4/ipv6.dns` on every active ethernet/wifi NetworkManager connection and runs `nmcli device reapply`, so links stay up. No password needed: polkit allows `settings.modify.system` for the active session. To add a preset, edit the `V4`/`V6` tables in `dns.sh` and `dnsPresets` in `ControlCenter.qml`.
+
+systemd-resolved queries global servers alongside per-link ones, so a global `DNS=` would undercut the switcher. Keep `/etc/systemd/resolved.conf.d/10-lan-dns.conf` to `Domains=` only:
+
+```bash
+sudo sed -i '/^DNS=/d' /etc/systemd/resolved.conf.d/10-lan-dns.conf && sudo systemctl restart systemd-resolved
+jetshell/dns.sh get; resolvectl dns    # verify
+```
 
 ## Stop the screen locking mid-game or mid-video
 
@@ -116,6 +194,22 @@ Gotchas:
 - `width / scale` and `height / scale` must be whole numbers or cross-monitor focus breaks.
 - A mode lighting up isn't proof it holds: test refresh rates under load (a fullscreen game), not just on the desktop.
 
+## Take a screenshot or record the screen
+
+Both are keybinds over two scripts; the scripts are the single place to change behaviour.
+
+| Keys | What |
+| --- | --- |
+| `Super + P` | Full screen → `~/Pictures/Screenshots/` |
+| `Super + Shift + P` | Drag a region → file |
+| `Super + Ctrl + P` | Drag a region → clipboard |
+| `Super + Shift + S` | Drag a region → `swappy`; the saved file is written back on exit |
+| `Super + Shift + R` | Start/stop a screen recording |
+
+`hypr/scripts/screenshot.sh {full|region|copy|annotate}` uses `grim` + `slurp` and notifies on save. Esc during a region grab exits quietly — no error, no notification.
+
+`hypr/scripts/screen-record.sh [toggle|start|stop]` uses `gpu-screen-recorder` (GPU/VAAPI, no CPU hit) to record the **focused monitor** and the default audio output to `~/Videos/Screencasts/`. The pidfile lives in `$XDG_RUNTIME_DIR`; `SIGINT` is its stop-and-save. Override the directory with `RECORD_DIR`. To also capture the mic, add `-a default_input` to the command in the script. `gpu-screen-recorder` also does instant replay (`-r <secs>` + `SIGUSR1`), but that isn't wired to a keybind.
+
 ## LLM: opencode
 
 Everything defaults to the local server (`qwen3.6:35b-a3b`). Launchers, linked into `~/.local/bin` by the installers:
@@ -125,8 +219,10 @@ Everything defaults to the local server (`qwen3.6:35b-a3b`). Launchers, linked i
 | `opencode` | local by default, no automatic fallback (shared background service) |
 | `opencode-local` | local only, no fallback |
 | `opencode-codex` | every agent on `openai/gpt-6-sol`, no fallback |
-| `opencode-deep` | every agent on `deepseek/deepseek-flash` (V4.1 Flash), no fallback |
+| `opencode-ds` | every agent on `deepseek/deepseek-flash` (V4.1 Flash), no fallback |
 | `opencode-claude` | every agent on `anthropic/claude-opus-5-5` (direct Anthropic), no fallback |
+| `opencode-or` | OpenRouter only, no model pinned — pick one with `/models` |
+| `opencode-mm` | every agent on `minimax-coding-plan/MiniMax-M3` (MiniMax coding plan), no fallback |
 | `opencode-hybrid` | cloud for primary work; local for title, explore, and scout |
 
 Point it at the homelab llm-router (`bash scripts/setup-llm.sh http://<homelab>:8080/v1`), not a single llama-swap host: the router queues and picks whichever machine has the model loaded, so opencode and Hermes don't evict each other's models. `scripts/update.sh` re-checks the configured URL every sync (`setup-llm.sh --check`).
@@ -140,7 +236,7 @@ opencode debug config
 
 Keep every agent on one model: each llama-swap host runs `--parallel 1`, so a second model means swaps.
 The launchers use private servers so their model and plugin settings do not leak into the shared service.
-Connect the DeepSeek and Anthropic accounts with `/connect` before using their launchers.
+Connect the DeepSeek and Anthropic accounts with `/connect` before using their launchers. `opencode-or` needs an OpenRouter account too (`/connect openrouter`, or `OPENROUTER_API_KEY` in the environment); with no model pinned it falls back to the newest available OpenRouter model until you pick one from `/models`.
 
 ## LLM: hand work to Hermes
 
