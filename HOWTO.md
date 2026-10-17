@@ -108,9 +108,9 @@ lists all of it; a bare `jetshell` prints the same instead of starting a second 
 jetshell ipc call launcher toggle                    # app launcher
 jetshell ipc call notifications toggle               # notification center
 jetshell ipc call clipboard toggle                   # clipboard history
-jetshell ipc call theme get                          # -> white | black | wallpaper
-jetshell ipc call theme set black                    # white | black | wallpaper
-jetshell ipc call theme cycle                        # white -> black -> wallpaper
+jetshell ipc call theme get                          # -> white | black | red
+jetshell ipc call theme set black                    # white | black | red
+jetshell ipc call theme cycle                        # white -> black -> red (Super+T)
 jetshell ipc call theme getWallpaper
 jetshell ipc call theme setWallpaper ~/Pictures/Wallpapers/upscaled_maoguin.png
 jetshell ipc call metrics get                        # CPU / RAM summary
@@ -125,8 +125,9 @@ The line is idempotent -- Hyprland re-reads that file on every reload, so it dro
 of the entry before re-adding one. Outside the Hyprland session entirely, pass
 `-p ~/.config/jetshell` to `quickshell` yourself.
 
-`setWallpaper` takes an absolute path (a `file://` URL works too) and persists with the
-theme choice under `~/.local/state/quickshell/`. The control center's Theme/Wallpaper
+`setWallpaper` takes an absolute path (a `file://` URL works too) and sets the wallpaper
+for the *current* theme only: each theme (light, dark, red) keeps its own, so switching
+themes switches wallpapers. Choices persist under `~/.local/state/quickshell/` (`wallpapers`). The control center's Theme/Wallpaper
 buttons call the same functions. Keybinds live in `hypr/config/keybinds.lua`.
 
 Quickshell renders `kitty/themes/quickshell.conf` on startup and on theme changes (`jetshell/sync-kitty-theme.sh`, driven by `Theme.qml`). The GTK palettes (`gtk-{3,4}.0/quickshell.css`) are frozen copies until Quickshell renders them too -- see ROADMAP.

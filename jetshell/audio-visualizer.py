@@ -10,40 +10,41 @@ import numpy as np
 
 RATE = 48000
 SAMPLES = 2048
+CHANNELS = 2
 HOP = 800  # 60 updates per second, retaining the FFT's frequency resolution.
 BANDS = 24
-EDGES = np.geomspace(45, 8000, BANDS + 1)
-FREQUENCIES = np.fft.rfftfreq(SAMPLES, 1 / RATE)
+EDGES = np.geomspace(20, 20000, BANDS + 1)
 WINDOW = np.hanning(SAMPLES)
-
-# Band centers plus a gentle low-frequency emphasis. Without it the top bars
-# (which span a huge linear range and grab broadband air/hiss) dominate and the
-# lows barely move, producing a lopsided "only jumping on the right" look.
-CENTERS = np.sqrt(EDGES[:-1] * EDGES[1:])
-TILT_DB = 8 * np.log10(45.0 / CENTERS)
+# Each band needs at least one distinct FFT bin. At this window size the
+# narrowest logarithmic bands otherwise reuse the same low-frequency bin.
+BIN_EDGES = np.rint(EDGES * SAMPLES / RATE).astype(int)
+for index in range(1, len(BIN_EDGES)):
+    BIN_EDGES[index] = max(BIN_EDGES[index], BIN_EDGES[index - 1] + 1)
+POWER_SCALE = 2 / (SAMPLES * np.sum(WINDOW ** 2))
 
 
 def spectrum(samples):
-    """Return 24 logarithmic bands (0..1) on a fixed, low-emphasised dB scale."""
+    """Return 24 non-overlapping bands (0..1), scaled from -84 to -12 dBFS."""
     audio = np.asarray(samples, dtype=np.float64) / 32768.0
     if len(audio) != SAMPLES:
         raise ValueError(f"expected {SAMPLES} samples")
+    if audio.ndim == 1:
+        audio = audio[:, None]
+    if audio.ndim != 2 or audio.shape[1] not in (1, CHANNELS):
+        raise ValueError("expected mono or stereo audio")
     if np.max(np.abs(audio)) < 1e-4:
         return np.zeros(BANDS)
 
-    magnitudes = np.abs(np.fft.rfft(audio * WINDOW))
-    bands = np.empty(BANDS)
-    for index, (low, high) in enumerate(zip(EDGES[:-1], EDGES[1:])):
-        start = np.searchsorted(FREQUENCIES, low, side="left")
-        stop = np.searchsorted(FREQUENCIES, high, side="left")
-        if stop <= start:
-            start = min(np.searchsorted(FREQUENCIES, (low + high) / 2), len(magnitudes) - 1)
-            stop = start + 1
-        bands[index] = np.mean(magnitudes[start:stop])
-
-    amplitudes = bands * 2 / WINDOW.sum()
-    decibels = 20 * np.log10(np.maximum(amplitudes, 1e-10)) + TILT_DB
-    return np.clip((decibels + 65) / 55, 0, 1)
+    # Combine channel energy, not waveforms: a mono downmix can cancel
+    # out-of-phase stereo details before the FFT ever sees them.
+    magnitudes = np.abs(np.fft.rfft(audio * WINDOW[:, None], axis=0))
+    powers = np.mean(magnitudes ** 2, axis=1)
+    # Integrate energy rather than averaging magnitudes: wide treble bands
+    # must not dilute a tone just because they contain more FFT bins.
+    bands = np.array([np.sum(powers[start:stop])
+                      for start, stop in zip(BIN_EDGES[:-1], BIN_EDGES[1:])])
+    decibels = 10 * np.log10(np.maximum(bands * POWER_SCALE, 1e-12))
+    return np.clip((decibels + 84) / 72, 0, 1)
 
 
 def emit(bands):
@@ -58,13 +59,13 @@ def main():
     signal.signal(signal.SIGTERM, stop)
     proc = subprocess.Popen(
         ["parec", "--device=@DEFAULT_MONITOR@", "--format=s16le",
-         "--rate=48000", "--channels=1", "--latency-msec=16"],
+         "--rate=48000", f"--channels={CHANNELS}", "--latency-msec=16"],
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
     )
     smoothed = None
     try:
-        frame_bytes = SAMPLES * 2
+        frame_bytes = SAMPLES * CHANNELS * 2
         pending = bytearray()
         while True:
             chunk = proc.stdout.read(frame_bytes - len(pending))
@@ -72,7 +73,7 @@ def main():
                 break
             pending.extend(chunk)
             if len(pending) == frame_bytes:
-                bands = spectrum(np.frombuffer(pending, dtype="<i2"))
+                bands = spectrum(np.frombuffer(pending, dtype="<i2").reshape(SAMPLES, CHANNELS))
                 if smoothed is None:
                     smoothed = bands
                 else:
@@ -82,7 +83,7 @@ def main():
                                         smoothed * 0.45 + bands * 0.55,
                                         smoothed * 0.88 + bands * 0.12)
                 emit(smoothed)
-                del pending[:HOP * 2]
+                del pending[:HOP * CHANNELS * 2]
     except (KeyboardInterrupt, BrokenPipeError):
         pass
     finally:

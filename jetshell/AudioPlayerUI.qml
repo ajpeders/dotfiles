@@ -25,12 +25,26 @@ Item {
             Rectangle {
                 required property int index
                 width: 3
-                height: Math.max(1, 22 * (AudioPlayer.freq[index] || 0))
+                height: Math.max(1, 22 * Math.min(1, 1.8 * (AudioPlayer.freq[index] || 0)))
                 anchors.bottom: parent.bottom
                 color: Theme.foreground
                 opacity: AudioPlayer.playing ? 0.85 : 0.3
-                Behavior on height { NumberAnimation { duration: 150 } }
             }
+        }
+    }
+
+    Rectangle {
+        anchors.left: visualizer.left
+        anchors.top: visualizer.bottom
+        anchors.topMargin: 1
+        width: visualizer.width
+        height: 2
+        color: Qt.rgba(Theme.foreground.r, Theme.foreground.g, Theme.foreground.b, 0.2)
+
+        Rectangle {
+            width: parent.width * (Number.isFinite(progressBar.fraction) ? progressBar.fraction : 0)
+            height: parent.height
+            color: Theme.foreground
         }
     }
 
@@ -163,7 +177,7 @@ Item {
                     readonly property string timeText: {
                             if (!(AudioPlayer.player && AudioPlayer.player.positionSupported)) return "--:-- / --:--"
                             let pos = AudioPlayer.player.position
-                            let end = AudioPlayer.player.lengthSupported ? AudioPlayer.player.length : 0
+                             let end = AudioPlayer.duration
                             if (progressBar.scrubFraction >= 0 && end > 0)
                                 pos = progressBar.scrubFraction * end
                             return secsToString(pos) + " / " + (end > 0 ? secsToString(end) : "--:--")
@@ -212,10 +226,27 @@ Item {
                 height: 16
                 color: "transparent"
 
-                readonly property real len: !!AudioPlayer.player && AudioPlayer.player.lengthSupported
-                                            ? AudioPlayer.player.length : 0
-                readonly property bool seekable: !!AudioPlayer.player && AudioPlayer.player.canSeek && len > 0
-                readonly property real liveFraction: (!!AudioPlayer.player && AudioPlayer.player.lengthSupported
+                readonly property real len: AudioPlayer.duration
+                readonly property bool seekable: !!AudioPlayer.player && AudioPlayer.player.canSeek
+                    && AudioPlayer.player.positionSupported && Number.isFinite(len) && len > 0
+                readonly property var currentPlayer: AudioPlayer.player
+                readonly property int currentTrack: currentPlayer ? currentPlayer.uniqueId : -1
+                property var scrubPlayer: null
+                property int scrubTrack: -1
+                onCurrentPlayerChanged: cancelScrub()
+                onCurrentTrackChanged: cancelScrub()
+                onSeekableChanged: { if (!seekable) cancelScrub() }
+                Connections {
+                    target: playerPopup
+                    function onVisibleChanged() { if (!playerPopup.visible) progressBar.cancelScrub() }
+                }
+
+                function cancelScrub() {
+                    scrubFraction = -1
+                    scrubPlayer = null
+                    scrubTrack = -1
+                }
+                readonly property real liveFraction: (!!AudioPlayer.player && len > 0
                                                       && AudioPlayer.player.positionSupported)
                                                      ? Math.min(Math.max(AudioPlayer.player.position / Math.max(len, 0.1), 0), 1)
                                                      : 0
@@ -258,26 +289,33 @@ Item {
                     id: hoverable
                     anchors.fill: parent
                     hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
+                    enabled: progressBar.seekable
+                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
 
                     function fracAt(x) {
-                        return Math.min(Math.max(x / width, 0), 1)
+                        return Math.min(Math.max(x / Math.max(width, 1), 0), 1)
                     }
 
                     onPositionChanged: mouse => {
-                        if (pressed && progressBar.seekable)
+                        if (pressed && progressBar.scrubPlayer !== null)
                             progressBar.scrubFraction = fracAt(mouse.x)
                     }
                     onPressed: mouse => {
                         if (!progressBar.seekable) return
+                        progressBar.scrubPlayer = AudioPlayer.player
+                        progressBar.scrubTrack = progressBar.currentTrack
                         progressBar.scrubFraction = fracAt(mouse.x)
-                        AudioPlayer.player.position = progressBar.scrubFraction * progressBar.len
                     }
                     onReleased: mouse => {
-                        if (progressBar.seekable && progressBar.scrubFraction >= 0)
-                            AudioPlayer.player.position = progressBar.scrubFraction * progressBar.len
-                        progressBar.scrubFraction = -1
+                        // Commit once; seeking on press as well lets delayed player
+                        // updates from the first seek fight the final position.
+                        if (progressBar.seekable && progressBar.scrubFraction >= 0
+                            && progressBar.scrubPlayer === AudioPlayer.player
+                            && progressBar.scrubTrack === progressBar.currentTrack)
+                            AudioPlayer.player.position = fracAt(mouse.x) * progressBar.len
+                        progressBar.cancelScrub()
                     }
+                    onCanceled: progressBar.cancelScrub()
                 }
             }
 
@@ -287,15 +325,15 @@ Item {
 
                 AudioButton {
                     width: (parent.width - 32) / 5
-                    text: "-10s"
-                    enabled: !!AudioPlayer.player && AudioPlayer.player.canSeek
-                    onClicked: AudioPlayer.player.seek(-10)
-                }
-                AudioButton {
-                    width: (parent.width - 32) / 5
                     text: "Prev"
                     enabled: !!AudioPlayer.player && AudioPlayer.player.canGoPrevious
                     onClicked: AudioPlayer.player.previous()
+                }
+                AudioButton {
+                    width: (parent.width - 32) / 5
+                    text: "-10s"
+                    enabled: !!AudioPlayer.player && AudioPlayer.player.canSeek
+                    onClicked: AudioPlayer.player.seek(-10)
                 }
                 AudioButton {
                     width: (parent.width - 32) / 5
@@ -305,15 +343,15 @@ Item {
                 }
                 AudioButton {
                     width: (parent.width - 32) / 5
-                    text: "Next"
-                    enabled: !!AudioPlayer.player && AudioPlayer.player.canGoNext
-                    onClicked: AudioPlayer.player.next()
-                }
-                AudioButton {
-                    width: (parent.width - 32) / 5
                     text: "+10s"
                     enabled: !!AudioPlayer.player && AudioPlayer.player.canSeek
                     onClicked: AudioPlayer.player.seek(10)
+                }
+                AudioButton {
+                    width: (parent.width - 32) / 5
+                    text: "Next"
+                    enabled: !!AudioPlayer.player && AudioPlayer.player.canGoNext
+                    onClicked: AudioPlayer.player.next()
                 }
             }
 
@@ -323,7 +361,8 @@ Item {
                 spacing: 8
 
                 Text {
-                    text: "Player volume"
+                    id: volumeLabel
+                    text: "Source volume"
                     anchors.verticalCenter: parent.verticalCenter
                     color: Theme.foreground
                     font.family: Theme.regularFontFamily
@@ -332,13 +371,15 @@ Item {
 
                 Slider {
                     id: volumeSlider
-                    width: parent.width - 160
+                    width: Math.max(0, parent.width - volumeLabel.implicitWidth - volumePercent.width - 16)
+                    height: 28
                     anchors.verticalCenter: parent.verticalCenter
                     from: 0
                     to: 1
-                    enabled: !!AudioPlayer.player && AudioPlayer.player.volumeSupported
-                    value: enabled ? AudioPlayer.player.volume : 0
-                    onMoved: AudioPlayer.player.volume = value
+                    enabled: AudioPlayer.volumeSupported
+                    value: enabled ? AudioPlayer.volume : 0
+                    onMoved: AudioPlayer.setVolume(value)
+                    opacity: enabled ? 1 : 0.4
 
                     background: Rectangle {
                         x: volumeSlider.leftPadding
@@ -359,13 +400,17 @@ Item {
                         y: volumeSlider.topPadding + (volumeSlider.availableHeight - height) / 2
                         width: 10
                         height: 16
+                        implicitWidth: 10
+                        implicitHeight: 16
                         color: Theme.foreground
                     }
                 }
 
                 Text {
-                    text: AudioPlayer.player && AudioPlayer.player.volumeSupported
-                          ? Math.round(AudioPlayer.player.volume * 100) + "%" : "--%"
+                    id: volumePercent
+                    width: 44
+                    text: AudioPlayer.volumeSupported
+                          ? Math.round(AudioPlayer.volume * 100) + "%" : "--%"
                     anchors.verticalCenter: parent.verticalCenter
                     color: Theme.foreground
                     font.family: Theme.fontFamily

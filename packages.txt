@@ -126,6 +126,9 @@ climat-git
 
 # Desktop shell
 quickshell
+# FFT bands for JetShell's audio visualizer (parec is provided by libpulse).
+python-numpy
+libpulse
 # AI plan usage CLI (Quickshell's AIUsage widget reads `ai-usagebar usage --json`)
 ai-usagebar-bin
 

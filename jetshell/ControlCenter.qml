@@ -210,8 +210,7 @@ Item {
                     ControlButton {
                         width: parent.width
                         height: 40
-                        text: "Theme · " + (Theme.mode === "black" ? "Dark"
-                              : Theme.mode === "white" ? "Light" : "Wallpaper")
+                        text: "Theme · " + (Theme.mode === "black" ? "Dark" : Theme.mode === "red" ? "Red" : "Light")
                         onClicked: Theme.cycle()
                     }
 
@@ -292,7 +291,8 @@ Item {
 
                 Heading {
                     visible: controlCenter.currentTopic === "Wallpaper"
-                    text: "Choose wallpaper"
+                    text: "Choose wallpaper for the "
+                          + (Theme.mode === "black" ? "Dark" : Theme.mode === "red" ? "Red" : "Light") + " theme"
                 }
 
                 FolderListModel {

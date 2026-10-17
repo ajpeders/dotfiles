@@ -26,7 +26,7 @@ Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026
   - **Start here:** `xdg-mime` handler config, Kitty/OpenCode link launch code, Hyprland workspace rules.
   - **Do:** Investigate the launch path and browser window placement; try an alternative handler that opens links in a new window on the current workspace.
   - **Done when:** Clicking a link in Kitty/OpenCode opens it in a new LibreWolf window on the current Hyprland workspace.
-- [x] Add Quickshell themes: white, black, or wallpaper-matched colors (switch via `jetshell ipc call theme set <mode>`).
+- [x] Add Quickshell themes: white, black or red (switch via `jetshell ipc call theme set <mode>` or `Super + T`; wallpaper-matched mode removed 2026-10-17).
 
 ## JetShell
 
@@ -34,6 +34,7 @@ Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026
 - [ ] **Notification center** — dunst/notify-desktop integration
 - [ ] **Lock screen** — time, password prompt, wake gesture
 - [ ] **Media player widget** — MPRIS integration (Spotify, etc.)
+- [ ] **Media player time scrubber** — validate reliability with Chromium and other MPRIS players, both playing and paused. `jetshell/AudioPlayerUI.qml` now previews locally during dragging, commits one absolute seek on release (Quickshell maps this to `SetPosition`), and cancels on track/player changes. Confirm playback lands at the selected timestamp without snapping back; the earlier claim that Chromium's position is read-only was not established.
 - [ ] **Settings popup** — brightness, volume, theme cycling, network, bluetooth
 - [ ] **System tray popover** — expandable menus for wifi, audio, battery
 - [x] **Clipboard history** — `Super + Ctrl + V` (JetShell panel over cliphist; was Noctalia's clipboard panel)
@@ -48,4 +49,5 @@ Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026
 
 - Desktop widgets
 - Gaming mode toggle (disable shell animations, notifications)
+- Kitty `--single-instance`: every `Super + Return` starts its own kitty process (~150 MB each). One shared process would save memory; launch is already ~100 ms, so only worth it if RAM gets tight. `sync-kitty-theme.sh` already loops over every `kitty-quickshell-*` socket, so it keeps working.
 - Last personal bits in the repo: `rbw/config.json` and `rbw/pinentry-rbw` (vault URL, email, absolute pinentry path) plus the rbw HOWTO section. Options: untrack and move to `sync-private.sh`, or template them with a `*.example`.

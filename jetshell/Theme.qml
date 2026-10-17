@@ -9,17 +9,27 @@ Singleton {
     property string mode: "white"
     readonly property string fontFamily: barFont.name
     readonly property string regularFontFamily: regularFont.name
-    property string wallpaper: "file://" + Quickshell.env("HOME") + "/Pictures/Wallpapers/upscaled_maoguin.png"
-    readonly property color base: mode === "black" ? "#080808"
-                                  : mode === "wallpaper" && palette.colors.length ? palette.colors[0] : "#e6e2de"
-    readonly property color background: mode === "white" ? base : Qt.rgba(base.r, base.g, base.b, 0.93)
-    readonly property color foreground: mode === "black" ? "#ffffff"
-        : mode === "white" ? "#111111" : luminance(base) > 0.179 ? "#111111" : "#ffffff"
-    readonly property color panelBorder: mode === "white" ? "#918981" : foreground
+    // Each theme keeps its own wallpaper; a mode with none picked uses the fallback
+    // (the pre-per-theme saved wallpaper, else the default image).
+    property var wallpapers: ({})
+    property string fallbackWallpaper: "file://" + Quickshell.env("HOME") + "/Pictures/Wallpapers/upscaled_maoguin.png"
+    readonly property string wallpaper: wallpapers[mode] || fallbackWallpaper
+    // "red" is ink, paper and vermilion, sampled from the default wallpaper.
+    readonly property color targetBase: mode === "black" ? "#080808" : mode === "red" ? "#0e0c0a" : "#c0c0c0"
+    readonly property color targetForeground: mode === "black" ? "#ffffff" : mode === "red" ? "#ecddb5" : "#111111"
+    // The colours the UI binds to fade to their targets on a theme change.
+    readonly property int fadeDuration: 800
+    property color base: targetBase
+    property color background: mode === "white" ? targetBase
+                               : Qt.rgba(targetBase.r, targetBase.g, targetBase.b, 0.93)
+    property color foreground: targetForeground
+    property color panelBorder: mode === "white" ? "#6e6e6e" : mode === "red" ? "#d94420" : targetForeground
+    Behavior on base { ColorAnimation { duration: theme.fadeDuration; easing.type: Easing.InOutQuad } }
+    Behavior on background { ColorAnimation { duration: theme.fadeDuration; easing.type: Easing.InOutQuad } }
+    Behavior on foreground { ColorAnimation { duration: theme.fadeDuration; easing.type: Easing.InOutQuad } }
+    Behavior on panelBorder { ColorAnimation { duration: theme.fadeDuration; easing.type: Easing.InOutQuad } }
 
     onModeChanged: kittySync.restart()
-    onBaseChanged: kittySync.restart()
-    onForegroundChanged: kittySync.restart()
 
     Timer {
         id: kittySync
@@ -31,33 +41,28 @@ Singleton {
                 return
             }
             kittyUpdate.command = ["bash", Quickshell.shellPath("sync-kitty-theme.sh"),
-                                   theme.mode, theme.base.toString(), theme.foreground.toString()]
+                                   theme.mode, theme.targetBase.toString(), theme.targetForeground.toString()]
             kittyUpdate.running = true
         }
     }
 
     Process { id: kittyUpdate }
 
-    function luminance(color) {
-        function linear(channel) {
-            return channel <= 0.04045 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4)
-        }
-        return 0.2126 * linear(color.r) + 0.7152 * linear(color.g) + 0.0722 * linear(color.b)
-    }
-
     function setMode(value) {
-        if (!["white", "black", "wallpaper"].includes(value)) return
+        if (!["white", "black", "red"].includes(value)) return
         mode = value
         savedMode.setText(mode + "\n")
     }
 
     function cycle() {
-        setMode(mode === "white" ? "black" : mode === "black" ? "wallpaper" : "white")
+        setMode(mode === "white" ? "black" : mode === "black" ? "red" : "white")
     }
 
     function setWallpaper(url) {
-        wallpaper = url.toString()
-        savedWallpaper.setText(wallpaper + "\n")
+        const next = Object.assign({}, wallpapers)
+        next[mode] = url.toString()
+        wallpapers = next
+        savedWallpapers.setText(JSON.stringify(next) + "\n")
     }
 
     FontLoader {
@@ -81,20 +86,15 @@ Singleton {
         function getWallpaper(): string { return theme.wallpaper }
     }
 
-    ColorQuantizer {
-        id: palette
-        source: theme.wallpaper
-        depth: 3
-        rescaleSize: 64
-    }
-
     FileView {
         id: savedMode
         path: Quickshell.statePath("theme")
         printErrors: false // No saved choice on first launch.
         onLoaded: {
             const value = text().trim()
-            if (["white", "black", "wallpaper"].includes(value)) theme.mode = value
+            // "wallpaper" mode was removed; a saved choice of it falls back to black.
+            if (["white", "black", "red"].includes(value)) theme.mode = value
+            else if (value === "wallpaper") theme.mode = "black"
         }
     }
 
@@ -104,7 +104,21 @@ Singleton {
         printErrors: false
         onLoaded: {
             const value = text().trim()
-            if (value.startsWith("file://")) theme.wallpaper = value
+            if (value.startsWith("file://")) theme.fallbackWallpaper = value
+        }
+    }
+
+    FileView {
+        id: savedWallpapers
+        path: Quickshell.statePath("wallpapers")
+        printErrors: false // No per-theme choice yet.
+        onLoaded: {
+            let saved = {}
+            try { saved = JSON.parse(text()) } catch (e) { return }
+            const valid = {}
+            for (const key of ["white", "black", "red"])
+                if (typeof saved[key] === "string" && saved[key].startsWith("file://")) valid[key] = saved[key]
+            theme.wallpapers = valid
         }
     }
 }

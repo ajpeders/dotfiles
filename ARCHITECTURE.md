@@ -25,7 +25,7 @@ Native Lua (Hyprland 0.56+). `hypr/hyprland.lua` requires `hypr/config/*.lua`:
 
 ## Theming
 
-Quickshell renders the kitty palette at runtime (`jetshell/sync-kitty-theme.sh`). The GTK palettes (`gtk-{3,4}.0/quickshell.css`) are frozen copies until Quickshell renders them too (see ROADMAP); only the hand-written rules in each `gtk.css` are tracked, using libadwaita colour names. yazi uses the vendored catppuccin-mocha flavor.
+Quickshell renders the kitty palette at runtime (`jetshell/sync-kitty-theme.sh`), light and dark are monochrome (light grays on black, dark grays on the gray light-mode background); red is the default wallpaper's ink, paper and vermilion, with the accent in the red ANSI slots so fastfetch and the prompt pick it up. Theme changes fade over ~0.8 s in both the shell and kitty, and each theme keeps its own wallpaper. The GTK palettes (`gtk-{3,4}.0/quickshell.css`) are frozen copies until Quickshell renders them too (see ROADMAP); only the hand-written rules in each `gtk.css` are tracked, using libadwaita colour names. yazi uses the vendored catppuccin-mocha flavor.
 
 ## Key decisions
 

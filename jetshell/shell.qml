@@ -61,12 +61,16 @@ ShellRoot {
             WlrLayershell.layer: WlrLayer.Background
 
             Image {
+                id: wallpaperImage
+                // Light mode shows the wallpaper in grayscale, fading with the theme.
+                property real saturation: Theme.mode === "white" ? -1.0 : 0.0
+                Behavior on saturation { NumberAnimation { duration: Theme.fadeDuration; easing.type: Easing.InOutQuad } }
                 anchors.fill: parent
                 source: Theme.wallpaper
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
-                layer.enabled: Theme.mode === "white"
-                layer.effect: MultiEffect { saturation: -1.0 }
+                layer.enabled: saturation < 0
+                layer.effect: MultiEffect { saturation: wallpaperImage.saturation }
             }
         }
     }
@@ -81,4 +85,6 @@ ShellRoot {
     }
 
     VolumeOsd {}
+
+    DictationOsd {}
 }

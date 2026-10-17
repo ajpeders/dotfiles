@@ -27,6 +27,8 @@ hl.bind(mod .. " + SHIFT + F", hl.dsp.window.float({ action = "toggle" }))
 -- history, settings, control-center, session/power and caffeine had no
 -- Quickshell equivalent when Noctalia was removed -- see ROADMAP.md.
 hl.bind(mod .. " + N",     hl.dsp.exec_cmd("jetshell ipc call notifications toggle"))
+-- Cycles white -> black -> red; kitty follows via sync-kitty-theme.sh.
+hl.bind(mod .. " + T",     hl.dsp.exec_cmd("jetshell ipc call theme cycle"))
 hl.bind(mod .. " + L",     hl.dsp.exec_cmd("loginctl lock-session"))
 
 -- ====== Brightness (laptop) ======
@@ -58,6 +60,11 @@ hl.bind(mod .. " + SHIFT + P",  hl.dsp.exec_cmd(shot .. " region"))
 hl.bind(mod .. " + CTRL + P",   hl.dsp.exec_cmd(shot .. " copy"))
 hl.bind(mod .. " + SHIFT + S",  hl.dsp.exec_cmd(shot .. " annotate"))
 hl.bind(mod .. " + SHIFT + R",  hl.dsp.exec_cmd(rec .. " toggle"))
+
+-- ====== Dictation ======
+-- Offline speech-to-text (nerd-dictation + VOSK). Toggle: first press starts
+-- recording, second press stops and types. See scripts/nerd-dictation-toggle.sh.
+hl.bind(mod .. " + D", hl.dsp.exec_cmd("~/.config/hypr/scripts/nerd-dictation-toggle.sh"))
 
 -- ====== Monitor Focus (for gaming) ======
 hl.bind(mod .. " + Tab", hl.dsp.focus({ monitor = "+1" }))
