@@ -58,6 +58,7 @@ local rec  = "~/.config/hypr/scripts/screen-record.sh"
 hl.bind(mod .. " + P",          hl.dsp.exec_cmd(shot .. " full"))
 hl.bind(mod .. " + SHIFT + P",  hl.dsp.exec_cmd(shot .. " region"))
 hl.bind(mod .. " + CTRL + P",   hl.dsp.exec_cmd(shot .. " copy"))
+hl.bind(mod .. " + ALT + P",    hl.dsp.exec_cmd(shot .. " window"))
 hl.bind(mod .. " + SHIFT + S",  hl.dsp.exec_cmd(shot .. " annotate"))
 hl.bind(mod .. " + SHIFT + R",  hl.dsp.exec_cmd(rec .. " toggle"))
 

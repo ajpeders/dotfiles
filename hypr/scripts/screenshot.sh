@@ -2,6 +2,7 @@
 # Screenshots for Hyprland (Wayland): grim + slurp, optional swappy annotation.
 #
 #   screenshot.sh full      whole screen           -> file
+#   screenshot.sh window    focused window         -> clipboard
 #   screenshot.sh region    drag a region          -> file
 #   screenshot.sh copy      drag a region          -> clipboard only
 #   screenshot.sh annotate  drag a region          -> swappy, saves back on exit
@@ -28,6 +29,12 @@ case "$mode" in
         grim "$file"
         notify camera-photo "Screenshot" "Saved ${stamp}_screenshot.png"
         ;;
+    window)
+        geom=$(hyprctl activewindow -j | jq -r 'select(.at) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"') || exit 0
+        [ -n "$geom" ] || exit 0
+        grim -g "$geom" - | wl-copy
+        notify edit-copy "Screenshot" "Window copied to clipboard"
+        ;;
     region)
         geom="$(slurp)" || exit 0
         [ -n "$geom" ] || exit 0
@@ -47,7 +54,7 @@ case "$mode" in
         swappy -f "$file" -o "$file"
         ;;
     *)
-        echo "usage: ${0##*/} {full|region|copy|annotate}" >&2
+        echo "usage: ${0##*/} {full|window|region|copy|annotate}" >&2
         exit 2
         ;;
 esac

@@ -61,4 +61,4 @@ Mac uses `Alt` where Linux uses `Super`.
 | `Super + Shift + arrows` | `Alt + Shift + arrows` | Move window |
 | `Super + Ctrl + arrows` | `Alt + Ctrl + arrows` | Resize |
 
-Hyprland only: copy/paste `C` / `V` (forwarded as Ctrl+C/Ctrl+V), clipboard history `Ctrl+V`, launcher `Space`, notifications `N`, theme cycle `T`, lock `L`, brightness submap `B`, keyboard backlight `Shift+K`, screenshots `P` / `Shift+P` / `Ctrl+P`, annotate `Shift+S`, record toggle `Shift+R`, scratchpad `=` / `-`, exit `Shift+Q`. Full list: `hypr/config/keybinds.lua`.
+Hyprland only: copy/paste `C` / `V` (forwarded as Ctrl+C/Ctrl+V), clipboard history `Ctrl+V`, launcher `Space`, notifications `N`, theme cycle `T`, lock `L`, brightness submap `B`, keyboard backlight `Shift+K`, screenshots `P` / `Shift+P` / `Ctrl+P` / `Alt+P`, annotate `Shift+S`, record toggle `Shift+R`, scratchpad `=` / `-`, exit `Shift+Q`. Full list: `hypr/config/keybinds.lua`.

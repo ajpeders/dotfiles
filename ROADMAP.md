@@ -27,6 +27,7 @@ Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026
   - **Do:** Investigate the launch path and browser window placement; try an alternative handler that opens links in a new window on the current workspace.
   - **Done when:** Clicking a link in Kitty/OpenCode opens it in a new LibreWolf window on the current Hyprland workspace.
 - [x] Add Quickshell themes: white, black or red (switch via `jetshell ipc call theme set <mode>` or `Super + T`; wallpaper-matched mode removed 2026-10-17).
+- [x] **DOT-05 — Window screenshot keybind** — `Super + Alt + P` captures the focused window's client area; new `window` case in `screenshot.sh`; keybinds, HOWTO, and the README Hyprland-only line updated. Recheck: `hyprctl reload && hyprctl configerrors` clean, `Super + Shift + R` (record) still works.
 
 ## Split jetshell into its own repo
 
@@ -63,6 +64,7 @@ Hyprland is the Linux desktop (Omarchy removed 2026-09-26; Noctalia removed 2026
 - [x] **Clipboard history** — `Super + Ctrl + V` (JetShell panel over cliphist; was Noctalia's clipboard panel)
 - [ ] **Session / power menu** — `Super + O` (lock, logout, reboot, shutdown)
 - [ ] **Caffeine toggle** — `Super + Shift + A` / `Super + Ctrl + A` idle inhibitor
+- [ ] **Top-bar volume percentage position** — fix where the `NN%` label sits next to the volume bars in the top-left of the bar (`jetshell/TopBar.qml`, `volumePercent`, anchored to `volumeBars.right`)
 - [ ] **Brightness / volume OSD** — on-screen feedback (the keys now drive `brightnessctl` / `wpctl` directly)
 - [ ] **Tailscale and DNS widgets** — replaced the removed Noctalia plugins
 - [ ] **Render GTK/btop/qt6ct palettes from Quickshell** — only kitty is generated today; the GTK palettes are frozen copies

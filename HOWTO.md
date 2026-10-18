@@ -204,10 +204,11 @@ Both are keybinds over two scripts; the scripts are the single place to change b
 | `Super + P` | Full screen → `~/Pictures/Screenshots/` |
 | `Super + Shift + P` | Drag a region → file |
 | `Super + Ctrl + P` | Drag a region → clipboard |
+| `Super + Alt + P` | Focused window → clipboard |
 | `Super + Shift + S` | Drag a region → `swappy`; the saved file is written back on exit |
 | `Super + Shift + R` | Start/stop a screen recording |
 
-`hypr/scripts/screenshot.sh {full|region|copy|annotate}` uses `grim` + `slurp` and notifies on save. Esc during a region grab exits quietly — no error, no notification.
+`hypr/scripts/screenshot.sh {full|window|region|copy|annotate}` uses `grim` + `slurp` and notifies on save. Esc during a region grab exits quietly — no error, no notification. The `window` mode uses `hyprctl activewindow -j` (client area only, no border).
 
 `hypr/scripts/screen-record.sh [toggle|start|stop]` uses `gpu-screen-recorder` (GPU/VAAPI, no CPU hit) to record the **focused monitor** and the default audio output to `~/Videos/Screencasts/`. The pidfile lives in `$XDG_RUNTIME_DIR`; `SIGINT` is its stop-and-save. Override the directory with `RECORD_DIR`. To also capture the mic, add `-a default_input` to the command in the script. `gpu-screen-recorder` also does instant replay (`-r <secs>` + `SIGUSR1`), but that isn't wired to a keybind.
 
