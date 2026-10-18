@@ -81,6 +81,15 @@ else
     fi
 fi
 
+if [ "$mode_value" = "headless" ]; then
+    info "Headless mode; JetShell not required."
+elif [ -f "$HOME/.config/jetshell/shell.qml" ]; then
+    ok "JetShell checkout found at ~/.config/jetshell."
+else
+    err "JetShell missing: clone it into ~/.config/jetshell or symlink a checkout there."
+    note_error
+fi
+
 # ---------------------------------------------------------------------------
 # Display managers (graphical hosts only)
 # ---------------------------------------------------------------------------
@@ -90,7 +99,24 @@ section "Display managers"
 if ! command -v systemctl >/dev/null 2>&1; then
     info "systemctl unavailable; skipping."
 elif [ "$mode_value" = "headless" ]; then
-    info "Headless mode; display managers intentionally absent."
+    enabled_dms=()
+    for dm in sddm.service gdm.service lightdm.service ly.service ly@tty1.service; do
+        if systemctl is-enabled --quiet "$dm" 2>/dev/null; then
+            enabled_dms+=("$dm")
+        fi
+    done
+    if [ ${#enabled_dms[@]} -gt 0 ]; then
+        err "Headless mode has enabled display managers: ${enabled_dms[*]}"
+        note_error
+    else
+        ok "No display manager enabled (headless mode)."
+    fi
+    if [ "$(systemctl get-default 2>/dev/null)" != "multi-user.target" ]; then
+        err "Headless mode should default to multi-user.target."
+        note_error
+    else
+        ok "Default target is multi-user.target."
+    fi
 else
     enabled_dms=()
     for dm in sddm.service gdm.service lightdm.service ly.service ly@tty1.service; do

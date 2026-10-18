@@ -192,16 +192,13 @@ print_phase "Phase 3: Environment Checks"
 # Rather than sourcing (which pulls in OMZ, plugins, etc.), extract
 # EDITOR from the user's config files.
 if [ -z "${EDITOR:-}" ]; then
-    for _cfg in "$ZDOTDIR/.zshenv" "$HOME/.config/zsh/.zshenv" \
-                 "$ZDOTDIR/.zshrc" "$HOME/.config/zsh/.zshrc" \
+    for _cfg in "${ZDOTDIR:-$HOME/.config/zsh}/.zshenv" "$HOME/.config/zsh/.zshenv" \
+                 "${ZDOTDIR:-$HOME/.config/zsh}/.zshrc" "$HOME/.config/zsh/.zshrc" \
                  "$HOME/.zshenv" "$HOME/.zshrc" \
                  "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile"; do
-        if [ -r "$_cfg" ]; then
-            _editor="$(grep -m1 '^export EDITOR=' "$_cfg" | sed 's/^export EDITOR=//')"
-            if [ -n "$_editor" ]; then
-                export EDITOR="$_editor"
-                break
-            fi
+        if [ -r "$_cfg" ] && _editor="$(grep -m1 '^export EDITOR=' "$_cfg")"; then
+            export EDITOR="${_editor#export EDITOR=}"
+            break
         fi
     done
     unset _cfg _editor

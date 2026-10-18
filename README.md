@@ -9,6 +9,7 @@ See [ARCHITECTURE](ARCHITECTURE.md) for how it fits together, [HOWTO](HOWTO.md) 
 ```bash
 # Arch: clone into ~/.config, then choose desktop or headless
 git clone <your-dotfiles-repo-url> ~/.config
+git clone <your-jetshell-repo-url> ~/.config/jetshell  # required for desktop only
 bash ~/.config/scripts/install.sh              # Arch desktop
 bash ~/.config/scripts/install.sh --headless   # Arch, CLI + sshd only
 
@@ -16,6 +17,10 @@ bash ~/.config/scripts/install.sh --headless   # Arch, CLI + sshd only
 git clone <your-dotfiles-repo-url> ~/dotfiles
 bash ~/dotfiles/macos/install.sh
 ```
+
+JetShell is a separate repo. If it already lives elsewhere, symlink that
+checkout to `~/.config/jetshell` instead. The desktop installer checks for its
+`shell.qml` before installing packages; headless installs do not need it.
 
 Then run `p10k configure`.
 
@@ -27,7 +32,8 @@ also remains in place. Re-run the matching installer to restore links.
 ## Keep in sync
 
 ```bash
-bash scripts/update.sh                # Arch: pull, packages, relink, reload
+bash scripts/update.sh                # Arch desktop: pull, relink, reload
+bash scripts/update.sh --headless     # Arch headless: relink CLI only, no GUI reload
 bash scripts/doctor.sh                # read-only health check
 bash scripts/sync-private.sh user@host  # private files (wallpapers, ssh, rclone, wireguard, gh)
 bash scripts/setup-llm.sh [base-url]  # optional: point opencode at another LLM server

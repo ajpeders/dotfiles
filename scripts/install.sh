@@ -69,6 +69,15 @@ phase_preflight() {
     fi
     print_status "Dotfiles repo found at: $REPO_DIR"
 
+    if [ "$HEADLESS" -eq 0 ]; then
+        if [ ! -f "$HOME/.config/jetshell/shell.qml" ]; then
+            print_error "JetShell is required for a desktop install: ~/.config/jetshell/shell.qml is missing"
+            print_info "Clone the JetShell repo into ~/.config/jetshell (or symlink an existing checkout there), then retry."
+            exit 1
+        fi
+        print_status "JetShell checkout found at: $HOME/.config/jetshell"
+    fi
+
     echo ""
     print_info "This script will:"
     echo "  - Install paru if needed"
@@ -141,9 +150,9 @@ read_packages() {
         pkgs+=("$line")
     done < "$REPO_DIR/packages.txt"
 
-    # Apple Silicon (Asahi) extras. Kept out of packages.txt so x86 never
-    # tries to build them from the AUR.
-    if [ "$(uname -m)" = "aarch64" ] && [ -f "$REPO_DIR/packages-asahi.txt" ]; then
+    # Apple Silicon (Asahi) speaker stack is desktop-only. Kept out of
+    # packages.txt so x86 never tries to build it from the AUR.
+    if [ "$HEADLESS" -eq 0 ] && [ "$(uname -m)" = "aarch64" ] && [ -f "$REPO_DIR/packages-asahi.txt" ]; then
         while IFS= read -r line; do
             line="${line%%#*}"
             line="${line//[[:space:]]/}"
@@ -308,14 +317,6 @@ phase_shell() {
         print_status "powerlevel10k installed"
     fi
 
-    # Editor for OpenCode's external editor prompt (Ctrl+X E)
-    if ! grep -q 'export EDITOR=' "$HOME/.zshrc" 2>/dev/null; then
-        printf '\n# Editor for OpenCode external editor (Ctrl+X E)\nexport EDITOR=nvim\n' >> "$HOME/.zshrc"
-        print_status "Added EDITOR=nvim to ~/.zshrc"
-    else
-        print_status "EDITOR already set in ~/.zshrc"
-    fi
-
 }
 
 phase_services() {
@@ -387,7 +388,7 @@ phase_session() {
 
     print_phase "Phase 9: Display Manager (ly)"
 
-    local ly_unit=""
+    local ly_unit="" other_ly_unit=""
     local dm
     for dm in gdm sddm lightdm; do
         if systemctl is-enabled --quiet "$dm" 2>/dev/null; then
@@ -398,8 +399,15 @@ phase_session() {
 
     if [[ -f /usr/lib/systemd/system/ly@.service ]]; then
         ly_unit="ly@tty1.service"
+        other_ly_unit="ly.service"
     else
         ly_unit="ly.service"
+        other_ly_unit="ly@tty1.service"
+    fi
+
+    if systemctl is-enabled --quiet "$other_ly_unit" 2>/dev/null; then
+        sudo systemctl disable "$other_ly_unit"
+        print_status "Disabled conflicting display manager: $other_ly_unit"
     fi
 
     if systemctl is-enabled --quiet "$ly_unit" 2>/dev/null; then
@@ -407,6 +415,11 @@ phase_session() {
     else
         sudo systemctl enable "$ly_unit"
         print_status "Enabled: $ly_unit"
+    fi
+
+    if [ "$(systemctl get-default)" != "graphical.target" ]; then
+        sudo systemctl set-default graphical.target
+        print_status "Default target set to graphical.target"
     fi
 }
 
