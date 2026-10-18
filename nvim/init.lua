@@ -8,6 +8,21 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true
 vim.opt.termguicolors = true
+-- Use the light palette when Kitty's generated theme has a light background.
+local kitty_theme = vim.fn.expand('~/.config/kitty/themes/quickshell.conf')
+local theme_file = io.open(kitty_theme, 'r')
+if theme_file then
+  for line in theme_file:lines() do
+    if line:match('^background%s+#c0c0c0$') then
+      vim.opt.background = 'light'
+      break
+    end
+  end
+  theme_file:close()
+end
+-- Keep Kitty's foreground, background and opacity instead of Neovim's defaults.
+vim.cmd('highlight Normal guifg=NONE guibg=NONE')
+vim.cmd('highlight NormalFloat guibg=NONE')
 vim.opt.scrolloff = 8
 vim.opt.signcolumn = 'yes'
 
