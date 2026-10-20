@@ -12,6 +12,7 @@
 [core]
 	editor = nvim
 	hooksPath = ~/.config/git/hooks   # Global hooks; replaces every repo's own .git/hooks
+	excludesFile = ~/.config/git/ignore
 [credential "https://github.com"]
 	helper =                  # Reset any inherited helper (e.g. store)
 	helper = !gh auth git-credential

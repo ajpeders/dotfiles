@@ -1,1 +1,8 @@
 **/.claude/settings.local.json
+
+# ~/.config/jetshell is a symlink to ~/code/jetshell (the source repo,
+# tracked there). git recurses the worktree with :(literal). for opencode
+# snapshot discovery and refuses path-listing past the symlink because the
+# target is outside the worktree (\"pathspec X is beyond a symbolic link\").
+/jet*
+jetshell

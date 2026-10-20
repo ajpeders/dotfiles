@@ -1,0 +1,21 @@
+# Default http(s) handler, installed to ~/.local/share/applications by
+# dotfiles_browser_link_handler (scripts/lib-dotfiles.sh).
+#
+# LibreWolf's own desktop entry runs `librewolf %u`, which opens the URL as a
+# tab in the most recently used window. That window lives on whichever
+# workspace it was last left on, so a link clicked in kitty or opencode
+# appeared to open "somewhere else". --new-window asks for a fresh window
+# instead, and Hyprland puts new windows on the focused monitor's active
+# workspace, so the link lands where the click happened.
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=LibreWolf (new window)
+Comment=Open links in a new LibreWolf window on the current workspace
+Exec=/usr/bin/librewolf --new-window %u
+Icon=librewolf
+Terminal=false
+NoDisplay=true
+StartupNotify=true
+Categories=Network;WebBrowser;
+MimeType=text/html;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;

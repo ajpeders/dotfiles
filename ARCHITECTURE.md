@@ -2,7 +2,7 @@
 
 ## Overview
 
-The git repo is `~/.config` itself. `scripts/install.sh` bootstraps a machine (packages, links, shell, services); `scripts/update.sh` resyncs it; `scripts/doctor.sh` checks it read-only; `scripts/uninstall.sh` removes only the links it made. Scripts resolve the repo root as `$REPO_DIR` (one level up). macOS clones elsewhere and `macos/install.sh` symlinks into `~/.config`.
+The dotfiles git repo is `~/.config` itself. JetShell is maintained separately at `~/code/jetshell`; `~/.config/jetshell` is a symlink to that checkout. `scripts/install.sh` bootstraps a machine (packages, links, shell, services); `scripts/update.sh` resyncs it; `scripts/doctor.sh` checks it read-only; `scripts/uninstall.sh` removes only the links it made. Scripts resolve the dotfiles repo root as `$REPO_DIR` (one level up). macOS clones the dotfiles elsewhere and `macos/install.sh` symlinks into `~/.config`.
 
 ```
 Hyprland (compositor)
@@ -30,7 +30,8 @@ Quickshell renders the kitty palette at runtime (`jetshell/sync-kitty-theme.sh`)
 ## Key decisions
 
 - **Monitors keyed by EDID, positioned absolutely.** `monitors.lua` matches panels by `desc:` (make/model), not connector, and gives known panels absolute coordinates; unknown displays hit an `auto` catch-all. Connector names mean different panels at different desks, and relative `auto-*` placement depended on connection order. `nwg-displays` emits connector-keyed layouts, so it's not used.
-- **Custom shell: JetShell.** Noctalia 5 was removed 2026-10-15 in favour of this repo's own Quickshell config (bar, launcher, notifications, wallpaper, theme, clipboard history). A session menu, caffeine and a brightness/volume OSD are still missing (ROADMAP).
+- **Custom shell: JetShell.** Noctalia 5 was removed 2026-10-15 in favour of the separately maintained JetShell Quickshell config (bar, launcher, notifications, wallpaper, theme, clipboard history). A session menu, caffeine and a brightness/volume OSD are still missing (ROADMAP).
+- **JetShell is a separate checkout.** The shell has its own repo at `~/code/jetshell`; `~/.config/jetshell` is a documented symlink, not a submodule or subtree. This keeps its history independent and install/update can continue to use the existing config path. See HOWTO for fresh-install order.
 - **One desktop stack.** A second stack (Omarchy) behind runtime detection cost more than it gave and was removed on 2026-09-26; recover from `b0b8471^` if ever needed.
 - **ly** as display manager — minimal TUI.
 - **Global git hook.** `git/config` sets `core.hooksPath` to `git/hooks/`, whose `prepare-commit-msg` strips every `Co-Authored-By:` and `Claude-*:` trailer. GitHub HTTPS auth goes through `gh auth git-credential`.

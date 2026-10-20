@@ -205,3 +205,58 @@ PY
     sudo install -Dm644 "$merged" "$dst"
     print_status "Librewolf policies installed; restart Librewolf to apply"
 }
+
+# dotfiles_browser_link_handler -- register librewolf/new-window.desktop as the
+# default http(s) handler.
+#
+# kitty (open_url_with default) and opencode both hand a clicked link to
+# xdg-open, which resolves the MIME type to a desktop entry. Left alone that is
+# LibreWolf's own entry, `librewolf %u`, which opens the URL as a tab in the
+# most recently used window — a window sitting on whatever workspace it was last
+# left on, which is why links seemed to open on the wrong workspace. Routing the
+# same URL through --new-window gets a fresh window, and Hyprland maps new
+# windows onto the focused monitor's active workspace.
+#
+# Writes only to ~/.local/share/applications and the (untracked) mimeapps.list.
+dotfiles_browser_link_handler() {
+    local src="$REPO_DIR/librewolf/new-window.desktop"
+    local dst="$HOME/.local/share/applications/librewolf-new-window.desktop"
+
+    if [ ! -f "$src" ]; then
+        print_info "No librewolf/new-window.desktop in repo — skipping link handler"
+        return
+    fi
+
+    if ! command -v xdg-mime >/dev/null 2>&1; then
+        print_info "xdg-mime unavailable — skipping link handler"
+        return
+    fi
+
+    mkdir -p "$(dirname "$dst")"
+    if ! install -Dm644 "$src" "$dst"; then
+        print_error "Could not install link handler: $dst"
+        return
+    fi
+
+    local mime current changed=0 failed=0
+    for mime in x-scheme-handler/http x-scheme-handler/https \
+                text/html application/xhtml+xml; do
+        current="$(xdg-mime query default "$mime" 2>/dev/null || true)"
+        [ "$current" = "librewolf-new-window.desktop" ] && continue
+        if xdg-mime default librewolf-new-window.desktop "$mime" >/dev/null 2>&1; then
+            changed=1
+            print_info "  $mime: ${current:-<unset>} → librewolf-new-window.desktop"
+        else
+            print_error "Could not set default handler for $mime"
+            failed=1
+        fi
+    done
+
+    [ "$failed" -eq 0 ] || return 1
+
+    if [ "$changed" -eq 0 ]; then
+        print_status "Link handler already opens URLs in a new window"
+    else
+        print_status "Links now open in a new LibreWolf window on the current workspace"
+    fi
+}

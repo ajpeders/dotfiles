@@ -1,17 +1,21 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "model": "openrouter/~deepseek/deepseek-flash-latest",
+  "agents": {
+    "title":     { "model": "openrouter/~deepseek/deepseek-flash-latest" },
+    "build":     { "model": "openrouter/~deepseek/deepseek-flash-latest" },
+    "plan":      { "model": "openrouter/~deepseek/deepseek-flash-latest" },
+    "general":   { "model": "openrouter/~deepseek/deepseek-flash-latest" },
+    "explore":   { "model": "openrouter/~deepseek/deepseek-flash-latest" },
+    "scout":     { "model": "openrouter/~deepseek/deepseek-flash-latest" },
+    "review":    { "model": "openrouter/~deepseek/deepseek-flash-latest" },
+    "docs-writer": { "model": "openrouter/~deepseek/deepseek-flash-latest" },
+    "debug":     { "model": "openrouter/~deepseek/deepseek-flash-latest" }
+  },
   "experimental": {
     "policies": [
-      {
-        "action": "provider.use",
-        "resource": "*",
-        "effect": "deny"
-      },
-      {
-        "action": "provider.use",
-        "resource": "openrouter",
-        "effect": "allow"
-      }
+      { "action": "provider.use", "resource": "*", "effect": "deny" },
+      { "action": "provider.use", "resource": "openrouter", "effect": "allow" }
     ]
   }
 }

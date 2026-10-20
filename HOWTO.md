@@ -78,6 +78,30 @@ Then `hyprctl reload && hyprctl configerrors` (a reload succeeds even with error
 
 ## JetShell
 
+### Fresh install / separate checkout
+
+JetShell is a separate repository; cloning the dotfiles repo does not fetch it.
+On a fresh machine, clone/configure dotfiles first, then clone JetShell and create
+the symlink expected by the desktop config:
+
+```bash
+git clone YOUR_DOTFILES_REPO_URL ~/.config
+git clone YOUR_JETSHELL_REPO_URL ~/code/jetshell
+ln -s ~/code/jetshell ~/.config/jetshell
+```
+
+Replace the URL placeholders with your repository URLs.
+
+If JetShell is already checked out elsewhere, symlink that checkout instead.
+The dotfiles repo intentionally does not use a submodule or subtree; it points
+to the separate repo here and in `ARCHITECTURE.md`.
+
+To use a different shell checkout without the symlink, set `JETSHELL_PATH` for
+the `jetshell` launcher or pass `jetshell --path /path/to/jetshell`. For the
+systemd service, put `JETSHELL_PATH=/path/to/jetshell` in
+`~/.config/jetshell.env`, then run `systemctl --user daemon-reload` and restart
+`jetshell.service`.
+
 The shell (JetShell, a Quickshell config) runs under systemd (`systemd/user/jetshell.service`,
 `Restart=on-failure`), started at session start by `hypr/config/autostart.lua`. Manage it with
 `systemctl --user`:
@@ -96,10 +120,9 @@ Quickshell watches its own QML, so edits under `jetshell/` reload live -- restar
 when the config failed to parse. The unit retries forever, so a bad edit crash-loops until
 the file is valid again and the shell returns on its own.
 
-The config lives at `~/.config/jetshell/`, which is not where Quickshell looks by default
-(`~/.config/quickshell/`), so the path is always passed explicitly -- `--path` in
-`systemd/user/jetshell.service`, and `-p` inside the `jetshell` launcher (`scripts/jetshell`,
-linked into `~/.local/bin`), which is just `quickshell -p ~/.config/jetshell "$@"`.
+The default config path is `~/.config/jetshell/`, which is not where Quickshell looks by
+default (`~/.config/quickshell/`), so the path is passed explicitly. The launcher and service
+default to this symlink-compatible path and both support a `JETSHELL_PATH` override.
 
 Talk to the running shell over IPC. From a terminal, use `jetshell` (`jetshell help`
 lists all of it; a bare `jetshell` prints the same instead of starting a second shell):
@@ -206,11 +229,28 @@ Both are keybinds over two scripts; the scripts are the single place to change b
 | `Super + Ctrl + P` | Drag a region → clipboard |
 | `Super + Alt + P` | Focused window → clipboard |
 | `Super + Shift + S` | Drag a region → `swappy`; the saved file is written back on exit |
-| `Super + Shift + R` | Start/stop a screen recording |
+| `Super + Shift + R` | Start/stop a selected-region recording |
+| `Super + Alt + R` | Start/stop a focused-window recording |
 
 `hypr/scripts/screenshot.sh {full|window|region|copy|annotate}` uses `grim` + `slurp` and notifies on save. Esc during a region grab exits quietly — no error, no notification. The `window` mode uses `hyprctl activewindow -j` (client area only, no border).
 
-`hypr/scripts/screen-record.sh [toggle|start|stop]` uses `gpu-screen-recorder` (GPU/VAAPI, no CPU hit) to record the **focused monitor** and the default audio output to `~/Videos/Screencasts/`. The pidfile lives in `$XDG_RUNTIME_DIR`; `SIGINT` is its stop-and-save. Override the directory with `RECORD_DIR`. To also capture the mic, add `-a default_input` to the command in the script. `gpu-screen-recorder` also does instant replay (`-r <secs>` + `SIGUSR1`), but that isn't wired to a keybind.
+`hypr/scripts/screen-record.sh [toggle|start|stop] [monitor|region|focused]` uses `gpu-screen-recorder` (GPU/VAAPI) and records the default audio output to `~/Videos/Screencasts/`. JetShell shows a persistent recording OSD until stopped; the shortcuts toggle region/window recording, and focused-monitor mode remains available with `screen-record.sh toggle monitor`. The pidfile lives in `$XDG_RUNTIME_DIR`; `SIGINT` stops and saves. Override the directory with `RECORD_DIR`. To also capture the mic, add `-a default_input` to the command in the script. Instant replay (`-r <secs>` + `SIGUSR1`) is not wired to a keybind.
+
+## Open links on the current workspace
+
+Kitty and OpenCode use `xdg-open`. The desktop installer and `scripts/update.sh`
+register `librewolf/new-window.desktop` as the HTTP/HTTPS and HTML handler. It
+uses `librewolf --new-window` rather than opening a tab in an existing window on
+another workspace. This applies to external links system-wide, not just Kitty.
+
+`bash scripts/doctor.sh` checks the HTTP/HTTPS defaults. To restore LibreWolf's
+normal tab-opening behaviour:
+
+```bash
+xdg-mime default librewolf.desktop x-scheme-handler/http x-scheme-handler/https text/html application/xhtml+xml
+```
+
+The next desktop install/update reapplies the new-window handler.
 
 ## LLM: opencode
 

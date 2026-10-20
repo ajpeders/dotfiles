@@ -439,6 +439,7 @@ phase_browser_policies() {
 
     print_phase "Phase 10: Browser Policies"
     dotfiles_librewolf_policies
+    dotfiles_browser_link_handler
 }
 
 phase_reminders() {

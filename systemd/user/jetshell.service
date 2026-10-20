@@ -8,6 +8,9 @@ StartLimitIntervalSec=0
 [Service]
 Type=simple
 # --path is required: Quickshell only auto-discovers ~/.config/quickshell/.
-ExecStart=/usr/bin/quickshell --no-duplicate --path %h/.config/jetshell
+# Keep the symlink-compatible default; a per-user env file can override it.
+Environment=JETSHELL_PATH=%h/.config/jetshell
+EnvironmentFile=-%h/.config/jetshell.env
+ExecStart=/usr/bin/quickshell --no-duplicate --path ${JETSHELL_PATH}
 Restart=on-failure
 RestartSec=2

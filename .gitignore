@@ -67,6 +67,7 @@ opencode/service.json
 # Single files inside otherwise-ignored dirs
 !librewolf/
 !librewolf/policies.json
+!librewolf/new-window.desktop
 
 # The shell's systemd user unit. Everything else in systemd/ is per-machine.
 !systemd/

@@ -60,7 +60,8 @@ hl.bind(mod .. " + SHIFT + P",  hl.dsp.exec_cmd(shot .. " region"))
 hl.bind(mod .. " + CTRL + P",   hl.dsp.exec_cmd(shot .. " copy"))
 hl.bind(mod .. " + ALT + P",    hl.dsp.exec_cmd(shot .. " window"))
 hl.bind(mod .. " + SHIFT + S",  hl.dsp.exec_cmd(shot .. " annotate"))
-hl.bind(mod .. " + SHIFT + R",  hl.dsp.exec_cmd(rec .. " toggle"))
+hl.bind(mod .. " + SHIFT + R",  hl.dsp.exec_cmd(rec .. " toggle region"))
+hl.bind(mod .. " + ALT + R",    hl.dsp.exec_cmd(rec .. " toggle focused"))
 
 -- ====== Dictation ======
 -- Offline speech-to-text (nerd-dictation + VOSK). Toggle: first press starts

@@ -1,20 +1,40 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# jetshell — this repo's Quickshell shell under a short name. Quickshell only
+# jetshell — launcher for the JetShell Quickshell config. Quickshell only
 # auto-discovers ~/.config/quickshell/, and the config lives in jetshell/, so the
-# path is pinned here. Mirrors --path in systemd/user/jetshell.service.
+# default path follows the dotfiles symlink; override with JETSHELL_PATH or
+# --path. The systemd unit has the same default and supports JETSHELL_PATH.
 # --no-duplicate so a stray launch can't start a second shell; it is a no-op for
 # subcommands (`ipc call`, `log`, `list`).
-config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/jetshell"
+config_dir="${JETSHELL_PATH:-${XDG_CONFIG_HOME:-$HOME/.config}/jetshell}"
+
+case "${1:-}" in
+    --path)
+        if [ "$#" -lt 2 ] || [ -z "$2" ]; then
+            echo "jetshell: --path requires a directory" >&2
+            exit 2
+        fi
+        config_dir="$2"
+        shift 2
+        ;;
+    --path=*)
+        config_dir="${1#--path=}"
+        if [ -z "$config_dir" ]; then
+            echo "jetshell: --path requires a directory" >&2
+            exit 2
+        fi
+        shift
+        ;;
+esac
 
 usage() {
     cat <<'EOF'
-jetshell — this repo's Quickshell shell (config: ~/.config/jetshell/).
+jetshell — this repo's Quickshell shell (default config: ~/.config/jetshell/).
 
-Wraps `quickshell -p ~/.config/jetshell`. The shell is a systemd user unit, so it
-is normally already running; a bare `jetshell` shows this help instead of starting
-a second copy.
+Wraps `quickshell -p <config>`. Override the default with JETSHELL_PATH or a
+leading `--path <directory>`. The shell is a systemd user unit, so it is normally
+already running; a bare `jetshell` shows this help instead of starting a second copy.
 
 Service:
   systemctl --user restart jetshell.service     # reload after breaking the QML

@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export PATH="$HOME/.opencode/bin:$PATH"
 
 config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
 export OPENCODE_CONFIG_CONTENT="$(<"$config_dir/profiles/hybrid.json")"
-exec opencode --standalone "$@"
+
+# Cross-version: v2.0.18 only accepts --standalone as a `run`-subcommand flag;
+# v2.0.29 added --standalone as a global flag. Inserting it after the first
+# non-flag arg satisfies both, and the global-position form covers the bare
+# no-subcommand TUI case on either version.
+if [ "$#" -gt 0 ] && [[ "$1" != -* ]]; then
+    sub="$1"; shift
+    exec opencode "$sub" --standalone "$@"
+else
+    exec opencode --standalone "$@"
+fi

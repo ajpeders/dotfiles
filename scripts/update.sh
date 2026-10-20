@@ -224,6 +224,7 @@ case "$PLATFORM" in
         if [ "$HEADLESS" -ne 1 ] && command -v python3 >/dev/null 2>&1; then
             print_phase "Phase 4: Browser Policies"
             dotfiles_librewolf_policies
+            dotfiles_browser_link_handler
         fi
 
         # Live reload (Linux only)

@@ -7,6 +7,7 @@
 #   - Exactly one display manager (ly) is enabled on a graphical host
 #   - Hyprland config loads without errors
 #   - Terminal theme includes resolve (kitty)
+#   - Browser link handler owns http/https
 #   - Repo working tree state
 #
 # Always exits 0; findings are the output. Pair with --strict to fail on
@@ -201,6 +202,43 @@ elif [ -r "$kitty_conf" ]; then
 else
     err "kitty.conf missing: $kitty_conf"
     note_error
+fi
+
+# ---------------------------------------------------------------------------
+# Link handler
+# ---------------------------------------------------------------------------
+
+section "Link handler"
+
+# kitty and opencode both call xdg-open for clicked links; the MIME default
+# decides whether the URL lands in a new window on this workspace or in a tab
+# on whatever workspace the browser was last left on.
+if [ "$mode_value" = "headless" ]; then
+    info "Headless mode; browser link handler not required."
+elif ! command -v xdg-mime >/dev/null 2>&1; then
+    info "xdg-mime unavailable; skipping."
+else
+    handler_desktop="$HOME/.local/share/applications/librewolf-new-window.desktop"
+    if [ -r "$handler_desktop" ]; then
+        ok "librewolf-new-window.desktop installed."
+    else
+        err "librewolf-new-window.desktop missing: $handler_desktop (run scripts/update.sh)"
+        note_error
+    fi
+
+    mime_drift=""
+    for mime in x-scheme-handler/http x-scheme-handler/https; do
+        current_mime="$(xdg-mime query default "$mime" 2>/dev/null || true)"
+        if [ "$current_mime" != "librewolf-new-window.desktop" ]; then
+            mime_drift="$mime (${current_mime:-<unset>})"
+        fi
+    done
+    if [ -n "$mime_drift" ]; then
+        err "Links do not open in a new window on the current workspace: $mime_drift"
+        note_error
+    else
+        ok "http/https links open in a new LibreWolf window."
+    fi
 fi
 
 # ---------------------------------------------------------------------------
